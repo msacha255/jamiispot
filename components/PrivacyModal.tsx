@@ -36,7 +36,7 @@ export const PrivacyModal: React.FC<PrivacyModalProps> = ({ isOpen, onClose }) =
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose} aria-modal="true" role="dialog">
-            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-lg transform transition-all" onClick={e => e.stopPropagation()}>
+            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-lg transform transition-all animate-modal-content" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700">
                     <h2 className="text-xl font-bold">Privacy Settings</h2>
                     <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700" aria-label="Close modal">
@@ -49,7 +49,7 @@ export const PrivacyModal: React.FC<PrivacyModalProps> = ({ isOpen, onClose }) =
                         <h3 className="font-semibold mb-2">Profile Visibility</h3>
                         <div className="space-y-2">
                            {visibilityOptions.map(option => (
-                                <div key={option.id} onClick={() => setVisibility(option.id)} className={`flex items-center p-3 border dark:border-zinc-700 rounded-lg cursor-pointer ${visibility === option.id ? 'border-primary bg-primary/5' : 'border-gray-300'}`}>
+                                <div key={option.id} onClick={() => setVisibility(option.id)} className={`flex items-center p-3 border dark:border-zinc-700 rounded-lg cursor-pointer transition-colors ${visibility === option.id ? 'border-primary bg-primary/5' : 'border-gray-300'}`}>
                                     <div className="mr-3 text-gray-600 dark:text-gray-300">{option.icon}</div>
                                     <div>
                                         <p className="font-semibold">{option.label}</p>

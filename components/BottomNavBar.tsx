@@ -1,4 +1,6 @@
 
+
+
 import React from 'react';
 import type { View } from '../types';
 import { HomeIcon, CompassIcon, MessageIcon, SettingsIcon, UserIcon } from '../constants';
@@ -17,11 +19,12 @@ const NavItem: React.FC<{
   <button
     onClick={onClick}
     aria-label={label}
-    className={`flex flex-col items-center justify-center w-full pt-3 pb-2 transition-colors duration-200 ${
+    className={`flex flex-col items-center justify-center w-full pt-3 pb-2 transition-all duration-200 group ${
       isActive ? 'text-primary' : 'text-gray-500 hover:text-deep-gray dark:text-gray-400 dark:hover:text-gray-200'
     }`}
   >
-    {icon}
+    {/* FIX: Use React.isValidElement to safely clone the icon and add classes, resolving TypeScript errors. */}
+    {React.isValidElement(icon) ? React.cloneElement(icon, { className: `${icon.props.className || ''} transition-transform group-hover:-translate-y-1` }) : icon}
     <span className="text-xs mt-1 font-medium">{label}</span>
   </button>
 );

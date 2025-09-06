@@ -1,9 +1,6 @@
-
-
 import React, { useState, useEffect, useMemo } from 'react';
-import { XIcon, SearchIcon } from '../constants';
-// FIX: Removed MOCK_POSTS and MOCK_COMMUNITIES as they will be passed via props.
-import { MOCK_USERS } from '../constants';
+import { XIcon, SearchIcon, TrendingUpIcon, HashIcon } from '../constants';
+import { MOCK_USERS, TRENDING_TOPICS, POPULAR_HASHTAGS } from '../constants';
 import type { User, Post, Community, View } from '../types';
 
 interface SearchModalProps {
@@ -11,9 +8,7 @@ interface SearchModalProps {
   onClose: () => void;
   onNavigate: (view: View, params?: any) => void;
   onOpenProfile: (user: User) => void;
-  // FIX: Add optional `initialSearchTerm` prop to pre-fill the search input.
   initialSearchTerm?: string;
-  // FIX: Add props for dynamic data searching.
   allPosts: Post[];
   communities: Community[];
   onOpenPostDetail: (post: Post) => void;
@@ -32,6 +27,24 @@ const useDebounce = (value: string, delay: number) => {
     return debouncedValue;
 };
 
+// A simple fuzzy match function. It checks if characters of searchTerm
+// appear in text in the correct order, but not necessarily consecutively.
+const fuzzyMatch = (searchTerm: string, text: string): boolean => {
+  if (!searchTerm) return true;
+  if (!text) return false;
+
+  const search = searchTerm.toLowerCase().replace(/\s/g, '');
+  const target = text.toLowerCase();
+  let searchIndex = 0;
+  for (let i = 0; i < target.length && searchIndex < search.length; i++) {
+    if (search[searchIndex] === target[i]) {
+      searchIndex++;
+    }
+  }
+  return searchIndex === search.length;
+};
+
+
 export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNavigate, onOpenProfile, initialSearchTerm = '', allPosts, communities, onOpenPostDetail }) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [activeTab, setActiveTab] = useState('all');
@@ -39,7 +52,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNav
 
     useEffect(() => {
         if (isOpen) {
-            // FIX: Set search term from prop when modal opens.
             setSearchTerm(initialSearchTerm);
         } else {
             setSearchTerm('');
@@ -51,11 +63,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNav
         if (!debouncedSearchTerm) {
             return { people: [], posts: [], communities: [] };
         }
-        const lowercasedTerm = debouncedSearchTerm.toLowerCase();
-        const people = MOCK_USERS.filter(u => u.name.toLowerCase().includes(lowercasedTerm) || u.username.toLowerCase().includes(lowercasedTerm));
-        // FIX: Use `allPosts` and `communities` from props for searching instead of mock data.
-        const posts = allPosts.filter(p => p.content.toLowerCase().includes(lowercasedTerm));
-        const communitiesResult = communities.filter(c => c.name.toLowerCase().includes(lowercasedTerm) || c.description.toLowerCase().includes(lowercasedTerm));
+        
+        const people = MOCK_USERS.filter(u => fuzzyMatch(debouncedSearchTerm, u.name) || fuzzyMatch(debouncedSearchTerm, u.username));
+        const posts = allPosts.filter(p => fuzzyMatch(debouncedSearchTerm, p.content));
+        const communitiesResult = communities.filter(c => fuzzyMatch(debouncedSearchTerm, c.name) || fuzzyMatch(debouncedSearchTerm, c.description));
+        
         return { people, posts, communities: communitiesResult };
     }, [debouncedSearchTerm, allPosts, communities]);
 
@@ -75,6 +87,45 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNav
         onClose();
         onOpenProfile(user);
     };
+
+    const renderSuggestions = () => (
+        <div className="p-4 space-y-6">
+            <section>
+                <h2 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-800 dark:text-gray-200">
+                    <TrendingUpIcon className="w-5 h-5 text-primary" />
+                    Trending Topics
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                    {TRENDING_TOPICS.map(topic => (
+                        <button 
+                            key={topic}
+                            onClick={() => setSearchTerm(topic)}
+                            className="bg-gray-100 dark:bg-zinc-800 px-3 py-1.5 rounded-full text-sm font-semibold hover:bg-gray-200 dark:hover:bg-zinc-700 transition"
+                        >
+                            {topic}
+                        </button>
+                    ))}
+                </div>
+            </section>
+            <section>
+                <h2 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-800 dark:text-gray-200">
+                    <HashIcon className="w-5 h-5 text-primary" />
+                    Popular Hashtags
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                    {POPULAR_HASHTAGS.map(tag => (
+                        <button 
+                            key={tag}
+                            onClick={() => setSearchTerm(tag)}
+                            className="bg-gray-100 dark:bg-zinc-800 px-3 py-1.5 rounded-full text-sm font-semibold hover:bg-gray-200 dark:hover:bg-zinc-700 transition"
+                        >
+                            {tag}
+                        </button>
+                    ))}
+                </div>
+            </section>
+        </div>
+    );
 
     if (!isOpen) return null;
 
@@ -105,49 +156,54 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNav
                 </nav>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                {(activeTab === 'all' || activeTab === 'people') && searchResults.people.length > 0 && (
-                    <section>
-                        <h2 className="text-lg font-bold mb-2">People</h2>
-                        {searchResults.people.map(user => (
-                            <div key={user.id} onClick={() => handleProfileClick(user)} className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer">
-                                <img src={user.avatarUrl} alt={user.name} className="w-10 h-10 rounded-full" />
-                                <div className="ml-3"><p className="font-semibold">{user.name}</p><p className="text-sm text-gray-500">@{user.username}</p></div>
+            <div className="flex-1 overflow-y-auto">
+                {debouncedSearchTerm ? (
+                    <div className="p-4 space-y-6">
+                        {(activeTab === 'all' || activeTab === 'people') && searchResults.people.length > 0 && (
+                            <section>
+                                <h2 className="text-lg font-bold mb-2">People</h2>
+                                {searchResults.people.map(user => (
+                                    <div key={user.id} onClick={() => handleProfileClick(user)} className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer">
+                                        <img src={user.avatarUrl} alt={user.name} className="w-10 h-10 rounded-full" />
+                                        <div className="ml-3"><p className="font-semibold">{user.name}</p><p className="text-sm text-gray-500">@{user.username}</p></div>
+                                    </div>
+                                ))}
+                            </section>
+                        )}
+                         {(activeTab === 'all' || activeTab === 'communities') && searchResults.communities.length > 0 && (
+                            <section>
+                                <h2 className="text-lg font-bold mb-2">Communities</h2>
+                                {searchResults.communities.map(community => (
+                                    <div key={community.id} onClick={() => handleCommunityClick(community.id)} className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer">
+                                        <img src={community.coverUrl} alt={community.name} className="w-16 h-10 rounded-md object-cover" />
+                                        <div className="ml-3"><p className="font-semibold">{community.name}</p><p className="text-sm text-gray-500">{community.memberCount.toLocaleString()} members</p></div>
+                                    </div>
+                                ))}
+                            </section>
+                        )}
+                        {(activeTab === 'all' || activeTab === 'posts') && searchResults.posts.length > 0 && (
+                             <section>
+                                <h2 className="text-lg font-bold mb-2">Posts</h2>
+                                {searchResults.posts.map(post => (
+                                    <div key={post.id} onClick={() => { onClose(); onOpenPostDetail(post); }} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer">
+                                        <div className="flex items-center mb-2">
+                                            <img src={post.user.avatarUrl} alt={post.user.name} className="w-8 h-8 rounded-full" />
+                                            <p className="ml-2 font-semibold">{post.user.name}</p>
+                                        </div>
+                                        <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2" dangerouslySetInnerHTML={{ __html: post.content}} />
+                                    </div>
+                                ))}
+                            </section>
+                        )}
+                        {debouncedSearchTerm && searchResults.people.length === 0 && searchResults.posts.length === 0 && searchResults.communities.length === 0 && (
+                            <div className="text-center py-20 text-gray-500">
+                                <p className="font-semibold">No results found for "{debouncedSearchTerm}"</p>
+                                <p className="mt-1 text-sm">Try searching for something else.</p>
                             </div>
-                        ))}
-                    </section>
-                )}
-                 {(activeTab === 'all' || activeTab === 'communities') && searchResults.communities.length > 0 && (
-                    <section>
-                        <h2 className="text-lg font-bold mb-2">Communities</h2>
-                        {searchResults.communities.map(community => (
-                            <div key={community.id} onClick={() => handleCommunityClick(community.id)} className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer">
-                                <img src={community.coverUrl} alt={community.name} className="w-16 h-10 rounded-md object-cover" />
-                                <div className="ml-3"><p className="font-semibold">{community.name}</p><p className="text-sm text-gray-500">{community.memberCount.toLocaleString()} members</p></div>
-                            </div>
-                        ))}
-                    </section>
-                )}
-                {(activeTab === 'all' || activeTab === 'posts') && searchResults.posts.length > 0 && (
-                     <section>
-                        <h2 className="text-lg font-bold mb-2">Posts</h2>
-                        {searchResults.posts.map(post => (
-                            // FIX: Added onClick to open post detail modal.
-                            <div key={post.id} onClick={() => { onClose(); onOpenPostDetail(post); }} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer">
-                                <div className="flex items-center mb-2">
-                                    <img src={post.user.avatarUrl} alt={post.user.name} className="w-8 h-8 rounded-full" />
-                                    <p className="ml-2 font-semibold">{post.user.name}</p>
-                                </div>
-                                <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2" dangerouslySetInnerHTML={{ __html: post.content}} />
-                            </div>
-                        ))}
-                    </section>
-                )}
-                {debouncedSearchTerm && searchResults.people.length === 0 && searchResults.posts.length === 0 && searchResults.communities.length === 0 && (
-                    <div className="text-center py-20 text-gray-500">
-                        <p className="font-semibold">No results found for "{debouncedSearchTerm}"</p>
-                        <p className="mt-1 text-sm">Try searching for something else.</p>
+                        )}
                     </div>
+                ) : (
+                    renderSuggestions()
                 )}
             </div>
         </div>

@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import type { Community, Post, User, Event } from '../types';
-import { HeartIcon, MessageCircleIcon, ShareIcon, UsersIcon, SettingsIcon, MapIcon, PlusIcon, CalendarIcon, MapPinIcon } from '../constants';
+import { HeartIcon, MessageCircleIcon, ShareIcon, UsersIcon, SettingsIcon, MapIcon, PlusIcon, CalendarIcon, MapPinIcon, MoreHorizontalIcon, EditIcon, ArchiveIcon } from '../constants';
 
 interface PostCardProps {
   post: Post;
+  currentUser: User;
   onOpenProfileModal: (user: User) => void;
   onOpenPostDetail: (post: Post) => void;
   onOpenSharePost: (post: Post) => void;
   onToggleLike: (postId: string) => void;
   likedPostIds: Set<string>;
+  onOpenEditPost: (post: Post) => void;
+  onToggleArchive: (postId: string) => void;
 }
 
 interface CommunityDetailViewProps {
@@ -22,21 +25,44 @@ interface CommunityDetailViewProps {
   onToggleLike: (postId: string) => void;
   likedPostIds: Set<string>;
   onOpenCreateEvent: (community: Community) => void;
-  // FIX: Add onOpenEventDetail to handle opening event details.
   onOpenEventDetail: (event: Event) => void;
+  onOpenEditPost: (post: Post) => void;
+  onToggleArchive: (postId: string) => void;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ post, onOpenProfileModal, onOpenPostDetail, onOpenSharePost, onToggleLike, likedPostIds }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, currentUser, onOpenProfileModal, onOpenPostDetail, onOpenSharePost, onToggleLike, likedPostIds, onOpenEditPost, onToggleArchive }) => {
+  const [isOptionsOpen, setIsOptionsOpen] = React.useState(false);
   const isLiked = likedPostIds.has(post.id);
+  const isOwnPost = post.user.id === currentUser.id;
+
   return (
     <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden">
       <div className="p-5">
-        <div className="flex items-center mb-4">
-          <img src={post.user.avatarUrl} alt={post.user.name} className="w-12 h-12 rounded-full cursor-pointer" onClick={() => onOpenProfileModal(post.user)} />
-          <div className="ml-4">
-            <p className="font-bold text-deep-gray dark:text-white cursor-pointer" onClick={() => onOpenProfileModal(post.user)}>{post.user.name}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username} · {post.timestamp}</p>
-          </div>
+        <div className="flex items-start justify-between">
+            <div className="flex items-center mb-4">
+              <img src={post.user.avatarUrl} alt={post.user.name} className="w-12 h-12 rounded-full cursor-pointer" onClick={() => onOpenProfileModal(post.user)} />
+              <div className="ml-4">
+                <p className="font-bold text-deep-gray dark:text-white cursor-pointer" onClick={() => onOpenProfileModal(post.user)}>{post.user.name}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username} · {new Date(post.timestamp).toLocaleDateString()}</p>
+              </div>
+            </div>
+            {isOwnPost && (
+                 <div className="relative">
+                    <button onClick={() => setIsOptionsOpen(p => !p)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700">
+                        <MoreHorizontalIcon className="w-5 h-5"/>
+                    </button>
+                    {isOptionsOpen && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border dark:border-zinc-700 z-10 py-1">
+                             <button onClick={() => { onOpenEditPost(post); setIsOptionsOpen(false); }} className="w-full flex items-center gap-3 text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-zinc-800">
+                                <EditIcon className="w-5 h-5"/> Edit Post
+                            </button>
+                             <button onClick={() => { onToggleArchive(post.id); setIsOptionsOpen(false); }} className="w-full flex items-center gap-3 text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-zinc-800">
+                                <ArchiveIcon className="w-5 h-5"/> Archive Post
+                            </button>
+                        </div>
+                    )}
+                 </div>
+            )}
         </div>
         <div 
           className="text-gray-800 dark:text-gray-300 [&_strong]:font-bold [&_em]:italic [&_u]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
@@ -160,7 +186,7 @@ export const CommunityDetailView: React.FC<CommunityDetailViewProps> = ({ commun
                 {activeTab === 'posts' && (
                     <div className="space-y-6">
                         {community.posts.length > 0 ? (
-                            community.posts.map(post => <PostCard key={post.id} post={post} {...postCardHandlers} />)
+                            community.posts.map(post => <PostCard key={post.id} post={post} currentUser={currentUser} {...postCardHandlers} />)
                         ) : (
                             <div className="text-center py-10 text-gray-500 dark:text-gray-400 bg-white dark:bg-zinc-800 rounded-xl shadow-sm">
                                 <p className="font-semibold">No posts yet</p>

@@ -1,5 +1,7 @@
 
-import React, { useState } from 'react';
+
+
+import React, { useState, useMemo } from 'react';
 import { XIcon, ShieldCheckIcon, LockIcon, ComputerIcon, SmartphoneIcon } from '../constants';
 import type { LoginSession } from '../types';
 import { MOCK_LOGIN_SESSIONS } from '../constants';
@@ -65,20 +67,72 @@ const TwoFactorAuthTab: React.FC = () => {
     );
 };
 
-const LoginActivityTab: React.FC = () => (
-    <div className="space-y-3">
-        {MOCK_LOGIN_SESSIONS.map(session => (
-            <div key={session.id} className="flex items-center gap-4 p-3 rounded-lg bg-light-gray dark:bg-zinc-700/50">
-                {session.device.includes('iOS') || session.device.includes('Android') ? <SmartphoneIcon className="w-8 h-8 text-gray-500"/> : <ComputerIcon className="w-8 h-8 text-gray-500"/>}
-                <div className="flex-1">
-                    <p className="font-semibold">{session.device} {session.isCurrent && <span className="text-xs text-green-500 font-bold ml-2">(Current)</span>}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{session.location} · {session.ip}</p>
-                </div>
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{session.timestamp}</p>
+const LoginActivityTab: React.FC = () => {
+    type SortKey = 'active' | 'lastActive' | 'device';
+    const [sortKey, setSortKey] = useState<SortKey>('active');
+
+    const parseTimestamp = (timestamp: string): number => {
+        if (timestamp === 'Active now') return 0;
+        const parts = timestamp.split(' ');
+        const value = parseInt(parts[0], 10);
+        const unit = parts[1];
+
+        if (unit.startsWith('hour')) return value * 60;
+        if (unit.startsWith('day')) return value * 24 * 60;
+        return Infinity;
+    };
+
+    const sortedSessions = useMemo(() => {
+        const sorted = [...MOCK_LOGIN_SESSIONS];
+        sorted.sort((a, b) => {
+            switch (sortKey) {
+                case 'active':
+                    if (a.isCurrent) return -1;
+                    if (b.isCurrent) return 1;
+                    return parseTimestamp(a.timestamp) - parseTimestamp(b.timestamp);
+                case 'lastActive':
+                    return parseTimestamp(a.timestamp) - parseTimestamp(b.timestamp);
+                case 'device':
+                    return a.device.localeCompare(b.device);
+                default:
+                    return 0;
+            }
+        });
+        return sorted;
+    }, [sortKey]);
+
+    const SortButton: React.FC<{ label: string; sortValue: SortKey }> = ({ label, sortValue }) => (
+        <button 
+            onClick={() => setSortKey(sortValue)}
+            className={`px-3 py-1 text-sm rounded-full font-semibold ${sortKey === sortValue ? 'bg-primary text-white' : 'bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300 dark:hover:bg-zinc-600'}`}
+        >
+            {label}
+        </button>
+    );
+
+    return (
+        <div>
+            <div className="flex items-center gap-2 mb-4">
+                <span className="text-sm font-semibold">Sort by:</span>
+                <SortButton label="Active Now" sortValue="active" />
+                <SortButton label="Last Active" sortValue="lastActive" />
+                <SortButton label="Device Type" sortValue="device" />
             </div>
-        ))}
-    </div>
-);
+            <div className="space-y-3">
+                {sortedSessions.map(session => (
+                    <div key={session.id} className="flex items-center gap-4 p-3 rounded-lg bg-light-gray dark:bg-zinc-700/50">
+                        {session.device.includes('iOS') || session.device.includes('Android') ? <SmartphoneIcon className="w-8 h-8 text-gray-500"/> : <ComputerIcon className="w-8 h-8 text-gray-500"/>}
+                        <div className="flex-1">
+                            <p className="font-semibold">{session.device} {session.isCurrent && <span className="text-xs text-green-500 font-bold ml-2">(Current)</span>}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{session.location} · {session.ip}</p>
+                        </div>
+                        <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{session.timestamp}</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
 
 
 export const SecurityModal: React.FC<SecurityModalProps> = ({ isOpen, onClose }) => {
@@ -88,7 +142,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({ isOpen, onClose })
     
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose} aria-modal="true" role="dialog">
-            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-lg transform transition-all" onClick={e => e.stopPropagation()}>
+            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-lg transform transition-all animate-modal-content" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700">
                     <div className="flex items-center gap-3">
                         <ShieldCheckIcon className="w-6 h-6 text-primary"/>

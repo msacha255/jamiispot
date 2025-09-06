@@ -70,7 +70,7 @@ export const CreateStoryModal: React.FC<CreateStoryModalProps> = ({ isOpen, onCl
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4" onClick={onClose} aria-modal="true" role="dialog">
-            <div className="bg-zinc-800 rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex transform transition-all" onClick={e => e.stopPropagation()}>
+            <div className="bg-zinc-800 rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex transform transition-all animate-modal-content" onClick={e => e.stopPropagation()}>
                 {/* Sidebar */}
                 <div className="w-80 bg-zinc-900 p-6 flex flex-col rounded-l-xl">
                     <h2 className="text-2xl font-bold text-white mb-6">Create Story</h2>

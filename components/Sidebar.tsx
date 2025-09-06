@@ -16,13 +16,14 @@ const NavItem: React.FC<{
 }> = ({ icon, label, isActive, onClick }) => (
   <button
     onClick={onClick}
-    className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors duration-200 ${
+    className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200 group ${
       isActive
         ? 'bg-primary text-white'
         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
     }`}
   >
-    {icon}
+    {/* FIX: Use React.isValidElement to safely clone the icon and add classes, resolving TypeScript errors. */}
+    {React.isValidElement(icon) ? React.cloneElement(icon, { className: `${icon.props.className || ''} transition-transform group-hover:scale-110` }) : icon}
     <span className="ml-4 font-semibold">{label}</span>
   </button>
 );
@@ -56,7 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, use
 
         <div className="mt-auto">
              <div 
-                className="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 cursor-pointer"
+                className="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 cursor-pointer transition-colors duration-200"
                 onClick={() => setActiveView('profile')}
              >
                 <img src={user.avatarUrl} alt={user.name} className="w-10 h-10 rounded-full" />

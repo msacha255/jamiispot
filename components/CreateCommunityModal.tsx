@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useRef, useEffect } from 'react';
 import { XIcon, ImageIcon, GlobeIcon, LockIcon } from '../constants';
 import { COMMUNITY_CATEGORIES } from '../constants';
@@ -56,7 +57,7 @@ export const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({ isOp
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose} aria-modal="true" role="dialog">
-            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-2xl transform transition-all" onClick={e => e.stopPropagation()}>
+            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-2xl transform transition-all animate-modal-content" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700">
                     <h2 className="text-xl font-bold">Create a Community</h2>
                     <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700" aria-label="Close modal"><XIcon className="w-6 h-6" /></button>
@@ -93,14 +94,14 @@ export const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({ isOp
                      <div>
                         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Privacy</h3>
                         <div className="flex gap-4">
-                            <div onClick={() => setPrivacy('public')} className={`flex-1 flex items-center p-3 border dark:border-zinc-700 rounded-lg cursor-pointer ${privacy === 'public' ? 'border-primary bg-primary/5' : 'border-gray-300'}`}>
+                            <div onClick={() => setPrivacy('public')} className={`flex-1 flex items-center p-3 border dark:border-zinc-700 rounded-lg cursor-pointer transition-colors ${privacy === 'public' ? 'border-primary bg-primary/5' : 'border-gray-300'}`}>
                                 <GlobeIcon className="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"/>
                                 <div>
                                     <p className="font-semibold">Public</p>
                                     <p className="text-xs text-gray-500">Anyone can join and see posts.</p>
                                 </div>
                             </div>
-                             <div onClick={() => setPrivacy('private')} className={`flex-1 flex items-center p-3 border dark:border-zinc-700 rounded-lg cursor-pointer ${privacy === 'private' ? 'border-primary bg-primary/5' : 'border-gray-300'}`}>
+                             <div onClick={() => setPrivacy('private')} className={`flex-1 flex items-center p-3 border dark:border-zinc-700 rounded-lg cursor-pointer transition-colors ${privacy === 'private' ? 'border-primary bg-primary/5' : 'border-gray-300'}`}>
                                 <LockIcon className="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"/>
                                 <div>
                                     <p className="font-semibold">Private</p>

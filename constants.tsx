@@ -1,6 +1,16 @@
 import React from 'react';
 import type { User, Post, Story, Conversation, Message, Community, Notification, Language, Comment, Event, LoginSession } from './types';
 
+export const TRENDING_TOPICS = [
+    'JamiiSpot Launch',
+    'East Africa Tech',
+    'Swahili Cuisine',
+    'Kilimanjaro Challenge',
+    'Local Music Fest',
+];
+
+export const POPULAR_HASHTAGS = ['#Tanzania', '#reactdev', '#milima', '#webdesign', '#mapishi'];
+
 export const MOCK_USER: User = {
   id: 'u1',
   name: 'Florence Sakaya',
@@ -373,4 +383,13 @@ export const CakeIcon: React.FC<{ className?: string }> = ({ className }) => (
         <path d="M12 4h.01"/>
         <path d="M17 4h.01"/>
     </svg>
+);
+export const TrendingUpIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+);
+export const HashIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>
+);
+export const EditIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
 );

@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { XIcon, FileTextIcon } from '../constants';
 
@@ -13,7 +14,7 @@ export const TermsAndPolicyModal: React.FC<TermsAndPolicyModalProps> = ({ isOpen
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose} aria-modal="true" role="dialog">
-            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-2xl h-[90vh] flex flex-col transform transition-all" onClick={e => e.stopPropagation()}>
+            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-2xl h-[90vh] flex flex-col transform transition-all animate-modal-content" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700">
                     <div className="flex items-center gap-3">
                         <FileTextIcon className="w-6 h-6 text-primary"/>

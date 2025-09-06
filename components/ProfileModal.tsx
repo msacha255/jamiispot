@@ -1,5 +1,6 @@
 
 
+
 import React, { useState } from 'react';
 // FIX: Changed import from TwitterIcon to XSocialIcon to resolve module export error.
 import { XIcon, LockIcon, HeartIcon, MessageCircleIcon, CheckBadgeIcon, MoreVerticalIcon, ShareIcon, XSocialIcon, LinkedinIcon, GithubIcon } from '../constants';
@@ -94,7 +95,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, use
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose} aria-modal="true" role="dialog">
-            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col transform transition-all" onClick={e => e.stopPropagation()}>
+            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col transform transition-all animate-modal-content" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700 flex-shrink-0">
                     <h2 className="text-xl font-bold">@{user.username}</h2>
                     <div className="flex items-center gap-2">
@@ -103,7 +104,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, use
                                 <MoreVerticalIcon className="w-6 h-6" />
                             </button>
                             {isOptionsOpen && (
-                                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-800 rounded-lg shadow-lg border dark:border-zinc-700 z-20">
+                                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-800 rounded-lg shadow-lg border dark:border-zinc-700 z-20 animate-modal-content">
                                     <button onClick={handleShare} className="w-full flex items-center gap-3 text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-t-lg"><ShareIcon className="w-5 h-5"/> Share Profile</button>
                                     <button onClick={() => { onBlockUser(user); setIsOptionsOpen(false); }} className="w-full flex items-center gap-3 text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-b-lg"><LockIcon className="w-5 h-5"/> Block @{user.username}</button>
                                 </div>

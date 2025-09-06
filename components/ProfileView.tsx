@@ -13,6 +13,7 @@ interface ProfileViewProps {
     onToggleFollow: (userId: string) => void;
     communities: Community[];
     onToggleArchive: (postId: string) => void;
+    onOpenPostDetail: (post: Post) => void;
 }
 
 const Stat: React.FC<{ value?: number; label: string }> = ({ value, label }) => (
@@ -22,8 +23,8 @@ const Stat: React.FC<{ value?: number; label: string }> = ({ value, label }) => 
     </div>
 );
 
-const ProfilePostCard: React.FC<{ post: Post, isArchived?: boolean, onUnarchive?: () => void }> = ({ post, isArchived, onUnarchive }) => (
-  <div className="relative aspect-square bg-white dark:bg-zinc-800 rounded-lg overflow-hidden group">
+const ProfilePostCard: React.FC<{ post: Post, isArchived?: boolean, onUnarchive?: () => void, onOpenPostDetail: (post: Post) => void }> = ({ post, isArchived, onUnarchive, onOpenPostDetail }) => (
+  <div onClick={() => !isArchived && onOpenPostDetail(post)} className={`relative aspect-square bg-white dark:bg-zinc-800 rounded-lg overflow-hidden group ${!isArchived ? 'cursor-pointer' : ''}`}>
     {post.imageUrl && <img src={post.imageUrl} alt="Post content" className="w-full h-full object-cover" />}
     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white font-bold">
       {!isArchived ? (
@@ -111,7 +112,7 @@ const AboutTab: React.FC<{ user: User }> = ({ user }) => {
     );
 };
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ user, posts: allUserPosts, isOwnProfile, onNavigate, onBlockUser, onSendMessage, followingIds, onToggleFollow, communities, onToggleArchive }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ user, posts: allUserPosts, isOwnProfile, onNavigate, onBlockUser, onSendMessage, followingIds, onToggleFollow, communities, onToggleArchive, onOpenPostDetail }) => {
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'posts' | 'about' | 'events' | 'archive'>('posts');
     
@@ -182,7 +183,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, posts: allUserPo
                            <div>
                                 {publicPosts.length > 0 ? (
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                                        {publicPosts.map(post => <ProfilePostCard key={post.id} post={post} />)}
+                                        {publicPosts.map(post => <ProfilePostCard key={post.id} post={post} onOpenPostDetail={onOpenPostDetail} />)}
                                     </div>
                                 ) : (
                                     <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-10 text-center text-gray-500">
@@ -207,7 +208,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, posts: allUserPo
                             <div>
                                 {archivedPosts.length > 0 ? (
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                                        {archivedPosts.map(post => <ProfilePostCard key={post.id} post={post} isArchived onUnarchive={() => onToggleArchive(post.id)} />)}
+                                        {archivedPosts.map(post => <ProfilePostCard key={post.id} post={post} isArchived onUnarchive={() => onToggleArchive(post.id)} onOpenPostDetail={onOpenPostDetail}/>)}
                                     </div>
                                 ) : (
                                     <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-10 text-center text-gray-500">

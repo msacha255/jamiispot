@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { AuthScreen } from './components/AuthScreen';
 import { Sidebar } from './components/Sidebar';
@@ -12,6 +13,7 @@ import { SettingsView } from './components/SettingsView';
 import { CommunityDetailView } from './components/GamificationView';
 import { BottomNavBar } from './components/BottomNavBar';
 import { CreatePostModal } from './components/CreatePostModal';
+import { EditPostModal } from './components/EditPostModal';
 import { CreateStoryModal } from './components/CreateStoryModal';
 import { PrivacyModal } from './components/PrivacyModal';
 import { PermissionsModal } from './components/PermissionsModal';
@@ -62,6 +64,7 @@ const App: React.FC = () => {
 
   // Modal States
   const [isCreatePostModalOpen, setCreatePostModalOpen] = useState(false);
+  const [isEditPostModalOpen, setEditPostModalOpen] = useState(false);
   const [isCreateStoryModalOpen, setCreateStoryModalOpen] = useState(false);
   const [isPrivacyModalOpen, setPrivacyModalOpen] = useState(false);
   const [isPermissionsModalOpen, setPermissionsModalOpen] = useState(false);
@@ -91,6 +94,7 @@ const App: React.FC = () => {
   const [userToBlock, setUserToBlock] = useState<User | null>(null);
   const [postForDetail, setPostForDetail] = useState<Post | null>(null);
   const [postToShare, setPostToShare] = useState<Post | null>(null);
+  const [postToEdit, setPostToEdit] = useState<Post | null>(null);
   const [eventForDetail, setEventForDetail] = useState<Event | null>(null);
   const [initialSearchTerm, setInitialSearchTerm] = useState('');
 
@@ -241,6 +245,10 @@ const App: React.FC = () => {
       const updateArchiveStatus = (p: Post) => p.id === postId ? {...p, isArchived: !p.isArchived} : p;
       setPosts(prev => prev.map(updateArchiveStatus));
       setCommunities(prev => prev.map(c => ({...c, posts: c.posts.map(updateArchiveStatus) })));
+      if(postForDetail?.id === postId) {
+        setPostForDetail(null);
+        setPostDetailModalOpen(false);
+      }
   };
   
   const handleHashtagClick = (hashtag: string) => {
@@ -261,6 +269,26 @@ const App: React.FC = () => {
     };
     setPosts(prevPosts => [newPost, ...prevPosts]);
   }, [currentUser]);
+  
+  const handleOpenEditPost = useCallback((post: Post) => {
+    setPostDetailModalOpen(false); // Close detail modal if it's open
+    setPostToEdit(post);
+    setEditPostModalOpen(true);
+  }, []);
+
+  const handleUpdatePost = useCallback((postId: string, updatedData: Partial<Post>) => {
+    const updatePostInList = (p: Post) => p.id === postId ? { ...p, ...updatedData, timestamp: new Date().toISOString() } : p;
+    
+    setPosts(prev => prev.map(updatePostInList));
+    setCommunities(prev => prev.map(c => ({
+        ...c,
+        posts: c.posts.map(updatePostInList)
+    })));
+    
+    if (postForDetail?.id === postId) {
+        setPostForDetail(prev => prev ? { ...prev, ...updatedData, timestamp: new Date().toISOString() } : null);
+    }
+  }, [postForDetail]);
 
   const handleCreateStory = useCallback((storyData: Partial<Story>) => {
     const newStory: Story = {
@@ -410,6 +438,7 @@ const App: React.FC = () => {
       likedPostIds,
       onToggleArchive: handleToggleArchive,
       onHashtagClick: handleHashtagClick,
+      onOpenEditPost: handleOpenEditPost,
       currentUser,
     };
 
@@ -439,7 +468,7 @@ const App: React.FC = () => {
         const allUserPosts = allPosts.filter(p => p.user.id === user.id);
         const publicUserPosts = allUserPosts.filter(p => !p.isArchived);
 
-        return <ProfileView user={user} posts={isLoggedIn && currentUser.id === user.id ? allUserPosts : publicUserPosts} isOwnProfile={user.id === currentUser.id} onNavigate={handleNavigate} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} followingIds={followingIds} onToggleFollow={handleToggleFollow} communities={communities} onToggleArchive={handleToggleArchive} />;
+        return <ProfileView user={user} posts={isLoggedIn && currentUser.id === user.id ? allUserPosts : publicUserPosts} isOwnProfile={user.id === currentUser.id} onNavigate={handleNavigate} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} followingIds={followingIds} onToggleFollow={handleToggleFollow} communities={communities} onToggleArchive={handleToggleArchive} onOpenPostDetail={handleOpenPostDetail} />;
       case 'edit-profile':
         return <EditProfileView user={currentUser} onUpdateUser={handleUpdateUser} onCancel={handleBack} />;
       case 'settings':
@@ -470,6 +499,7 @@ const App: React.FC = () => {
         <BottomNavBar activeView={activeView} setActiveView={navigateToView} />
       </div>
       <CreatePostModal isOpen={isCreatePostModalOpen} onClose={() => setCreatePostModalOpen(false)} onCreatePost={handleCreatePost} user={currentUser} blockedUserIds={blockedUserIds} />
+      <EditPostModal isOpen={isEditPostModalOpen} onClose={() => setEditPostModalOpen(false)} onUpdatePost={handleUpdatePost} post={postToEdit} user={currentUser} />
       <CreateStoryModal isOpen={isCreateStoryModalOpen} onClose={() => setCreateStoryModalOpen(false)} onCreateStory={handleCreateStory} />
       <PrivacyModal isOpen={isPrivacyModalOpen} onClose={() => setPrivacyModalOpen(false)} />
       <PermissionsModal isOpen={isPermissionsModalOpen} onClose={() => setPermissionsModalOpen(false)} permissions={permissions} onPermissionsChange={handlePermissionsChange} />
@@ -478,7 +508,6 @@ const App: React.FC = () => {
       <CommunityMapModal isOpen={isCommunityMapModalOpen} onClose={() => setCommunityMapModalOpen(false)} community={selectedCommunityForMap} />
       <CreateCommunityModal isOpen={isCreateCommunityModalOpen} onClose={() => setCreateCommunityModalOpen(false)} onCreate={handleCreateCommunity} />
       <CommunitySettingsModal isOpen={isCommunitySettingsModalOpen} onClose={() => setCommunitySettingsModalOpen(false)} community={selectedCommunityForSettings} setCommunities={setCommunities} />
-      {/* FIX: Removed extraneous props from ProfileModal and added missing 'communities' prop to match component definition. */}
       <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} user={selectedUserForProfile} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} followingIds={followingIds} onToggleFollow={handleToggleFollow} isOwnProfile={selectedUserForProfile?.id === currentUser.id} posts={allPosts} communities={communities} onToggleArchive={handleToggleArchive}/>
       <BlockUserModal isOpen={isBlockUserModalOpen} onClose={() => setBlockUserModalOpen(false)} user={userToBlock} onConfirmBlock={handleBlockUser} />
       <BlockedUsersModal isOpen={isBlockedUsersModalOpen} onClose={() => setBlockedUsersModalOpen(false)} blockedUserIds={[...blockedUserIds]} onUnblockUser={handleUnblockUser} />
@@ -486,7 +515,7 @@ const App: React.FC = () => {
       <SearchModal isOpen={isSearchModalOpen} onClose={() => setSearchModalOpen(false)} onNavigate={handleNavigate} onOpenProfile={handleOpenProfileModal} initialSearchTerm={initialSearchTerm} allPosts={allPosts} communities={communities} onOpenPostDetail={handleOpenPostDetail} />
       <LanguageChangeModal isOpen={isLanguageModalOpen} onClose={() => setLanguageModalOpen(false)} currentLanguage={language} onLanguageChange={setLanguage} />
       <ShareModal isOpen={isShareModalOpen} onClose={() => setShareModalOpen(false)} user={currentUser} />
-      <PostDetailModal isOpen={isPostDetailModalOpen} onClose={() => setPostDetailModalOpen(false)} post={postForDetail} currentUser={currentUser} onAddComment={handleAddComment} likedPostIds={likedPostIds} onToggleLike={handleToggleLike} onOpenShare={handleOpenSharePost} onToggleArchive={handleToggleArchive} onHashtagClick={handleHashtagClick} onOpenProfile={handleOpenProfileModal}/>
+      <PostDetailModal isOpen={isPostDetailModalOpen} onClose={() => setPostDetailModalOpen(false)} post={postForDetail} currentUser={currentUser} onAddComment={handleAddComment} likedPostIds={likedPostIds} onToggleLike={handleToggleLike} onOpenShare={handleOpenSharePost} onToggleArchive={handleToggleArchive} onHashtagClick={handleHashtagClick} onOpenProfile={handleOpenProfileModal} onOpenEditPost={handleOpenEditPost} />
       <SharePostModal isOpen={isSharePostModalOpen} onClose={() => setSharePostModalOpen(false)} post={postToShare} />
       <CreateEventModal isOpen={isCreateEventModalOpen} onClose={() => setCreateEventModalOpen(false)} community={selectedCommunityForEvent} onCreateEvent={handleCreateEvent} />
       <SecurityModal isOpen={isSecurityModalOpen} onClose={() => setSecurityModalOpen(false)} />
