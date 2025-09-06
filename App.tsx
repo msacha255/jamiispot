@@ -79,6 +79,7 @@ const App: React.FC = () => {
       imageUrl,
       viewed: false,
     };
+    // Add new story and remove any existing story from the same user to prevent duplicates.
     setStories(prevStories => [newStory, ...prevStories.filter(s => s.user.id !== currentUser.id)]);
   }, [currentUser]);
   
