@@ -37,6 +37,7 @@ import { CreateEventModal } from './components/CreateEventModal';
 import { SecurityModal } from './components/SecurityModal';
 import { ToastNotification } from './components/ToastNotification';
 import { EventDetailModal } from './components/EventDetailModal';
+import { MarketplaceDetailModal } from './components/MarketplaceDetailModal';
 
 import type { View, Post, User, Story, Community, Conversation, Notification, Permissions, Language, Comment, Event, Message, FeedItem } from './types';
 import { MOCK_USERS, MOCK_POSTS, MOCK_STORIES, MOCK_COMMUNITIES, MOCK_CONVERSATIONS, MOCK_NOTIFICATIONS, SUPPORTED_LANGUAGES } from './constants';
@@ -86,6 +87,7 @@ const App: React.FC = () => {
   const [isCreateEventModalOpen, setCreateEventModalOpen] = useState(false);
   const [isSecurityModalOpen, setSecurityModalOpen] = useState(false);
   const [isEventDetailModalOpen, setEventDetailModalOpen] = useState(false);
+  const [isMarketplaceDetailModalOpen, setMarketplaceDetailModalOpen] = useState(false);
   
   // Data for Modals
   const [selectedCommunityForMap, setSelectedCommunityForMap] = useState<Community | null>(null);
@@ -98,6 +100,7 @@ const App: React.FC = () => {
   const [postToEdit, setPostToEdit] = useState<Post | null>(null);
   const [eventForDetail, setEventForDetail] = useState<Event | null>(null);
   const [initialSearchTerm, setInitialSearchTerm] = useState('');
+  const [selectedMarketplaceCategory, setSelectedMarketplaceCategory] = useState<{ name: string; icon: string } | null>(null);
 
 
   const { view: activeView, params: activeParams } = navHistory[navHistory.length - 1];
@@ -399,6 +402,11 @@ const App: React.FC = () => {
       setCreateEventModalOpen(true);
   }, []);
   
+  const handleOpenMarketplaceCategory = useCallback((category: { name: string; icon: string }) => {
+    setSelectedMarketplaceCategory(category);
+    setMarketplaceDetailModalOpen(true);
+  }, []);
+  
   // --- Filtering based on blocked users ---
   const memberCommunities = useMemo(() => communities.filter(c => c.isMember), [communities]);
 
@@ -475,7 +483,7 @@ const App: React.FC = () => {
       case 'settings':
         return <SettingsView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onLogout={handleLogout} onOpenPrivacyModal={() => setPrivacyModalOpen(true)} onOpenPermissionsModal={() => setPermissionsModalOpen(true)} onOpenHelpSupportModal={() => setHelpSupportModalOpen(true)} onOpenBlockedUsers={() => setBlockedUsersModalOpen(true)} onOpenVerification={() => setVerificationModalOpen(true)} onOpenLanguageModal={() => setLanguageModalOpen(true)} onOpenShareModal={() => setShareModalOpen(true)} language={language} onOpenSecurityModal={() => setSecurityModalOpen(true)} />;
       case 'marketplace':
-        return <MarketplaceView />;
+        return <MarketplaceView onCategorySelect={handleOpenMarketplaceCategory} />;
       default:
         return <FeedView feedItems={feedItems} stories={stories} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenCreateStory={() => setCreateStoryModalOpen(true)} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenEventDetail={handleOpenEventDetail} {...commonPostHandlers} />;
     }
@@ -523,6 +531,7 @@ const App: React.FC = () => {
       <CreateEventModal isOpen={isCreateEventModalOpen} onClose={() => setCreateEventModalOpen(false)} community={selectedCommunityForEvent} onCreateEvent={handleCreateEvent} />
       <SecurityModal isOpen={isSecurityModalOpen} onClose={() => setSecurityModalOpen(false)} />
       <EventDetailModal isOpen={isEventDetailModalOpen} onClose={() => setEventDetailModalOpen(false)} event={eventForDetail} onCommunitySelect={(id) => { setEventDetailModalOpen(false); handleNavigate('community-detail', { communityId: id })}} />
+      <MarketplaceDetailModal isOpen={isMarketplaceDetailModalOpen} onClose={() => setMarketplaceDetailModalOpen(false)} category={selectedMarketplaceCategory} />
     </div>
   );
 };

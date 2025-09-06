@@ -142,4 +142,13 @@ export interface LoginSession {
     isCurrent?: boolean;
 }
 
+export interface MarketplaceListing {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  price: string;
+  seller: User;
+}
+
 export type View = 'feed' | 'discover' | 'messages' | 'notifications' | 'profile' | 'settings' | 'community-detail' | 'edit-profile' | 'marketplace';

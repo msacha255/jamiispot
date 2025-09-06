@@ -1,6 +1,6 @@
 
 import React from 'react';
-import type { User, Post, Story, Conversation, Message, Community, Notification, Language, Comment, Event, LoginSession } from './types';
+import type { User, Post, Story, Conversation, Message, Community, Notification, Language, Comment, Event, LoginSession, MarketplaceListing } from './types';
 
 export const TRENDING_TOPICS = [
     'JamiiSpot Launch',
@@ -145,6 +145,25 @@ export const MOCK_LOGIN_SESSIONS: LoginSession[] = [
     { id: 'ls2', device: 'JamiiSpot for iOS', location: 'Mombasa, KE', ip: '10.0.0.1', timestamp: '2 hours ago' },
     { id: 'ls3', device: 'Firefox on Windows', location: 'Dar es Salaam, TZ', ip: '172.16.0.1', timestamp: '1 day ago' },
 ];
+
+export const MOCK_MARKETPLACE_LISTINGS: { [key: string]: MarketplaceListing[] } = {
+    'Digital Services': [
+        { id: 'ds1', category: 'Digital Services', title: 'React Frontend Development', description: 'Building fast and responsive web apps.', price: '$50/hr', seller: MOCK_USERS[1] },
+        { id: 'ds2', category: 'Digital Services', title: 'UI/UX Design Mockups', description: 'Creating beautiful and intuitive user interfaces.', price: '$40/hr', seller: MOCK_USERS[0] },
+        { id: 'ds3', category: 'Digital Services', title: 'Node.js API Development', description: 'Secure and scalable backend APIs.', price: '$55/hr', seller: MOCK_USERS[4] },
+    ],
+    'Creative Arts': [
+         { id: 'ca1', category: 'Creative Arts', title: 'Custom Logo Design', description: 'Unique logos for your brand.', price: '$150', seller: MOCK_USERS[2] },
+         { id: 'ca2', category: 'Creative Arts', title: 'Portrait Photography Session', description: 'Professional portraits for any occasion.', price: '$200/session', seller: MOCK_USERS[0] },
+    ],
+    'Tutoring & Education': [
+        { id: 'te1', category: 'Tutoring & Education', title: 'Swahili Language Tutor', description: 'Learn Swahili from a native speaker.', price: '$25/hr', seller: MOCK_USERS[5] },
+        { id: 'te2', category: 'Tutoring & Education', title: 'Math & Science Tutoring (High School)', description: 'Helping students excel in STEM.', price: '$30/hr', seller: MOCK_USERS[6] },
+    ],
+     'Handmade Goods': [
+        { id: 'hg1', category: 'Handmade Goods', title: 'Hand-woven baskets', description: 'Beautiful and durable baskets made with traditional techniques.', price: '$40', seller: MOCK_USERS[3] },
+    ],
+};
 
 export const COUNTRIES = [
     { code: 'US', name: 'United States', flag: '🇺🇸' },
