@@ -12,6 +12,7 @@ interface SettingsViewProps {
     onOpenBlockedUsers: () => void;
     onOpenVerification: () => void;
     onOpenLanguageModal: () => void;
+    onOpenShareModal: () => void;
     language: Language;
 }
 
@@ -57,7 +58,7 @@ const SettingsToggle: React.FC<{label: string; enabled: boolean; onToggle: () =>
 );
 
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout, onOpenPrivacyModal, onOpenPermissionsModal, onOpenHelpSupportModal, onOpenBlockedUsers, onOpenVerification, onOpenLanguageModal, language }) => {
+export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout, onOpenPrivacyModal, onOpenPermissionsModal, onOpenHelpSupportModal, onOpenBlockedUsers, onOpenVerification, onOpenLanguageModal, onOpenShareModal, language }) => {
     const [isNotificationsExpanded, setNotificationsExpanded] = useState(false);
     const [notificationPrefs, setNotificationPrefs] = useState({ likes: true, comments: true, follows: false });
     const t = useTranslation(language.code);
@@ -129,6 +130,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDar
                     <div className="divide-y divide-gray-200 dark:divide-zinc-700">
                         <SettingsItem label="Blocked Users" description="Manage users you've blocked." onClick={onOpenBlockedUsers} />
                         <SettingsItem label="Request Verification" description="Get a badge to show your authenticity." onClick={onOpenVerification} />
+                        <SettingsItem label="Share & Refer" description="Share your profile or invite friends." onClick={onOpenShareModal} />
                     </div>
                     <button
                         onClick={onLogout}

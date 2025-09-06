@@ -259,8 +259,8 @@ export const MoreVerticalIcon: React.FC<{ className?: string }> = ({ className }
 );
 export const CheckBadgeIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M19.965 8.521C19.988 8.347 20 8.17 20 8c0-2.21-1.79-4-4-4s-4 1.79-4 4c0 .17.012.347.035.521C11.413 8.192 10.74 7.5 10 7.5c-1.895 0-3.475 1.42-3.873 3.25C6.066 10.928 6 11.107 6 11.3c0 1.21.99 2.2 2.2 2.2.193 0 .38-.026.568-.077C9.176 15.36 10.428 16.5 12 16.5c2.478 0 4.5-2.022 4.5-4.5 0-.74-.18-1.432-.501-2.04.188.02.38.03.571.03.953 0 1.8-.448 2.395-1.18.237-.286.39-.623.4-1.29z" />
-      <path fill="#fff" d="m10.46 15.65-3.32-3.32a.75.75 0 0 1 1.06-1.06l2.26 2.26 4.97-4.97a.75.75 0 0 1 1.06 1.06l-6.03 6.03z" />
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.05 15.3-3.6-3.6L8.8 12.25l2.15 2.15 4.95-4.95L17.35 11l-6.4 6.3z" />
+        <path d="M10.95 17.3 7.35 13.7l1.45-1.45 2.15 2.15 4.95-4.95 1.45 1.45-6.4 6.3z" style={{fill: 'white'}}/>
     </svg>
 );
 export const InfoIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -274,5 +274,11 @@ export const TranslateIcon: React.FC<{ className?: string }> = ({ className }) =
         <path d="M12 3v2"/>
         <path d="m21 15-4-4-4 4"/>
         <path d="M17 11v8"/>
+    </svg>
+);
+export const CopyIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
     </svg>
 );

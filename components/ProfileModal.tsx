@@ -69,7 +69,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, use
                 await navigator.share({
                     title: `${user.name}'s Profile on JamiiSpot`,
                     text: `Check out ${user.name}'s profile on JamiiSpot.`,
-                    url: window.location.href,
+                    url: `https://jamiispot.com/profile/${user.username}`,
                 });
             } catch (error) {
                 console.error('Error sharing:', error);
