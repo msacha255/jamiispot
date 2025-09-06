@@ -1,12 +1,13 @@
 import React from 'react';
 import type { Story, Post, User } from '../types';
-import { MOCK_STORIES } from '../constants';
 import { HeartIcon, MessageCircleIcon, ShareIcon, PlusIcon } from '../constants';
 
 interface FeedViewProps {
   posts: Post[];
+  stories: Story[];
   currentUser: User;
   onOpenCreatePost: () => void;
+  onOpenCreateStory: () => void;
 }
 
 const CreatePostTrigger: React.FC<{ user: User, onClick: () => void }> = ({ user, onClick }) => (
@@ -26,11 +27,13 @@ const CreatePostTrigger: React.FC<{ user: User, onClick: () => void }> = ({ user
   </div>
 );
 
-const Stories: React.FC<{ stories: Story[] }> = ({ stories }) => (
+const Stories: React.FC<{ stories: Story[], onAdd: () => void }> = ({ stories, onAdd }) => (
   <div className="mb-6">
     <div className="flex space-x-4 overflow-x-auto pb-4">
       <div className="flex-shrink-0 text-center w-20">
-        <button className="w-16 h-16 rounded-full bg-white dark:bg-zinc-700 border-2 border-dashed border-gray-400 dark:border-zinc-500 flex items-center justify-center text-gray-500 hover:border-primary hover:text-primary transition">
+        <button 
+          onClick={onAdd}
+          className="w-16 h-16 rounded-full bg-white dark:bg-zinc-700 border-2 border-dashed border-gray-400 dark:border-zinc-500 flex items-center justify-center text-gray-500 hover:border-primary hover:text-primary transition">
           <PlusIcon className="w-8 h-8"/>
         </button>
         <p className="text-xs mt-2 font-medium">Add Story</p>
@@ -91,10 +94,10 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => (
   </div>
 );
 
-export const FeedView: React.FC<FeedViewProps> = ({ posts, currentUser, onOpenCreatePost }) => {
+export const FeedView: React.FC<FeedViewProps> = ({ posts, stories, currentUser, onOpenCreatePost, onOpenCreateStory }) => {
   return (
     <div className="max-w-3xl mx-auto">
-      <Stories stories={MOCK_STORIES} />
+      <Stories stories={stories} onAdd={onOpenCreateStory} />
       <CreatePostTrigger user={currentUser} onClick={onOpenCreatePost} />
       <div className="space-y-6">
         {posts.map(post => (

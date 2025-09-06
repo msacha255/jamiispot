@@ -18,9 +18,12 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => (
           <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username} · {post.timestamp}</p>
         </div>
       </div>
-      <p className="mb-4 text-gray-800 dark:text-gray-300">{post.content}</p>
+      <div 
+        className="text-gray-800 dark:text-gray-300 [&_strong]:font-bold [&_em]:italic [&_u]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+        dangerouslySetInnerHTML={{ __html: post.content }} 
+      />
     </div>
-    {post.imageUrl && <img src={post.imageUrl} alt="Post content" className="w-full h-auto" />}
+    {post.imageUrl && <img src={post.imageUrl} alt="Post content" className="w-full h-auto object-cover" />}
     <div className="p-5">
       <div className="flex justify-between items-center text-gray-500 dark:text-gray-400">
         <button className="flex items-center gap-2 hover:text-red-500 transition-colors">

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ChevronRightIcon } from '../constants';
 
@@ -6,6 +5,8 @@ interface SettingsViewProps {
     isDarkMode: boolean;
     setIsDarkMode: (isDark: boolean) => void;
     onLogout: () => void;
+    onOpenPrivacyModal: () => void;
+    onOpenPermissionsModal: () => void;
 }
 
 const SettingsItem: React.FC<{label: string; description: string; onClick: () => void}> = ({ label, description, onClick }) => (
@@ -31,18 +32,18 @@ const SettingsToggle: React.FC<{label: string; enabled: boolean; onToggle: () =>
 );
 
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout }) => {
+export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout, onOpenPrivacyModal, onOpenPermissionsModal }) => {
     
     const generalSettings = [
         {
             title: "Privacy",
             description: "Control your profile visibility and data.",
-            action: () => {}
+            action: onOpenPrivacyModal
         },
         {
             title: "Permissions",
             description: "Manage app permissions for camera, location etc.",
-            action: () => {}
+            action: onOpenPermissionsModal
         },
         {
             title: "Notifications",

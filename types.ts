@@ -13,6 +13,11 @@ export interface User {
   location?: string;
   country?: string;
   showFlag?: boolean;
+  socialLinks?: {
+    twitter?: string;
+    linkedin?: string;
+    github?: string;
+  };
 }
 
 export interface Story {

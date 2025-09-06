@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import type { User } from '../types';
-import { ChevronLeftIcon, XIcon, COUNTRIES } from '../constants';
+import { ChevronLeftIcon, XIcon, COUNTRIES, TwitterIcon, LinkedinIcon, GithubIcon } from '../constants';
 
 interface EditProfileViewProps {
     user: User;
@@ -8,12 +8,28 @@ interface EditProfileViewProps {
     onCancel: () => void;
 }
 
-const TagInput: React.FC<{
+interface TagInputProps {
     label: string;
     tags: string[];
     setTags: (tags: string[]) => void;
-}> = ({ label, tags, setTags }) => {
+    color: 'primary' | 'accent';
+}
+
+const TagInput: React.FC<TagInputProps> = ({ label, tags, setTags, color }) => {
     const [currentTag, setCurrentTag] = useState('');
+
+    const colorClasses = {
+        primary: {
+            container: 'bg-orange-100 dark:bg-primary/20 text-primary dark:text-orange-300',
+            removeHover: 'hover:bg-primary/20 dark:hover:bg-primary/30',
+        },
+        accent: {
+            container: 'bg-accent/10 dark:bg-accent/20 text-accent dark:text-blue-300',
+            removeHover: 'hover:bg-accent/20 dark:hover:bg-accent/30',
+        }
+    };
+    const selectedColor = colorClasses[color];
+
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && currentTag.trim()) {
@@ -42,9 +58,13 @@ const TagInput: React.FC<{
             />
             <div className="flex flex-wrap gap-2 mt-2">
                 {tags.map((tag) => (
-                    <div key={tag} className="flex items-center bg-gray-200 dark:bg-zinc-600 text-sm font-semibold pl-3 pr-2 py-1 rounded-full">
+                     <div key={tag} className={`flex items-center ${selectedColor.container} text-sm font-semibold pl-3 pr-1 py-1 rounded-full`}>
                         <span>{tag}</span>
-                        <button onClick={() => removeTag(tag)} className="ml-1.5 text-gray-500 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-zinc-500 rounded-full">
+                        <button 
+                            onClick={() => removeTag(tag)} 
+                            className={`ml-1.5 p-0.5 rounded-full transition-colors ${selectedColor.removeHover}`}
+                            aria-label={`Remove ${tag}`}
+                        >
                             <XIcon className="w-4 h-4" />
                         </button>
                     </div>
@@ -62,6 +82,11 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
         bio: user.bio || '',
         location: user.location || '',
         country: user.country || '',
+        socialLinks: {
+            twitter: user.socialLinks?.twitter || '',
+            linkedin: user.socialLinks?.linkedin || '',
+            github: user.socialLinks?.github || '',
+        }
     });
     const [showFlag, setShowFlag] = useState(user.showFlag || false);
     const [interests, setInterests] = useState(user.interests || []);
@@ -76,6 +101,17 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
+
+    const handleSocialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            socialLinks: {
+                ...prev.socialLinks,
+                [name]: value,
+            }
+        }))
+    }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') => {
         if (e.target.files && e.target.files[0]) {
@@ -111,6 +147,27 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
             {children}
         </div>
     );
+    
+    const SocialInput: React.FC<{name: 'twitter' | 'linkedin' | 'github', value: string, onChange: (e: React.ChangeEvent<HTMLInputElement>) => void}> = ({ name, value, onChange }) => {
+        const icons = {
+            twitter: <TwitterIcon className="w-5 h-5 text-gray-400" />,
+            linkedin: <LinkedinIcon className="w-5 h-5 text-gray-400" />,
+            github: <GithubIcon className="w-5 h-5 text-gray-400" />
+        };
+        return (
+            <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">{icons[name]}</span>
+                <input 
+                    type="text" 
+                    name={name} 
+                    value={value} 
+                    onChange={onChange} 
+                    placeholder={`https://${name}.com/username`}
+                    className="w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg pl-10 pr-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none" 
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-4xl mx-auto">
@@ -157,11 +214,17 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
                     </FormSection>
 
                     <FormSection title="Interests">
-                        <TagInput label="Interests" tags={interests} setTags={setInterests} />
+                        <TagInput label="Interests" tags={interests} setTags={setInterests} color="primary" />
                     </FormSection>
 
                      <FormSection title="Professional Skills">
-                        <TagInput label="Skills" tags={skills} setTags={setSkills} />
+                        <TagInput label="Skills" tags={skills} setTags={setSkills} color="accent" />
+                    </FormSection>
+
+                    <FormSection title="Social Links">
+                        <SocialInput name="twitter" value={formData.socialLinks.twitter} onChange={handleSocialChange} />
+                        <SocialInput name="linkedin" value={formData.socialLinks.linkedin} onChange={handleSocialChange} />
+                        <SocialInput name="github" value={formData.socialLinks.github} onChange={handleSocialChange} />
                     </FormSection>
 
                     <FormSection title="Other Settings">

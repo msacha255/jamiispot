@@ -1,7 +1,6 @@
 import React from 'react';
 import type { User, Post, View } from '../types';
-import { MOCK_POSTS, COUNTRIES } from '../constants';
-import { HeartIcon, MessageCircleIcon, ShareIcon, LockIcon } from '../constants';
+import { MOCK_POSTS, COUNTRIES, HeartIcon, MessageCircleIcon, ShareIcon, LockIcon, TwitterIcon, LinkedinIcon, GithubIcon } from '../constants';
 
 
 const ProfilePostCard: React.FC<{ post: Post }> = ({ post }) => (
@@ -42,6 +41,7 @@ const InfoCard: React.FC<{title: string, items?: string[], color: 'primary' | 'a
 
 export const ProfileView: React.FC<{ user: User; isOwnProfile: boolean; onNavigate: (view: View, params?: any) => void; }> = ({ user, isOwnProfile, onNavigate }) => {
     const flag = COUNTRIES.find(c => c.code === user.country)?.flag;
+    const hasSocials = user.socialLinks && Object.values(user.socialLinks).some(link => !!link);
     
     return (
         <div className="max-w-5xl mx-auto">
@@ -63,7 +63,16 @@ export const ProfileView: React.FC<{ user: User; isOwnProfile: boolean; onNaviga
                         </div>
                     </div>
                     <div className="mt-4">
-                        <h1 className="text-3xl font-bold font-display">{user.name}</h1>
+                        <div className="flex items-center gap-4">
+                            <h1 className="text-3xl font-bold font-display">{user.name}</h1>
+                            {hasSocials && (
+                                <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
+                                    {user.socialLinks?.twitter && <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><TwitterIcon className="w-5 h-5" /></a>}
+                                    {user.socialLinks?.linkedin && <a href={user.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><LinkedinIcon className="w-5 h-5" /></a>}
+                                    {user.socialLinks?.github && <a href={user.socialLinks.github} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><GithubIcon className="w-5 h-5" /></a>}
+                                </div>
+                            )}
+                        </div>
                         <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
                         
                         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-2">

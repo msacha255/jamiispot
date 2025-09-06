@@ -11,16 +11,23 @@ import { SettingsView } from './components/SettingsView';
 import { CommunityDetailView } from './components/GamificationView';
 import { BottomNavBar } from './components/BottomNavBar';
 import { CreatePostModal } from './components/CreatePostModal';
+import { CreateStoryModal } from './components/CreateStoryModal';
+import { PrivacyModal } from './components/PrivacyModal';
+import { PermissionsModal } from './components/PermissionsModal';
 import { EditProfileView } from './components/EditProfileView';
-import type { View, Post, User } from './types';
-import { MOCK_USERS, MOCK_POSTS } from './constants';
+import type { View, Post, User, Story } from './types';
+import { MOCK_USERS, MOCK_POSTS, MOCK_STORIES } from './constants';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [navHistory, setNavHistory] = useState<{view: View, params?: any}[]>([{ view: 'feed' }]);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
+  const [stories, setStories] = useState<Story[]>(MOCK_STORIES);
   const [isCreatePostModalOpen, setCreatePostModalOpen] = useState(false);
+  const [isCreateStoryModalOpen, setCreateStoryModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setPrivacyModalOpen] = useState(false);
+  const [isPermissionsModalOpen, setPermissionsModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>(MOCK_USERS[0]);
 
   const { view: activeView, params: activeParams } = navHistory[navHistory.length - 1];
@@ -64,22 +71,36 @@ const App: React.FC = () => {
     };
     setPosts(prevPosts => [newPost, ...prevPosts]);
   }, [currentUser]);
+
+  const handleCreateStory = useCallback((imageUrl: string) => {
+    const newStory: Story = {
+      id: `s${Date.now()}`,
+      user: currentUser,
+      imageUrl,
+      viewed: false,
+    };
+    setStories(prevStories => [newStory, ...prevStories.filter(s => s.user.id !== currentUser.id)]);
+  }, [currentUser]);
   
   const handleUpdateUser = useCallback((updatedUser: User) => {
     setCurrentUser(updatedUser);
-    // In a real app, you would also need to find all posts/comments by the user and update them.
-    // For this mock data setup, we'll update the posts array to reflect the user's new details.
     setPosts(prevPosts => prevPosts.map(p => 
       p.user.id === updatedUser.id ? { ...p, user: updatedUser } : p
     ));
-    handleBack(); // Go back to profile view after saving.
+    handleBack(); 
   }, [handleBack]);
 
 
   const renderView = () => {
     switch (activeView) {
       case 'feed':
-        return <FeedView posts={posts} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} />;
+        return <FeedView 
+                  posts={posts} 
+                  stories={stories} 
+                  currentUser={currentUser} 
+                  onOpenCreatePost={() => setCreatePostModalOpen(true)}
+                  onOpenCreateStory={() => setCreateStoryModalOpen(true)}
+                />;
       case 'discover':
         return <DiscoveryView onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} />;
       case 'community-detail':
@@ -95,15 +116,26 @@ const App: React.FC = () => {
       case 'edit-profile':
         return <EditProfileView user={currentUser} onUpdateUser={handleUpdateUser} onCancel={handleBack} />;
       case 'settings':
-        return <SettingsView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onLogout={handleLogout} />;
+        return <SettingsView 
+                  isDarkMode={isDarkMode} 
+                  setIsDarkMode={setIsDarkMode} 
+                  onLogout={handleLogout}
+                  onOpenPrivacyModal={() => setPrivacyModalOpen(true)}
+                  onOpenPermissionsModal={() => setPermissionsModalOpen(true)}
+                />;
       default:
-        return <FeedView posts={posts} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} />;
+        return <FeedView 
+                  posts={posts} 
+                  stories={stories}
+                  currentUser={currentUser} 
+                  onOpenCreatePost={() => setCreatePostModalOpen(true)} 
+                  onOpenCreateStory={() => setCreateStoryModalOpen(true)}
+                />;
     }
   };
   
   const navigateToView = (view: View, params?: any) => {
     const navParams = (view === 'profile' && !params) ? { userId: currentUser.id } : params;
-    // Reset history for main tab navigation
     setNavHistory([{ view, params: navParams }]);
   };
 
@@ -131,6 +163,19 @@ const App: React.FC = () => {
         onClose={() => setCreatePostModalOpen(false)}
         onCreatePost={handleCreatePost}
         user={currentUser}
+      />
+       <CreateStoryModal
+        isOpen={isCreateStoryModalOpen}
+        onClose={() => setCreateStoryModalOpen(false)}
+        onCreateStory={handleCreateStory}
+      />
+      <PrivacyModal 
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setPrivacyModalOpen(false)}
+      />
+       <PermissionsModal 
+        isOpen={isPermissionsModalOpen}
+        onClose={() => setPermissionsModalOpen(false)}
       />
     </div>
   );
