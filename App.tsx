@@ -95,6 +95,11 @@ const App: React.FC = () => {
     handleBack(); 
   }, [handleBack]);
 
+  const handleViewAllNotifications = useCallback(() => {
+    setNotificationsModalOpen(false);
+    handleNavigate('notifications');
+  }, [handleNavigate]);
+
 
   const renderView = () => {
     switch (activeView) {
@@ -191,6 +196,7 @@ const App: React.FC = () => {
       <NotificationsModal
         isOpen={isNotificationsModalOpen}
         onClose={() => setNotificationsModalOpen(false)}
+        onViewAll={handleViewAllNotifications}
       />
     </div>
   );

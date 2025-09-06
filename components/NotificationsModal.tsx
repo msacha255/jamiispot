@@ -5,6 +5,7 @@ import { MOCK_NOTIFICATIONS } from '../constants';
 interface NotificationsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onViewAll: () => void;
 }
 
 const NotificationItem: React.FC<{ notification: typeof MOCK_NOTIFICATIONS[0] }> = ({ notification }) => (
@@ -21,7 +22,7 @@ const NotificationItem: React.FC<{ notification: typeof MOCK_NOTIFICATIONS[0] }>
 );
 
 
-export const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose }) => {
+export const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose, onViewAll }) => {
     if (!isOpen) return null;
 
     return (
@@ -45,7 +46,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, 
                 </div>
 
                 <div className="p-2 border-t border-gray-200 dark:border-zinc-700 text-center">
-                   <button className="text-sm font-semibold text-primary hover:underline">
+                   <button onClick={onViewAll} className="text-sm font-semibold text-primary hover:underline">
                         View all notifications
                    </button>
                 </div>
