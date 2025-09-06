@@ -24,6 +24,8 @@ import { ProfileModal } from './components/ProfileModal';
 import { BlockUserModal } from './components/BlockUserModal';
 import { BlockedUsersModal } from './components/BlockedUsersModal';
 import { VerificationRequestModal } from './components/VerificationRequestModal';
+import { SearchModal } from './components/SearchModal';
+import { AboutProfileModal } from './components/AboutProfileModal';
 import type { View, Post, User, Story, Community, Conversation, Notification } from './types';
 import { MOCK_USERS, MOCK_POSTS, MOCK_STORIES, MOCK_COMMUNITIES, MOCK_CONVERSATIONS, MOCK_NOTIFICATIONS } from './constants';
 
@@ -51,12 +53,15 @@ const App: React.FC = () => {
   const [isBlockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [isBlockedUsersModalOpen, setBlockedUsersModalOpen] = useState(false);
   const [isVerificationModalOpen, setVerificationModalOpen] = useState(false);
+  const [isSearchModalOpen, setSearchModalOpen] = useState(false);
+  const [isAboutProfileModalOpen, setAboutProfileModalOpen] = useState(false);
 
   // Data for Modals
   const [selectedCommunityForMap, setSelectedCommunityForMap] = useState<Community | null>(null);
   const [selectedCommunityForSettings, setSelectedCommunityForSettings] = useState<Community | null>(null);
   const [selectedUserForProfile, setSelectedUserForProfile] = useState<User | null>(null);
   const [userToBlock, setUserToBlock] = useState<User | null>(null);
+  const [selectedUserForAbout, setSelectedUserForAbout] = useState<User | null>(null);
 
   const { view: activeView, params: activeParams } = navHistory[navHistory.length - 1];
 
@@ -84,6 +89,7 @@ const App: React.FC = () => {
       setBlockedUserIds(prev => new Set(prev).add(userToBlock.id));
       setUserToBlock(null);
       setBlockUserModalOpen(false);
+      setProfileModalOpen(false); // Close profile modal if open
   }, []);
 
   const handleUnblockUser = useCallback((userId: string) => {
@@ -97,6 +103,17 @@ const App: React.FC = () => {
   const handleOpenBlockUserModal = (user: User) => {
     setUserToBlock(user);
     setBlockUserModalOpen(true);
+  };
+
+  const handleOpenAboutProfileModal = (user: User) => {
+    setSelectedUserForAbout(user);
+    setAboutProfileModalOpen(true);
+  };
+
+  const handleSendMessageFromProfile = (user: User) => {
+    setProfileModalOpen(false);
+    const conversation = MOCK_CONVERSATIONS.find(c => c.participants.some(p => p.id === user.id));
+    handleNavigate('messages', { conversationId: conversation?.id });
   };
 
   // --- Filtering based on blocked users ---
@@ -173,13 +190,13 @@ const App: React.FC = () => {
         };
         return <CommunityDetailView community={communityWithFilteredContent} onOpenMap={handleOpenCommunityMap} onOpenSettings={handleOpenCommunitySettings} currentUser={currentUser} onOpenProfileModal={handleOpenProfileModal}/>;
       case 'messages':
-        return <MessagingView conversations={filteredConversations} />;
+        return <MessagingView conversations={filteredConversations} activeConversationIdParam={activeParams?.conversationId} />;
       case 'notifications':
         return <NotificationsView notifications={filteredNotifications} />;
       case 'profile':
         const user = activeParams?.userId ? MOCK_USERS.find(u => u.id === activeParams.userId) : currentUser;
         if (!user) return <div className="text-center p-8">User not found</div>;
-        return <ProfileView user={user} isOwnProfile={user.id === currentUser.id} onNavigate={handleNavigate} onBlockUser={handleOpenBlockUserModal} />;
+        return <ProfileView user={user} isOwnProfile={user.id === currentUser.id} onNavigate={handleNavigate} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} />;
       case 'edit-profile':
         return <EditProfileView user={currentUser} onUpdateUser={handleUpdateUser} onCancel={handleBack} />;
       case 'settings':
@@ -202,7 +219,7 @@ const App: React.FC = () => {
     <div className="flex h-screen bg-light-gray dark:bg-zinc-900 text-deep-gray dark:text-gray-200 font-sans">
       <Sidebar activeView={activeView} setActiveView={navigateToView} user={currentUser} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header user={currentUser} showBack={navHistory.length > 1} onBack={handleBack} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenNotificationsModal={() => setNotificationsModalOpen(true)} />
+        <Header user={currentUser} showBack={navHistory.length > 1} onBack={handleBack} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenNotificationsModal={() => setNotificationsModalOpen(true)} onOpenSearch={() => setSearchModalOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
           {renderView()}
         </main>
@@ -217,10 +234,12 @@ const App: React.FC = () => {
       <CommunityMapModal isOpen={isCommunityMapModalOpen} onClose={() => setCommunityMapModalOpen(false)} community={selectedCommunityForMap} />
       <CreateCommunityModal isOpen={isCreateCommunityModalOpen} onClose={() => setCreateCommunityModalOpen(false)} onCreate={handleCreateCommunity} />
       <CommunitySettingsModal isOpen={isCommunitySettingsModalOpen} onClose={() => setCommunitySettingsModalOpen(false)} community={selectedCommunityForSettings} setCommunities={setCommunities} />
-      <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} user={selectedUserForProfile} />
+      <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} user={selectedUserForProfile} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} onOpenAbout={handleOpenAboutProfileModal} />
       <BlockUserModal isOpen={isBlockUserModalOpen} onClose={() => setBlockUserModalOpen(false)} user={userToBlock} onConfirmBlock={handleBlockUser} />
       <BlockedUsersModal isOpen={isBlockedUsersModalOpen} onClose={() => setBlockedUsersModalOpen(false)} blockedUserIds={[...blockedUserIds]} onUnblockUser={handleUnblockUser} />
       <VerificationRequestModal isOpen={isVerificationModalOpen} onClose={() => setVerificationModalOpen(false)} />
+      <SearchModal isOpen={isSearchModalOpen} onClose={() => setSearchModalOpen(false)} onNavigate={handleNavigate} onOpenProfile={handleOpenProfileModal} />
+      <AboutProfileModal isOpen={isAboutProfileModalOpen} onClose={() => setAboutProfileModalOpen(false)} user={selectedUserForAbout} />
     </div>
   );
 };

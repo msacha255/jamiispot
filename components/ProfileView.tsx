@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import type { User, Post, View } from '../types';
 import { MOCK_POSTS, COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, TwitterIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon } from '../constants';
 
+const Stat: React.FC<{ value?: number; label: string }> = ({ value, label }) => (
+    <div className="text-center">
+        <p className="font-bold text-xl">{value?.toLocaleString() || 0}</p>
+        <p className="text-sm text-gray-500">{label}</p>
+    </div>
+);
 
 const ProfilePostCard: React.FC<{ post: Post }> = ({ post }) => (
   <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden group">
@@ -33,12 +39,20 @@ const TagsDisplay: React.FC<{items: string[], color: 'primary' | 'accent'}> = ({
     );
 }
 
-export const ProfileView: React.FC<{ user: User; isOwnProfile: boolean; onNavigate: (view: View, params?: any) => void; onBlockUser: (user: User) => void; }> = ({ user, isOwnProfile, onNavigate, onBlockUser }) => {
+export const ProfileView: React.FC<{ 
+    user: User; 
+    isOwnProfile: boolean; 
+    onNavigate: (view: View, params?: any) => void; 
+    onBlockUser: (user: User) => void;
+    onSendMessage: (user: User) => void;
+}> = ({ user, isOwnProfile, onNavigate, onBlockUser, onSendMessage }) => {
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
     const flag = COUNTRIES.find(c => c.code === user.country)?.flag;
     const hasSocials = user.socialLinks && Object.values(user.socialLinks).some(link => !!link);
     const userPosts = MOCK_POSTS.filter(p => p.user.id === user.id);
     
+    const showStats = isOwnProfile || !user.isPrivate;
+
     return (
         <div className="max-w-5xl mx-auto">
             <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm mb-6 overflow-hidden">
@@ -55,7 +69,7 @@ export const ProfileView: React.FC<{ user: User; isOwnProfile: boolean; onNaviga
                         ) : (
                             <div className="flex items-center gap-2">
                                 <button className="bg-primary text-white font-semibold px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm">Follow</button>
-                                <button className="ml-2 bg-gray-200 dark:bg-zinc-700 text-deep-gray dark:text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-600 transition-colors">Message</button>
+                                <button onClick={() => onSendMessage(user)} className="ml-2 bg-gray-200 dark:bg-zinc-700 text-deep-gray dark:text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-600 transition-colors">Message</button>
                                 <div className="relative">
                                     <button onClick={() => setIsOptionsOpen(!isOptionsOpen)} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700">
                                         <MoreVerticalIcon className="w-6 h-6" />
@@ -86,7 +100,13 @@ export const ProfileView: React.FC<{ user: User; isOwnProfile: boolean; onNaviga
 
                         <p className="mt-4 text-gray-700 dark:text-gray-300 max-w-2xl">{user.bio}</p>
 
-                        <div className="mt-4 flex flex-wrap items-center gap-4">
+                        <div className="mt-4 flex flex-wrap items-center gap-x-8 gap-y-4">
+                            {showStats && (
+                                <>
+                                    <Stat value={user.followers} label="Followers" />
+                                    <Stat value={user.following} label="Following" />
+                                </>
+                            )}
                             {hasSocials && (
                                 <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400">
                                     {user.socialLinks?.twitter && <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><TwitterIcon className="w-6 h-6" /></a>}
@@ -100,7 +120,7 @@ export const ProfileView: React.FC<{ user: User; isOwnProfile: boolean; onNaviga
             </div>
             
             <div>
-                 {user.isPrivate && !isOwnProfile ? (
+                 {(user.isPrivate && !isOwnProfile) ? (
                     <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-10 text-center">
                         <LockIcon className="w-12 h-12 mx-auto text-gray-400"/>
                         <h3 className="mt-4 text-xl font-bold">This Account is Private</h3>

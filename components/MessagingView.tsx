@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Conversation } from '../types';
 import { MOCK_USER } from '../constants';
 // FIX: Imported `MessageIcon` to resolve reference error.
@@ -6,6 +6,7 @@ import { SearchIcon, MessageIcon } from '../constants';
 
 interface MessagingViewProps {
     conversations: Conversation[];
+    activeConversationIdParam?: string;
 }
 
 const ConversationItem: React.FC<{ conversation: Conversation; isActive: boolean; onClick: () => void }> = ({ conversation, isActive, onClick }) => {
@@ -28,9 +29,15 @@ const ConversationItem: React.FC<{ conversation: Conversation; isActive: boolean
     );
 };
 
-export const MessagingView: React.FC<MessagingViewProps> = ({ conversations }) => {
-    const [activeConversationId, setActiveConversationId] = useState(conversations.length > 0 ? conversations[0].id : null);
+export const MessagingView: React.FC<MessagingViewProps> = ({ conversations, activeConversationIdParam }) => {
+    const [activeConversationId, setActiveConversationId] = useState(activeConversationIdParam || (conversations.length > 0 ? conversations[0].id : null));
     
+    useEffect(() => {
+      if (activeConversationIdParam && conversations.some(c => c.id === activeConversationIdParam)) {
+        setActiveConversationId(activeConversationIdParam);
+      }
+    }, [activeConversationIdParam, conversations]);
+
     if (conversations.length === 0) {
         return (
              <div className="flex h-[calc(100vh-140px)] bg-white dark:bg-zinc-800 rounded-xl shadow-sm items-center justify-center">
@@ -43,7 +50,20 @@ export const MessagingView: React.FC<MessagingViewProps> = ({ conversations }) =
         )
     }
 
-    const activeConversation = conversations.find(c => c.id === activeConversationId)!;
+    const activeConversation = conversations.find(c => c.id === activeConversationId);
+
+    if (!activeConversation) {
+      return (
+        <div className="flex h-[calc(100vh-140px)] bg-white dark:bg-zinc-800 rounded-xl shadow-sm items-center justify-center">
+          <div className="text-center text-gray-500">
+            <MessageIcon className="w-16 h-16 mx-auto mb-4"/>
+            <h2 className="text-xl font-bold">Select a conversation</h2>
+            <p>Choose a conversation from the list to start chatting.</p>
+          </div>
+        </div>
+      );
+    }
+
     const otherParticipant = activeConversation.participants.find(p => p.id !== MOCK_USER.id)!;
 
     return (
@@ -89,7 +109,7 @@ export const MessagingView: React.FC<MessagingViewProps> = ({ conversations }) =
                     <div className="relative">
                     <input type="text" placeholder="Type a message..." className="w-full bg-light-gray dark:bg-zinc-700 rounded-full py-3 px-5 pr-14 focus:outline-none focus:ring-2 focus:ring-primary"/>
                     <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-white h-10 w-10 rounded-full flex items-center justify-center hover:bg-orange-600 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     </button>
                     </div>
                 </div>

@@ -21,6 +21,9 @@ export interface User {
   };
   latitude?: number;
   longitude?: number;
+  followers?: number;
+  following?: number;
+  joinDate?: string;
 }
 
 export interface Story {
