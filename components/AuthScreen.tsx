@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { JamiiSpotFullLogo, ChevronLeftIcon, MailIcon, UserIcon, LockIcon, CheckCircleIcon } from '../constants';
+import { ForgotPasswordModal } from './ForgotPasswordModal';
 
 interface AuthScreenProps {
   onLogin: () => void;
@@ -45,6 +46,7 @@ const IconInput: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { icon: 
 export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
     const [step, setStep] = useState('welcome'); // welcome, login, signup, success
     const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', password: '' });
+    const [isForgotModalOpen, setForgotModalOpen] = useState(false);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -85,7 +87,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
                                     required
                                     icon={<LockIcon className="w-5 h-5 text-gray-400" />} 
                                 />
-                                <a href="#" className="text-sm text-primary hover:underline mt-2 block text-right">Forgot Password?</a>
+                                <a href="#" onClick={(e) => { e.preventDefault(); setForgotModalOpen(true); }} className="text-sm text-primary hover:underline mt-2 block text-right">Forgot Password?</a>
                             </div>
                             <button type="submit" className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition duration-300 shadow-md">
                                Log In
@@ -174,5 +176,13 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
         }
     };
 
-    return renderStep();
+    return (
+        <>
+            {renderStep()}
+            <ForgotPasswordModal 
+                isOpen={isForgotModalOpen}
+                onClose={() => setForgotModalOpen(false)}
+            />
+        </>
+    );
 };

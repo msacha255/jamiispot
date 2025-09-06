@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { MOCK_USERS, XIcon, ImageIcon, BoldIcon, ItalicIcon, UnderlineIcon, ListIcon, ListOrderedIcon } from '../constants';
+import { MOCK_USERS, XIcon, ImageIcon, BoldIcon, ItalicIcon, UnderlineIcon, ListIcon, ListOrderedIcon, LinkIcon, PaletteIcon } from '../constants';
 import type { User } from '../types';
 
 interface CreatePostModalProps {
@@ -11,18 +11,35 @@ interface CreatePostModalProps {
 }
 
 const EditorToolbar: React.FC = () => {
-    const format = (command: string) => {
-        document.execCommand(command, false);
+    const colorInputRef = useRef<HTMLInputElement>(null);
+
+    const format = (command: string, value?: string) => {
+        document.execCommand(command, false, value);
+    };
+
+    const handleLink = () => {
+        const url = prompt('Enter the URL:');
+        if (url) {
+            format('createLink', url);
+        }
+    };
+    
+    const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        format('foreColor', e.target.value);
     };
 
     return (
-        <div className="flex items-center gap-1 sm:gap-2 p-2 border-b border-gray-200 dark:border-zinc-700">
+        <div className="flex items-center flex-wrap gap-1 sm:gap-2 p-2 border-b border-gray-200 dark:border-zinc-700">
             <button title="Bold" onClick={() => format('bold')} className="p-2 rounded hover:bg-gray-200 dark:hover:bg-zinc-600"><BoldIcon className="w-5 h-5" /></button>
             <button title="Italic" onClick={() => format('italic')} className="p-2 rounded hover:bg-gray-200 dark:hover:bg-zinc-600"><ItalicIcon className="w-5 h-5" /></button>
             <button title="Underline" onClick={() => format('underline')} className="p-2 rounded hover:bg-gray-200 dark:hover:bg-zinc-600"><UnderlineIcon className="w-5 h-5" /></button>
             <div className="w-px h-6 bg-gray-200 dark:bg-zinc-700 mx-1 sm:mx-2"></div>
             <button title="Bulleted List" onClick={() => format('insertUnorderedList')} className="p-2 rounded hover:bg-gray-200 dark:hover:bg-zinc-600"><ListIcon className="w-5 h-5" /></button>
             <button title="Numbered List" onClick={() => format('insertOrderedList')} className="p-2 rounded hover:bg-gray-200 dark:hover:bg-zinc-600"><ListOrderedIcon className="w-5 h-5" /></button>
+            <div className="w-px h-6 bg-gray-200 dark:bg-zinc-700 mx-1 sm:mx-2"></div>
+            <button title="Add Link" onClick={handleLink} className="p-2 rounded hover:bg-gray-200 dark:hover:bg-zinc-600"><LinkIcon className="w-5 h-5" /></button>
+            <button title="Text Color" onClick={() => colorInputRef.current?.click()} className="p-2 rounded hover:bg-gray-200 dark:hover:bg-zinc-600"><PaletteIcon className="w-5 h-5" /></button>
+            <input type="color" ref={colorInputRef} onChange={handleColorChange} className="w-0 h-0 absolute opacity-0"/>
         </div>
     );
 }
@@ -70,6 +87,13 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
   const editorRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const adjustEditorHeight = () => {
+    if (editorRef.current) {
+        editorRef.current.style.height = 'auto';
+        editorRef.current.style.height = `${editorRef.current.scrollHeight}px`;
+    }
+  };
 
   useEffect(() => {
       if (isOpen) {
@@ -78,7 +102,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
           setTags([]);
           setCurrentTag('');
           setShowSuggestions(false);
-          if(editorRef.current) editorRef.current.innerHTML = '';
+          if(editorRef.current) {
+            editorRef.current.innerHTML = '';
+            setTimeout(adjustEditorHeight, 0);
+          }
           if(fileInputRef.current) fileInputRef.current.value = '';
       }
   }, [isOpen]);
@@ -117,6 +144,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
   };
   
   const handleContentChange = () => {
+      adjustEditorHeight();
       setContent(editorRef.current?.innerHTML || '');
       const selection = window.getSelection();
       if (!selection || selection.rangeCount === 0) {
@@ -223,7 +251,8 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                         contentEditable="true"
                         aria-label="Post content"
                         data-placeholder={`What's on your mind, ${user.name.split(' ')[0]}?`}
-                        className="prose dark:prose-invert max-w-none p-3 min-h-[120px] focus:outline-none overflow-y-auto before:content-[attr(data-placeholder)] before:absolute before:text-gray-400 before:dark:text-gray-500 before:pointer-events-none empty:before:block"
+                        className="prose dark:prose-invert max-w-none p-3 focus:outline-none before:content-[attr(data-placeholder)] before:absolute before:text-gray-400 before:dark:text-gray-500 before:pointer-events-none empty:before:block"
+                        style={{ minHeight: '120px' }}
                     ></div>
                 </div>
             </div>

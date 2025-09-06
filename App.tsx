@@ -15,6 +15,8 @@ import { CreateStoryModal } from './components/CreateStoryModal';
 import { PrivacyModal } from './components/PrivacyModal';
 import { PermissionsModal } from './components/PermissionsModal';
 import { EditProfileView } from './components/EditProfileView';
+import { HelpSupportModal } from './components/HelpSupportModal';
+import { NotificationsModal } from './components/NotificationsModal';
 import type { View, Post, User, Story } from './types';
 import { MOCK_USERS, MOCK_POSTS, MOCK_STORIES } from './constants';
 
@@ -28,6 +30,8 @@ const App: React.FC = () => {
   const [isCreateStoryModalOpen, setCreateStoryModalOpen] = useState(false);
   const [isPrivacyModalOpen, setPrivacyModalOpen] = useState(false);
   const [isPermissionsModalOpen, setPermissionsModalOpen] = useState(false);
+  const [isHelpSupportModalOpen, setHelpSupportModalOpen] = useState(false);
+  const [isNotificationsModalOpen, setNotificationsModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>(MOCK_USERS[0]);
 
   const { view: activeView, params: activeParams } = navHistory[navHistory.length - 1];
@@ -123,6 +127,7 @@ const App: React.FC = () => {
                   onLogout={handleLogout}
                   onOpenPrivacyModal={() => setPrivacyModalOpen(true)}
                   onOpenPermissionsModal={() => setPermissionsModalOpen(true)}
+                  onOpenHelpSupportModal={() => setHelpSupportModalOpen(true)}
                 />;
       default:
         return <FeedView 
@@ -153,6 +158,7 @@ const App: React.FC = () => {
           showBack={navHistory.length > 1} 
           onBack={handleBack}
           onOpenCreatePost={() => setCreatePostModalOpen(true)}
+          onOpenNotificationsModal={() => setNotificationsModalOpen(true)}
         />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
           {renderView()}
@@ -177,6 +183,14 @@ const App: React.FC = () => {
        <PermissionsModal 
         isOpen={isPermissionsModalOpen}
         onClose={() => setPermissionsModalOpen(false)}
+      />
+       <HelpSupportModal
+        isOpen={isHelpSupportModalOpen}
+        onClose={() => setHelpSupportModalOpen(false)}
+      />
+      <NotificationsModal
+        isOpen={isNotificationsModalOpen}
+        onClose={() => setNotificationsModalOpen(false)}
       />
     </div>
   );

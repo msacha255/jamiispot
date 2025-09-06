@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronRightIcon } from '../constants';
 
 interface SettingsViewProps {
@@ -7,20 +7,21 @@ interface SettingsViewProps {
     onLogout: () => void;
     onOpenPrivacyModal: () => void;
     onOpenPermissionsModal: () => void;
+    onOpenHelpSupportModal: () => void;
 }
 
-const SettingsItem: React.FC<{label: string; description: string; onClick: () => void}> = ({ label, description, onClick }) => (
+const SettingsItem: React.FC<{label: string; description: string; onClick: () => void; hasChevron?: boolean;}> = ({ label, description, onClick, hasChevron = true }) => (
     <div onClick={onClick} className="flex justify-between items-center py-4 cursor-pointer group">
         <div>
             <p className="font-semibold text-deep-gray dark:text-white group-hover:text-primary transition-colors">{label}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
         </div>
-        <ChevronRightIcon className="w-5 h-5 text-gray-400"/>
+        {hasChevron && <ChevronRightIcon className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform"/>}
     </div>
 );
 
 const SettingsToggle: React.FC<{label: string; enabled: boolean; onToggle: () => void}> = ({ label, enabled, onToggle }) => (
-    <div className="flex justify-between items-center py-4">
+    <div className="flex justify-between items-center py-3">
         <p className="font-semibold text-deep-gray dark:text-white">{label}</p>
         <button
             onClick={onToggle}
@@ -32,7 +33,9 @@ const SettingsToggle: React.FC<{label: string; enabled: boolean; onToggle: () =>
 );
 
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout, onOpenPrivacyModal, onOpenPermissionsModal }) => {
+export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout, onOpenPrivacyModal, onOpenPermissionsModal, onOpenHelpSupportModal }) => {
+    const [isNotificationsExpanded, setNotificationsExpanded] = useState(false);
+    const [notificationPrefs, setNotificationPrefs] = useState({ likes: true, comments: true, follows: false });
     
     const generalSettings = [
         {
@@ -44,16 +47,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDar
             title: "Permissions",
             description: "Manage app permissions for camera, location etc.",
             action: onOpenPermissionsModal
-        },
-        {
-            title: "Notifications",
-            description: "Choose what updates you receive.",
-            action: () => {}
-        },
-        {
-            title: "Help & Support",
-            description: "Get help, send feedback, or contact us.",
-            action: () => {}
         },
     ];
 
@@ -68,6 +61,23 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDar
                          {generalSettings.map(item => (
                              <SettingsItem key={item.title} label={item.title} description={item.description} onClick={item.action} />
                          ))}
+                         <div onClick={() => setNotificationsExpanded(!isNotificationsExpanded)} className="cursor-pointer">
+                            <div className="flex justify-between items-center py-4 group">
+                                <div>
+                                    <p className="font-semibold text-deep-gray dark:text-white group-hover:text-primary transition-colors">Notifications</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Choose what updates you receive.</p>
+                                </div>
+                                <ChevronRightIcon className={`w-5 h-5 text-gray-400 transition-transform ${isNotificationsExpanded ? 'rotate-90' : ''}`}/>
+                            </div>
+                            {isNotificationsExpanded && (
+                                <div className="pb-2 pl-4 border-l-2 border-primary/20">
+                                    <SettingsToggle label="Likes" enabled={notificationPrefs.likes} onToggle={() => setNotificationPrefs(p => ({...p, likes: !p.likes}))}/>
+                                    <SettingsToggle label="Comments" enabled={notificationPrefs.comments} onToggle={() => setNotificationPrefs(p => ({...p, comments: !p.comments}))}/>
+                                    <SettingsToggle label="Follows" enabled={notificationPrefs.follows} onToggle={() => setNotificationPrefs(p => ({...p, follows: !p.follows}))}/>
+                                </div>
+                            )}
+                         </div>
+                         <SettingsItem label="Help & Support" description="Get help, send feedback, or contact us." onClick={onOpenHelpSupportModal} />
                     </div>
                 </div>
 
