@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { User, Post, View, Community, Event } from '../types';
-import { COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, XSocialIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon, CalendarIcon, CakeIcon } from '../constants';
+import { COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, XSocialIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon, CalendarIcon, CakeIcon, SettingsIcon } from '../constants';
 
 interface ProfileViewProps { 
     user: User;
@@ -131,7 +131,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, posts: allUserPo
                     <img src={user.avatarUrl} alt={user.name} className="w-32 h-32 rounded-full border-4 border-white dark:border-zinc-800 absolute -top-16 object-cover" />
                     <div className="flex justify-end mb-4">
                         {isOwnProfile ? (
-                            <button onClick={() => onNavigate('edit-profile')} className="bg-primary text-white font-semibold px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm">Edit Profile</button>
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => onNavigate('edit-profile')} className="bg-primary text-white font-semibold px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm">Edit Profile</button>
+                                <button onClick={() => onNavigate('settings')} className="bg-gray-200 dark:bg-zinc-700 p-2 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-600 transition-colors" aria-label="Settings">
+                                    <SettingsIcon className="w-6 h-6"/>
+                                </button>
+                            </div>
                         ) : (
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                                 <button onClick={() => onToggleFollow(user.id)} className={`font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm ${isFollowing ? 'bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300' : 'bg-primary text-white hover:bg-orange-600'}`}>{isFollowing ? 'Following' : 'Follow'}</button>

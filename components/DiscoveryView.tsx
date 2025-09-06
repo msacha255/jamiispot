@@ -12,7 +12,6 @@ interface DiscoveryViewProps {
     followingIds: Set<string>;
     onToggleFollow: (userId: string) => void;
     onOpenProfileModal: (user: User) => void;
-    // FIX: Add onOpenEventDetail to handle opening event details.
     onOpenEventDetail: (event: Event) => void;
 }
 

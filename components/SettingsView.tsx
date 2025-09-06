@@ -16,7 +16,6 @@ interface SettingsViewProps {
     onOpenLanguageModal: () => void;
     onOpenShareModal: () => void;
     language: Language;
-    // FIX: Add onOpenSecurityModal to props to handle opening the security modal.
     onOpenSecurityModal: () => void;
 }
 
@@ -27,7 +26,7 @@ const translations = {
     de: { settings: 'Einstellungen', language: 'Sprache', languageDesc: 'Wähle deine bevorzugte Sprache.'},
     pt: { settings: 'Configurações', language: 'Idioma', languageDesc: 'Escolha o seu idioma preferido.'},
     sw: { settings: 'Mipangilio', language: 'Lugha', languageDesc: 'Chagua lugha unayopendelea.'},
-    hi: { settings: 'सेटिंग्स', language: 'भाषा', languageDesc: 'अपनी पसंदीदा भाषा चुनें।'},
+    hi: { settings: 'सेटिंग्स', language: 'भाषा', languageDesc: ' अपनी पसंदीदा भाषा चुनें।'},
     zh: { settings: '设置', language: '语言', languageDesc: '选择您的首选语言。'},
     ja: { settings: '設定', language: '言語', languageDesc: 'ご希望の言語を選択してください。'},
     ar: { settings: 'الإعدادات', language: 'لغة', languageDesc: 'اختر لغتك المفضلة.'},

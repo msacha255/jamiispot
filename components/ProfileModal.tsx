@@ -2,9 +2,7 @@
 
 
 import React, { useState } from 'react';
-// FIX: Changed import from TwitterIcon to XSocialIcon to resolve module export error.
 import { XIcon, LockIcon, HeartIcon, MessageCircleIcon, CheckBadgeIcon, MoreVerticalIcon, ShareIcon, XSocialIcon, LinkedinIcon, GithubIcon } from '../constants';
-// FIX: Import Community type.
 import type { User, Post, View, Community } from '../types';
 import { MOCK_POSTS, COUNTRIES } from '../constants';
 
@@ -16,7 +14,6 @@ interface ProfileModalProps {
   onSendMessage: (user: User) => void;
   followingIds: Set<string>;
   onToggleFollow: (userId: string) => void;
-  // FIX: Add missing props to align with the parent component's call.
   posts: Post[];
   communities: Community[];
   onToggleArchive: (postId: string) => void;
@@ -28,7 +25,6 @@ const ProfilePostTile: React.FC<{ post: Post }> = ({ post }) => (
         {post.imageUrl && <img src={post.imageUrl} alt="Post" className="w-full h-full object-cover"/>}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white font-bold">
             <span className="flex items-center gap-1"><HeartIcon className="w-5 h-5"/> {post.likes}</span>
-            {/* FIX: Use `post.commentsData.length` to get the comment count, as `post.comments` does not exist on the `Post` type. */}
             <span className="flex items-center gap-1"><MessageCircleIcon className="w-5 h-5"/> {post.commentsData.length}</span>
         </div>
     </div>
@@ -53,7 +49,6 @@ const AboutTab: React.FC<{ user: User }> = ({ user }) => {
                  <div>
                     <h3 className="font-bold text-gray-800 dark:text-gray-200 mb-2">Socials</h3>
                     <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400">
-                        {/* FIX: Use XSocialIcon instead of the non-existent TwitterIcon. */}
                         {user.socialLinks?.twitter && <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><XSocialIcon className="w-6 h-6" /></a>}
                         {user.socialLinks?.linkedin && <a href={user.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><LinkedinIcon className="w-6 h-6" /></a>}
                         {user.socialLinks?.github && <a href={user.socialLinks.github} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><GithubIcon className="w-6 h-6" /></a>}
@@ -71,7 +66,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, use
     
     if (!isOpen || !user) return null;
 
-    // FIX: Use `posts` prop instead of MOCK_POSTS and filter out archived posts.
     const userPosts = posts.filter(p => p.user.id === user.id && !p.isArchived);
     const showContent = !user.isPrivate;
     const isFollowing = followingIds.has(user.id);
@@ -119,7 +113,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, use
                     <div className="p-6">
                         <div className="flex flex-col sm:flex-row justify-between -mt-16 sm:items-end gap-4">
                             <img src={user.avatarUrl} alt={user.name} className="w-24 h-24 rounded-full border-4 border-white dark:border-zinc-800 object-cover"/>
-                             {/* FIX: Conditionally render action buttons based on `isOwnProfile`. */}
                              {!isOwnProfile && (
                                 <div className="flex items-center gap-2 self-start sm:self-end">
                                     <button onClick={() => onToggleFollow(user.id)} className={`font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm flex-1 sm:flex-auto ${isFollowing ? 'bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300' : 'bg-primary text-white hover:bg-orange-600'}`}>{isFollowing ? 'Following' : 'Follow'}</button>

@@ -88,7 +88,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
   const [mentionSuggestions, setMentionSuggestions] = useState<User[]>([]);
   const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
   const [mentionRange, setMentionRange] = useState<Range | null>(null);
-  // FIX: Explicitly type the `postSettings` state to prevent type inference issues with string literals for `privacy` and `mediaQuality`.
   const [postSettings, setPostSettings] = useState<{
       privacy: 'public' | 'friends' | 'private';
       location: string;

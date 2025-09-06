@@ -3,7 +3,6 @@ export interface User {
   name: string;
   username: string;
   avatarUrl: string;
-  // FIX: Add optional email and password to the User type for use in forms.
   email?: string;
   password?: string;
   coverUrl?: string;
@@ -64,7 +63,6 @@ export interface Post {
   location?: string;
   mediaQuality?: 'standard' | 'high';
   isArchived?: boolean;
-  // FIX: Add optional tags array to support post tagging.
   tags?: string[];
 }
 
@@ -144,4 +142,4 @@ export interface LoginSession {
     isCurrent?: boolean;
 }
 
-export type View = 'feed' | 'discover' | 'messages' | 'notifications' | 'profile' | 'settings' | 'community-detail' | 'edit-profile';
+export type View = 'feed' | 'discover' | 'messages' | 'notifications' | 'profile' | 'settings' | 'community-detail' | 'edit-profile' | 'marketplace';

@@ -11,6 +11,7 @@ import { ProfileView } from './components/ProfileView';
 import { NotificationsView } from './components/NotificationsView';
 import { SettingsView } from './components/SettingsView';
 import { CommunityDetailView } from './components/GamificationView';
+import { MarketplaceView } from './components/MarketplaceView';
 import { BottomNavBar } from './components/BottomNavBar';
 import { CreatePostModal } from './components/CreatePostModal';
 import { EditPostModal } from './components/EditPostModal';
@@ -473,6 +474,8 @@ const App: React.FC = () => {
         return <EditProfileView user={currentUser} onUpdateUser={handleUpdateUser} onCancel={handleBack} />;
       case 'settings':
         return <SettingsView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onLogout={handleLogout} onOpenPrivacyModal={() => setPrivacyModalOpen(true)} onOpenPermissionsModal={() => setPermissionsModalOpen(true)} onOpenHelpSupportModal={() => setHelpSupportModalOpen(true)} onOpenBlockedUsers={() => setBlockedUsersModalOpen(true)} onOpenVerification={() => setVerificationModalOpen(true)} onOpenLanguageModal={() => setLanguageModalOpen(true)} onOpenShareModal={() => setShareModalOpen(true)} language={language} onOpenSecurityModal={() => setSecurityModalOpen(true)} />;
+      case 'marketplace':
+        return <MarketplaceView />;
       default:
         return <FeedView feedItems={feedItems} stories={stories} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenCreateStory={() => setCreateStoryModalOpen(true)} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenEventDetail={handleOpenEventDetail} {...commonPostHandlers} />;
     }
@@ -492,7 +495,7 @@ const App: React.FC = () => {
       <ToastNotification message={toastMessage} onDismiss={() => setToastMessage(null)} />
       <Sidebar activeView={activeView} setActiveView={navigateToView} user={currentUser} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header user={currentUser} showBack={navHistory.length > 1} onBack={handleBack} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenNotificationsModal={() => setNotificationsModalOpen(true)} onOpenSearch={() => setSearchModalOpen(true)} activeView={activeView}/>
+        <Header user={currentUser} showBack={navHistory.length > 1} onBack={handleBack} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenNotificationsModal={() => setNotificationsModalOpen(true)} onOpenSearch={() => setSearchModalOpen(true)} activeView={activeView} onOpenSettings={() => navigateToView('settings')}/>
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
           {renderView()}
         </main>

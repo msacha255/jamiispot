@@ -1,6 +1,6 @@
 import React from 'react';
 import type { User, View } from '../types';
-import { SearchIcon, PlusIcon, ChevronLeftIcon, BellIcon, JamiiSpotFullLogo } from '../constants';
+import { SearchIcon, PlusIcon, ChevronLeftIcon, BellIcon, JamiiSpotFullLogo, SettingsIcon } from '../constants';
 
 interface HeaderProps {
   user: User;
@@ -10,9 +10,10 @@ interface HeaderProps {
   onOpenNotificationsModal: () => void;
   onOpenSearch: () => void;
   activeView: View;
+  onOpenSettings: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ user, showBack, onBack, onOpenCreatePost, onOpenNotificationsModal, onOpenSearch, activeView }) => {
+export const Header: React.FC<HeaderProps> = ({ user, showBack, onBack, onOpenCreatePost, onOpenNotificationsModal, onOpenSearch, activeView, onOpenSettings }) => {
   return (
     <header className="bg-white dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 p-4 flex items-center justify-between gap-4">
       <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -52,6 +53,9 @@ export const Header: React.FC<HeaderProps> = ({ user, showBack, onBack, onOpenCr
         <button onClick={onOpenNotificationsModal} className="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700">
             <BellIcon className="w-6 h-6" />
             <span className="absolute top-1.5 right-1.5 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-zinc-800"></span>
+        </button>
+        <button onClick={onOpenSettings} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700">
+            <SettingsIcon className="w-6 h-6" />
         </button>
       </div>
     </header>

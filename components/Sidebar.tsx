@@ -1,5 +1,5 @@
 import React from 'react';
-import { JamiiSpotFullLogo, HomeIcon, CompassIcon, MessageIcon, BellIcon, SettingsIcon } from '../constants';
+import { JamiiSpotFullLogo, HomeIcon, CompassIcon, MessageIcon, BellIcon, SettingsIcon, StoreIcon } from '../constants';
 import type { View, User } from '../types';
 
 interface SidebarProps {
@@ -22,8 +22,6 @@ const NavItem: React.FC<{
         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
     }`}
   >
-    {/* FIX: Use React.isValidElement to safely clone the icon and add classes, resolving TypeScript errors. */}
-    {/* FIX: Add a generic type to React.isValidElement to provide type hints for the icon's props, resolving the cloneElement error. */}
     {React.isValidElement<{ className?: string }>(icon) ? React.cloneElement(icon, { className: `${icon.props.className || ''} transition-transform group-hover:scale-110` }) : icon}
     <span className="ml-4 font-semibold">{label}</span>
   </button>
@@ -33,6 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, use
   const navItems: {id: View, icon: React.ReactNode, label: string}[] = [
     { id: 'feed', icon: <HomeIcon className="w-6 h-6" />, label: 'Feed' },
     { id: 'discover', icon: <CompassIcon className="w-6 h-6" />, label: 'Discover' },
+    { id: 'marketplace', icon: <StoreIcon className="w-6 h-6" />, label: 'Marketplace' },
     { id: 'messages', icon: <MessageIcon className="w-6 h-6" />, label: 'Messages' },
     { id: 'notifications', icon: <BellIcon className="w-6 h-6" />, label: 'Notifications' },
   ];
@@ -67,12 +66,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, use
                     <p className="text-xs text-gray-500 dark:text-gray-400">@{user.username}</p>
                 </div>
             </div>
-             <NavItem
-                icon={<SettingsIcon className="w-6 h-6" />}
-                label="Settings"
-                isActive={activeView === 'settings'}
-                onClick={() => setActiveView('settings')}
-            />
         </div>
     </aside>
   );
