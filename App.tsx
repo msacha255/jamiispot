@@ -487,7 +487,7 @@ const App: React.FC = () => {
   };
 
   if (!isLoggedIn) {
-    return <AuthScreen onAuthSuccess={onAuthSuccess} />;
+    return <AuthScreen onAuthSuccess={onAuthSuccess} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />;
   }
 
   return (

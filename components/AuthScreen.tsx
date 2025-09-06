@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { JamiiSpotFullLogo, ChevronLeftIcon, MailIcon, UserIcon, LockIcon, CheckCircleIcon, CakeIcon, MOCK_USERS } from '../constants';
+import { JamiiSpotFullLogo, ChevronLeftIcon, MailIcon, UserIcon, LockIcon, CheckCircleIcon, CakeIcon, MOCK_USERS, SunIcon, MoonIcon } from '../constants';
 import { ForgotPasswordModal } from './ForgotPasswordModal';
 import { TermsAndPolicyModal } from './TermsAndPolicyModal';
 import type { User } from '../types';
 
 interface AuthScreenProps {
   onAuthSuccess: (user: User) => void;
+  isDarkMode: boolean;
+  setIsDarkMode: (isDark: boolean) => void;
 }
 
 const ProgressBar: React.FC<{step: number, total: number}> = ({ step, total }) => (
@@ -14,8 +16,15 @@ const ProgressBar: React.FC<{step: number, total: number}> = ({ step, total }) =
     </div>
 );
 
-const AuthContainer: React.FC<{ children: React.ReactNode, title: string, onBack?: () => void, progress?: {step: number, total: number} }> = ({ children, title, onBack, progress }) => (
-    <div className="min-h-screen bg-light-gray dark:bg-zinc-900 flex flex-col justify-center items-center p-4">
+const AuthContainer: React.FC<{ children: React.ReactNode, title: string, onBack?: () => void, progress?: {step: number, total: number}, isDarkMode: boolean, setIsDarkMode: (isDark: boolean) => void }> = ({ children, title, onBack, progress, isDarkMode, setIsDarkMode }) => (
+    <div className="min-h-screen bg-light-gray dark:bg-zinc-900 flex flex-col justify-center items-center p-4 relative">
+        <button
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className="absolute top-4 right-4 p-2 rounded-full bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-zinc-600 transition"
+            aria-label="Toggle dark mode"
+        >
+            {isDarkMode ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
+        </button>
         <div className="max-w-sm w-full">
             <div className="text-center mb-8">
                 <JamiiSpotFullLogo className="w-40 mx-auto" />
@@ -84,7 +93,7 @@ const BirthdaySelector: React.FC<{ value: string; onChange: (value: string) => v
 };
 
 
-export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
+export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, isDarkMode, setIsDarkMode }) => {
     const [step, setStep] = useState('welcome'); 
     const [signupStep, setSignupStep] = useState(1);
     const [formData, setFormData] = useState<Partial<User>>({});
@@ -133,10 +142,11 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
     }, [signupStep, formData.name]);
 
     const renderStep = () => {
+        const containerProps = { isDarkMode, setIsDarkMode };
         switch (step) {
             case 'login':
                 return (
-                    <AuthContainer title="Welcome Back" onBack={() => setStep('welcome')}>
+                    <AuthContainer title="Welcome Back" onBack={() => setStep('welcome')} {...containerProps}>
                         <form onSubmit={handleLoginSubmit} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="login-email">Username or Email</label>
@@ -170,7 +180,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
                 switch(signupStep) {
                     case 1:
                         return (
-                             <AuthContainer title="Create an account" onBack={() => setStep('welcome')} progress={{step:1, total:3}}>
+                             <AuthContainer title="Create an account" onBack={() => setStep('welcome')} progress={{step:1, total:3}} {...containerProps}>
                                 <form onSubmit={(e) => { e.preventDefault(); setSignupStep(2); }} className="space-y-4">
                                      <div>
                                         <label htmlFor="signup-name" className="block text-sm font-medium text-deep-gray dark:text-white mb-1">Full Name</label>
@@ -194,7 +204,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
                         );
                     case 2:
                          return (
-                             <AuthContainer title="Choose a username" onBack={() => setSignupStep(1)} progress={{step:2, total:3}}>
+                             <AuthContainer title="Choose a username" onBack={() => setSignupStep(1)} progress={{step:2, total:3}} {...containerProps}>
                                 <form onSubmit={(e) => { e.preventDefault(); handleSignupSubmit(e); }} className="space-y-4">
                                      <IconInput type="text" name="username" placeholder="Username" value={formData.username || ''} onChange={handleInputChange} required icon={<UserIcon className="w-5 h-5 text-gray-400" />} />
                                      <div>
@@ -212,7 +222,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
                 }
             default:
               return (
-                 <AuthContainer title="Join JamiiSpot">
+                 <AuthContainer title="Join JamiiSpot" {...containerProps}>
                     <div className="space-y-4">
                         <button onClick={() => { setStep('signup'); setSignupStep(1); }} className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition duration-300 shadow-md">
                             Sign Up
