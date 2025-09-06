@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
-import { XIcon, SearchIcon, MOCK_USERS, MOCK_POSTS, MOCK_COMMUNITIES } from '../constants';
+import { XIcon, SearchIcon } from '../constants';
+import { MOCK_USERS, MOCK_POSTS, MOCK_COMMUNITIES } from '../constants';
 import type { User, Post, Community, View } from '../types';
 
 interface SearchModalProps {
@@ -7,6 +9,8 @@ interface SearchModalProps {
   onClose: () => void;
   onNavigate: (view: View, params?: any) => void;
   onOpenProfile: (user: User) => void;
+  // FIX: Add optional `initialSearchTerm` prop to pre-fill the search input.
+  initialSearchTerm?: string;
 }
 
 const useDebounce = (value: string, delay: number) => {
@@ -22,17 +26,20 @@ const useDebounce = (value: string, delay: number) => {
     return debouncedValue;
 };
 
-export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNavigate, onOpenProfile }) => {
-    const [searchTerm, setSearchTerm] = useState('');
+export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNavigate, onOpenProfile, initialSearchTerm = '' }) => {
+    const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [activeTab, setActiveTab] = useState('all');
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
     useEffect(() => {
-        if (!isOpen) {
+        if (isOpen) {
+            // FIX: Set search term from prop when modal opens.
+            setSearchTerm(initialSearchTerm);
+        } else {
             setSearchTerm('');
             setActiveTab('all');
         }
-    }, [isOpen]);
+    }, [isOpen, initialSearchTerm]);
 
     const searchResults = useMemo(() => {
         if (!debouncedSearchTerm) {

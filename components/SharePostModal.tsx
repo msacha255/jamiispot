@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
-import { XIcon, TwitterIcon, FacebookIcon, WhatsAppIcon, LinkIcon } from '../constants';
+// FIX: Changed import from TwitterIcon to XSocialIcon to match updated constants.
+import { XIcon, XSocialIcon, FacebookIcon, WhatsAppIcon, LinkIcon } from '../constants';
 import type { Post } from '../types';
 
 interface SharePostModalProps {
@@ -35,8 +37,9 @@ export const SharePostModal: React.FC<SharePostModalProps> = ({ isOpen, onClose,
 
                 <div className="p-6">
                     <div className="flex justify-around items-center mb-6">
+                        {/* FIX: Use XSocialIcon component instead of TwitterIcon. */}
                         <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer" className="text-center text-gray-600 dark:text-gray-300 hover:text-primary">
-                            <TwitterIcon className="w-12 h-12 mx-auto"/>
+                            <XSocialIcon className="w-12 h-12 mx-auto"/>
                             <span className="text-sm mt-1">Twitter</span>
                         </a>
                          <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`} target="_blank" rel="noopener noreferrer" className="text-center text-gray-600 dark:text-gray-300 hover:text-primary">

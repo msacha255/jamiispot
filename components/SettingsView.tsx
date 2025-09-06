@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ChevronRightIcon, TranslateIcon } from '../constants';
 import type { Language } from '../types';
@@ -14,6 +15,8 @@ interface SettingsViewProps {
     onOpenLanguageModal: () => void;
     onOpenShareModal: () => void;
     language: Language;
+    // FIX: Add onOpenSecurityModal to props to handle opening the security modal.
+    onOpenSecurityModal: () => void;
 }
 
 const translations = {
@@ -58,7 +61,7 @@ const SettingsToggle: React.FC<{label: string; enabled: boolean; onToggle: () =>
 );
 
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout, onOpenPrivacyModal, onOpenPermissionsModal, onOpenHelpSupportModal, onOpenBlockedUsers, onOpenVerification, onOpenLanguageModal, onOpenShareModal, language }) => {
+export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout, onOpenPrivacyModal, onOpenPermissionsModal, onOpenHelpSupportModal, onOpenBlockedUsers, onOpenVerification, onOpenLanguageModal, onOpenShareModal, language, onOpenSecurityModal }) => {
     const [isNotificationsExpanded, setNotificationsExpanded] = useState(false);
     const [notificationPrefs, setNotificationPrefs] = useState({ likes: true, comments: true, follows: false });
     const t = useTranslation(language.code);
@@ -128,6 +131,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDar
                  <div className="p-6">
                     <h2 className="text-xl font-bold mb-2">Account</h2>
                     <div className="divide-y divide-gray-200 dark:divide-zinc-700">
+                        {/* FIX: Add SettingsItem for Security. */}
+                        <SettingsItem label="Security" description="Manage 2FA and login sessions." onClick={onOpenSecurityModal} />
                         <SettingsItem label="Blocked Users" description="Manage users you've blocked." onClick={onOpenBlockedUsers} />
                         <SettingsItem label="Request Verification" description="Get a badge to show your authenticity." onClick={onOpenVerification} />
                         <SettingsItem label="Share & Refer" description="Share your profile or invite friends." onClick={onOpenShareModal} />

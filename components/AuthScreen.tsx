@@ -1,9 +1,13 @@
+
 import React, { useState } from 'react';
-import { JamiiSpotFullLogo, ChevronLeftIcon, MailIcon, UserIcon, LockIcon, CheckCircleIcon } from '../constants';
+// FIX: Import User type and MOCK_USER for authentication callback.
+import { JamiiSpotFullLogo, ChevronLeftIcon, MailIcon, UserIcon, LockIcon, CheckCircleIcon, MOCK_USER } from '../constants';
 import { ForgotPasswordModal } from './ForgotPasswordModal';
+import type { User } from '../types';
 
 interface AuthScreenProps {
-  onLogin: () => void;
+  // FIX: Changed prop from `onLogin` to `onAuthSuccess` to match parent component and handle user data.
+  onAuthSuccess: (user: User) => void;
 }
 
 const SocialButton: React.FC<{ children: React.ReactNode; provider: string }> = ({ children, provider }) => (
@@ -43,7 +47,7 @@ const IconInput: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { icon: 
 );
 
 
-export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
+export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
     const [step, setStep] = useState('welcome'); // welcome, login, signup, success
     const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', password: '' });
     const [isForgotModalOpen, setForgotModalOpen] = useState(false);
@@ -61,7 +65,8 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
     
     const handleLoginSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onLogin();
+        // FIX: Pass a mock user object to satisfy the `onAuthSuccess` prop's signature.
+        onAuthSuccess(MOCK_USER);
     };
 
     const renderStep = () => {
@@ -136,7 +141,8 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
                                 <CheckCircleIcon className="w-10 h-10 text-green-600 dark:text-green-400" />
                             </div>
                             <p className="text-gray-600 dark:text-gray-300 mb-6">Your account has been successfully created. Welcome to JamiiSpot!</p>
-                            <button onClick={onLogin} className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition duration-300 shadow-md">
+                            {/* FIX: Call onAuthSuccess with a mock user object. */}
+                            <button onClick={() => onAuthSuccess(MOCK_USER)} className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition duration-300 shadow-md">
                                Get Started
                             </button>
                         </div>

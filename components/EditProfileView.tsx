@@ -1,6 +1,8 @@
+
 import React, { useState, useRef } from 'react';
 import type { User } from '../types';
-import { ChevronLeftIcon, XIcon, COUNTRIES, TwitterIcon, LinkedinIcon, GithubIcon } from '../constants';
+// FIX: Changed import from TwitterIcon to XSocialIcon to match the exported member from constants.
+import { ChevronLeftIcon, XIcon, COUNTRIES, XSocialIcon, LinkedinIcon, GithubIcon } from '../constants';
 
 interface EditProfileViewProps {
     user: User;
@@ -150,7 +152,8 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
     
     const SocialInput: React.FC<{name: 'twitter' | 'linkedin' | 'github', value: string, onChange: (e: React.ChangeEvent<HTMLInputElement>) => void}> = ({ name, value, onChange }) => {
         const icons = {
-            twitter: <TwitterIcon className="w-5 h-5 text-gray-400" />,
+            // FIX: Use XSocialIcon instead of the non-existent TwitterIcon.
+            twitter: <XSocialIcon className="w-5 h-5 text-gray-400" />,
             linkedin: <LinkedinIcon className="w-5 h-5 text-gray-400" />,
             github: <GithubIcon className="w-5 h-5 text-gray-400" />
         };

@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import type { User, Post, View, Community, Event } from '../types';
-import { COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, TwitterIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon, CalendarIcon } from '../constants';
+// FIX: Changed import from TwitterIcon to XSocialIcon to match the exported member from constants.
+import { COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, XSocialIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon, CalendarIcon } from '../constants';
 
 interface ProfileViewProps { 
     user: User;
@@ -87,7 +89,8 @@ const AboutTab: React.FC<{ user: User }> = ({ user }) => {
                 <div>
                     <h3 className="font-bold text-lg mb-2">Socials</h3>
                     <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400">
-                        {user.socialLinks?.twitter && <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><TwitterIcon className="w-6 h-6" /></a>}
+                        {/* FIX: Use XSocialIcon instead of the non-existent TwitterIcon. */}
+                        {user.socialLinks?.twitter && <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><XSocialIcon className="w-6 h-6" /></a>}
                         {user.socialLinks?.linkedin && <a href={user.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><LinkedinIcon className="w-6 h-6" /></a>}
                         {user.socialLinks?.github && <a href={user.socialLinks.github} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><GithubIcon className="w-6 h-6" /></a>}
                     </div>

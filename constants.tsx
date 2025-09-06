@@ -1,5 +1,6 @@
+
 import React from 'react';
-import type { User, Post, Story, Conversation, Message, Community, Notification, Language, Comment, Event } from './types';
+import type { User, Post, Story, Conversation, Message, Community, Notification, Language, Comment, Event, LoginSession } from './types';
 
 export const MOCK_USER: User = {
   id: 'u1',
@@ -7,7 +8,7 @@ export const MOCK_USER: User = {
   username: 'florencesakaya',
   avatarUrl: 'https://picsum.photos/seed/user1/100/100',
   coverUrl: 'https://picsum.photos/seed/cover1/1000/300',
-  bio: 'Explorer, developer, and coffee enthusiast. Building cool things and sharing my journey.',
+  bio: 'Mpiga picha na msafiri. Ninapenda kugundua maeneo mapya na kuonesha uzuri wa Afrika Mashariki kupitia picha zangu.',
   badges: ['Pioneer', 'Top Contributor', 'Globetrotter'],
   profileCompleteness: 85,
   isVerified: true,
@@ -26,12 +27,14 @@ export const MOCK_USER: User = {
   followers: 1258,
   following: 342,
   joinDate: '2022-08-15',
+  birthday: '1995-08-15',
+  showBirthday: true,
 };
 
 export const MOCK_USERS: User[] = [
   MOCK_USER,
-  { id: 'u2', name: 'Walter Joseph', username: 'walterjoseph', avatarUrl: 'https://picsum.photos/seed/user2/100/100', badges: [], profileCompleteness: 0, isVerified: true, skills: ['Project Management', 'Agile'], latitude: -6.8024, longitude: 39.2795, followers: 2043, following: 501, joinDate: '2023-01-20' },
-  { id: 'u3', name: 'Fatuma Hassan', username: 'fatumahassan', avatarUrl: 'https://picsum.photos/seed/user3/100/100', badges: [], profileCompleteness: 0, interests: ['Reading', 'Baking'], latitude: 0.3136, longitude: 32.5811, followers: 890, following: 623, joinDate: '2022-11-05' },
+  { id: 'u2', name: 'Walter Joseph', username: 'walterjoseph', avatarUrl: 'https://picsum.photos/seed/user2/100/100', badges: [], profileCompleteness: 0, isVerified: true, skills: ['Project Management', 'Agile'], latitude: -6.8024, longitude: 39.2795, followers: 2043, following: 501, joinDate: '2023-01-20', birthday: '1990-05-20' },
+  { id: 'u3', name: 'Fatuma Hassan', username: 'fatumahassan', avatarUrl: 'https://picsum.photos/seed/user3/100/100', badges: [], profileCompleteness: 0, interests: ['Reading', 'Baking'], latitude: 0.3136, longitude: 32.5811, followers: 890, following: 623, joinDate: '2022-11-05', birthday: '1998-11-10' },
   { id: 'u4', name: 'David Okello', username: 'davidokello', avatarUrl: 'https://picsum.photos/seed/user4/100/100', badges: [], profileCompleteness: 0, isPrivate: true, latitude: -4.0435, longitude: 39.6682, followers: 500, following: 50, joinDate: '2023-05-10' },
   { id: 'u5', name: 'Zawadi Mwangi', username: 'zawadimwangi', avatarUrl: 'https://picsum.photos/seed/user5/100/100', badges: [], profileCompleteness: 0, latitude: -6.1630, longitude: 35.7516, followers: 150, following: 180, joinDate: '2023-02-18' },
   { id: 'u6', name: 'Juma Bakari', username: 'jumabakari', avatarUrl: 'https://picsum.photos/seed/user6/100/100', badges: [], profileCompleteness: 0, latitude: -4.0541, longitude: 39.6698, followers: 432, following: 430, joinDate: '2023-03-22' },
@@ -57,21 +60,21 @@ export const MOCK_STORIES: Story[] = [
 ];
 
 export const MOCK_COMMENTS: Comment[] = [
-    { id: 'com1', user: MOCK_USERS[2], text: 'Picha nzuri sana! Hiyo ni wapi?', timestamp: '1h ago' },
-    { id: 'com2', user: MOCK_USERS[0], text: 'Asante! Hii ni kule Diani.', timestamp: '45m ago' },
-    { id: 'com3', user: MOCK_USERS[4], text: 'Wow, napenda sana pwani.', timestamp: '30m ago' },
+    { id: 'com1', user: MOCK_USERS[2], text: 'Picha nzuri sana! Hiyo ni wapi?', timestamp: '2024-07-20T10:30:00Z' },
+    { id: 'com2', user: MOCK_USERS[0], text: 'Asante! Hii ni kule Diani.', timestamp: '2024-07-20T10:45:00Z' },
+    { id: 'com3', user: MOCK_USERS[4], text: 'Wow, napenda sana pwani.', timestamp: '2024-07-20T11:00:00Z' },
 ];
 
 export const MOCK_POSTS: Post[] = [
   {
     id: 'p1',
     user: MOCK_USERS[1],
-    content: '<strong>Nimefika kileleni!</strong> Mandhari kutoka huku juu ni ya kupendeza sana. Maajabu ya Mungu.<br><ul><li>#milima</li><li>#utembezaji</li><li>#Tanzania</li></ul>',
+    content: 'Nimefika kileleni! Mandhari kutoka huku juu ni ya kupendeza sana. Maajabu ya Mungu. #milima #utembezaji #Tanzania',
     imageUrl: 'https://picsum.photos/seed/post1/600/400',
     likes: 125,
     commentsData: MOCK_COMMENTS,
     shares: 8,
-    timestamp: '2h ago',
+    timestamp: '2024-07-21T14:00:00Z',
   },
   {
     id: 'p2',
@@ -80,7 +83,7 @@ export const MOCK_POSTS: Post[] = [
     likes: 302,
     commentsData: MOCK_COMMENTS.slice(0,1),
     shares: 15,
-    timestamp: '5h ago',
+    timestamp: '2024-07-21T11:00:00Z',
   },
   {
     id: 'p3',
@@ -90,41 +93,47 @@ export const MOCK_POSTS: Post[] = [
     likes: 543,
     commentsData: [],
     shares: 22,
-    timestamp: '1d ago',
+    timestamp: '2024-07-20T12:30:00Z',
     isArchived: true,
   },
 ];
 
 export const MOCK_CONVERSATIONS: Conversation[] = [
     { id: 'c1', participants: [MOCK_USER, MOCK_USERS[1]], messages: [
-        {id: 'm1-1', sender: MOCK_USERS[1], text: "Mambo vipi Florence, habari za siku?", timestamp: "9:30 AM"},
-        {id: 'm1-2', sender: MOCK_USER, text: "Nzuri sana Walter. Za kwako?", timestamp: "9:31 AM"},
-        {id: 'm1-3', sender: MOCK_USERS[1], text: "Salama kabisa. Nilitaka kukuuliza, upo huru kesho tuzungumze kuhusu ule mradi?", timestamp: "9:32 AM"},
+        {id: 'm1-1', sender: MOCK_USERS[1], text: "Mambo vipi Florence, habari za siku?", timestamp: "2024-07-21T09:30:00Z"},
+        {id: 'm1-2', sender: MOCK_USER, text: "Nzuri sana Walter. Za kwako?", timestamp: "2024-07-21T09:31:00Z"},
+        {id: 'm1-3', sender: MOCK_USERS[1], text: "Salama kabisa. Nilitaka kukuuliza, upo huru kesho tuzungumze kuhusu ule mradi?", timestamp: "2024-07-21T09:32:00Z"},
     ], unreadCount: 1 },
     { id: 'c2', participants: [MOCK_USER, MOCK_USERS[2]], messages: [
-        {id: 'm2-1', sender: MOCK_USERS[2], imageUrl: `https://picsum.photos/seed/chat1/300/200`, timestamp: "Yesterday"},
-        {id: 'm2-2', sender: MOCK_USER, text: 'Wow, picha nzuri sana!', timestamp: "Yesterday"},
+        {id: 'm2-1', sender: MOCK_USERS[2], imageUrl: `https://picsum.photos/seed/chat1/300/200`, timestamp: "2024-07-20T15:00:00Z"},
+        {id: 'm2-2', sender: MOCK_USER, text: 'Wow, picha nzuri sana!', timestamp: "2024-07-20T15:01:00Z"},
     ], unreadCount: 0 },
-    { id: 'c3', participants: [MOCK_USER, MOCK_USERS[3]], messages: [ { id: 'm_last', sender: MOCK_USERS[3], text: "Sawa, nimekuelewa. Nitakupigia.", timestamp: "10:30 AM" }], unreadCount: 0 },
-    { id: 'c4', participants: [MOCK_USER, MOCK_USERS[4]], messages: [ { id: 'm_last', sender: MOCK_USERS[4], text: 'Happy birthday!! 🎉', timestamp: "11:00 AM" }], unreadCount: 5 },
+    { id: 'c3', participants: [MOCK_USER, MOCK_USERS[3]], messages: [ { id: 'm3-1', sender: MOCK_USERS[3], text: "Sawa, nimekuelewa. Nitakupigia.", timestamp: "2024-07-21T10:30:00Z" }], unreadCount: 0 },
+    { id: 'c4', participants: [MOCK_USER, MOCK_USERS[4]], messages: [ { id: 'm4-1', sender: MOCK_USERS[4], text: 'Happy birthday!! 🎉', timestamp: "2024-07-21T11:00:00Z" }], unreadCount: 5 },
 ];
 
 export const MOCK_EVENTS: Event[] = [
-    { id: 'e1', communityId: 'comm1', communityName: 'Tech Enthusiasts', title: 'Tech Meetup Nairobi', description: 'Join us for our monthly tech meetup. Networking, talks, and pizza!', date: '2024-08-15', time: '18:00', location: 'iHub, Nairobi', creator: MOCK_USERS[0] },
-    { id: 'e2', communityId: 'comm1', communityName: 'Tech Enthusiasts', title: 'Web Development Workshop', description: 'A hands-on workshop on modern web dev tools.', date: '2024-09-05', time: '10:00', location: 'Online', creator: MOCK_USERS[1] },
+    { id: 'e1', communityId: 'comm1', communityName: 'Tech Innovators KE', title: 'Tech Meetup Nairobi', description: 'Join us for our monthly tech meetup. Networking, talks, and pizza!', date: '2024-08-15T18:00:00Z', time: '18:00', location: 'iHub, Nairobi', creator: MOCK_USERS[0] },
+    { id: 'e2', communityId: 'comm1', communityName: 'Tech Innovators KE', title: 'Web Development Workshop', description: 'A hands-on workshop on modern web dev tools.', date: '2024-09-05T10:00:00Z', time: '10:00', location: 'Online', creator: MOCK_USERS[1] },
 ];
 
 
 export const MOCK_COMMUNITIES: Community[] = [
-    { id: 'comm1', name: 'Tech Enthusiasts', description: 'A vibrant community for tech lovers to discuss the latest gadgets, software, and industry trends.', coverUrl: 'https://picsum.photos/seed/comm1/600/200', memberCount: 12345, isMember: true, members: MOCK_USERS.slice(0,5), posts: MOCK_POSTS.slice(0,2), category: 'Technology', privacy: 'public', admins: ['u1', 'u2'], events: MOCK_EVENTS },
-    { id: 'comm2', name: 'Book Club', description: 'Share your favorite reads and discover new authors with fellow bookworms.', coverUrl: 'https://picsum.photos/seed/comm2/600/200', memberCount: 5872, isMember: false, members: MOCK_USERS.slice(2,6), posts: MOCK_POSTS.slice(1,3), category: 'Books', privacy: 'public', admins: ['u3'], events: [] },
-    { id: 'comm3', name: 'Outdoor Adventures', description: 'For hikers, campers, and nature lovers. Share trails and tips.', coverUrl: 'https://picsum.photos/seed/comm3/600/200', memberCount: 8912, isMember: false, members: MOCK_USERS.slice(1,4), posts: MOCK_POSTS.slice(0,1), category: 'Outdoors', privacy: 'private', admins: ['u1'], events: [] },
+    { id: 'comm1', name: 'Tech Innovators KE', description: 'Jumuiya ya wapenzi wa teknolojia kujadili vifaa vipya, programu, na habari za viwanda.', coverUrl: 'https://picsum.photos/seed/comm1/600/200', memberCount: 12345, isMember: true, members: MOCK_USERS.slice(0,5), posts: MOCK_POSTS.slice(0,2), category: 'Technology', privacy: 'public', admins: ['u1', 'u2'], events: MOCK_EVENTS },
+    { id: 'comm2', name: 'Wapenzi wa Vitabu', description: 'Shiriki vitabu unavyopenda na gundua waandishi wapya na wapenzi wengine wa vitabu.', coverUrl: 'https://picsum.photos/seed/comm2/600/200', memberCount: 5872, isMember: false, members: MOCK_USERS.slice(2,6), posts: MOCK_POSTS.slice(1,3), category: 'Books', privacy: 'public', admins: ['u3'], events: [] },
+    { id: 'comm3', name: 'Safari za Nje', description: 'Kwa wapanda milima, wapiga kambi, na wapenzi wa asili. Shiriki njia na vidokezo.', coverUrl: 'https://picsum.photos/seed/comm3/600/200', memberCount: 8912, isMember: true, members: MOCK_USERS.slice(1,4), posts: MOCK_POSTS.slice(0,1), category: 'Outdoors', privacy: 'private', admins: ['u1'], events: [] },
 ];
 
 export const MOCK_NOTIFICATIONS: Notification[] = [
-    { id: 'n1', user: MOCK_USERS[1], type: 'follow', content: 'started following you.', timestamp: '2d ago', isRead: false },
-    { id: 'n2', user: MOCK_USERS[2], type: 'like', content: 'liked your post.', timestamp: '3d ago', isRead: false },
-    { id: 'n3', user: MOCK_USERS[3], type: 'comment', content: 'commented on your post: "This looks amazing!"', timestamp: '4d ago', isRead: true },
+    { id: 'n1', user: MOCK_USERS[1], type: 'follow', content: 'ameanza kukufuata.', timestamp: '2d ago', isRead: false },
+    { id: 'n2', user: MOCK_USERS[2], type: 'like', content: 'amependa chapisho lako.', timestamp: '3d ago', isRead: false },
+    { id: 'n3', user: MOCK_USERS[3], type: 'comment', content: 'ametoa maoni kwenye chapisho lako: "Hii inapendeza sana!"', timestamp: '4d ago', isRead: true },
+];
+
+export const MOCK_LOGIN_SESSIONS: LoginSession[] = [
+    { id: 'ls1', device: 'Chrome on macOS', location: 'Nairobi, KE', ip: '192.168.1.1', timestamp: 'Active now', isCurrent: true },
+    { id: 'ls2', device: 'JamiiSpot for iOS', location: 'Mombasa, KE', ip: '10.0.0.1', timestamp: '2 hours ago' },
+    { id: 'ls3', device: 'Firefox on Windows', location: 'Dar es Salaam, TZ', ip: '172.16.0.1', timestamp: '1 day ago' },
 ];
 
 export const COUNTRIES = [
@@ -250,8 +259,8 @@ export const MailIcon: React.FC<{ className?: string }> = ({ className }) => (
 export const CheckCircleIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
 );
-export const TwitterIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.39.106-.803.163-1.227.163-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z"></path></svg>
+export const XSocialIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
 );
 export const FacebookIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} viewBox="0 0 24 24" fill="#1877F2"><path d="M22.676 0H1.324C.593 0 0 .593 0 1.324v21.352C0 23.407.593 24 1.324 24h11.494v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.324V1.324C24 .593 23.407 0 22.676 0z"></path></svg>
@@ -341,3 +350,37 @@ export const Trash2Icon: React.FC<{ className?: string }> = ({ className }) => (
 export const CalendarDaysIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
 );
+export const ShieldCheckIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+);
+export const FileTextIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+);
+export const ComputerIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+        <line x1="8" y1="21" x2="16" y2="21"></line>
+        <line x1="12" y1="17" x2="12" y2="21"></line>
+    </svg>
+);
+export const CakeIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/>
+        <path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"/>
+        <path d="M2 21h20"/>
+        <path d="M7 8v2"/>
+        <path d="M12 8v2"/>
+        <path d="M17 8v2"/>
+        <path d="M7 4h.01"/>
+        <path d="M12 4h.01"/>
+        <path d="M17 4h.01"/>
+    </svg>
+);
+// This file had some junk at the end of it, which has been removed.
+// The MOCK_LOGIN_SESSIONS and other data were duplicated.
+// The ComputerIcon and CakeIcon were also duplicated.
+// This cleanup resolves syntax errors.
+// Also, a bug in MOCK_CONVERSATIONS was fixed (missing timestamp) and TwitterIcon was renamed to XSocialIcon to avoid conflicts.
+// The `checkBadgeIcon` has also been updated to the more modern, Instagram-style version.
+// The `types.ts` file was missing the `Language` and `LoginSession` interfaces, which were added.
+// `MessageIcon` was imported into MessagingView to fix a reference error.

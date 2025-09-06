@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -24,6 +25,8 @@ export interface User {
   followers?: number;
   following?: number;
   joinDate?: string;
+  birthday?: string;
+  showBirthday?: boolean;
 }
 
 export interface Story {
@@ -50,7 +53,6 @@ export interface Post {
   content: string;
   imageUrl?: string;
   videoUrl?: string;
-  tags?: string[];
   likes: number;
   shares: number;
   timestamp: string;
@@ -60,6 +62,8 @@ export interface Post {
   location?: string;
   mediaQuality?: 'standard' | 'high';
   isArchived?: boolean;
+  // FIX: Add optional `tags` property to the Post interface.
+  tags?: string[];
 }
 
 export interface Message {
@@ -89,6 +93,8 @@ export interface Event {
     location: string;
     creator: User;
 }
+
+export type FeedItem = (Post & { type: 'post' }) | (Event & { type: 'event' });
 
 export interface Community {
     id: string;
@@ -127,5 +133,13 @@ export interface Permissions {
     notifications: boolean;
 }
 
+export interface LoginSession {
+    id: string;
+    device: string;
+    location: string;
+    ip: string;
+    timestamp: string;
+    isCurrent?: boolean;
+}
 
 export type View = 'feed' | 'discover' | 'messages' | 'notifications' | 'profile' | 'settings' | 'community-detail' | 'edit-profile';
