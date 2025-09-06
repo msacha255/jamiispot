@@ -465,8 +465,6 @@ const App: React.FC = () => {
       <SharePostModal isOpen={isSharePostModalOpen} onClose={() => setSharePostModalOpen(false)} post={postToShare} />
       <CreateEventModal isOpen={isCreateEventModalOpen} onClose={() => setCreateEventModalOpen(false)} community={selectedCommunityForEvent} onCreateEvent={handleCreateEvent} />
       <SecurityModal isOpen={isSecurityModalOpen} onClose={() => setSecurityModalOpen(false)} />
-      {/* This component is now managed inside AuthScreen to fix a bug */}
-      {/* <TermsAndPolicyModal isOpen={isTermsModalOpen} onClose={() => setTermsModalOpen(false)} onAccept={() => onAuthSuccess(signupData as User)} /> */}
     </div>
   );
 };
