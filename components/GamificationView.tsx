@@ -22,6 +22,8 @@ interface CommunityDetailViewProps {
   onToggleLike: (postId: string) => void;
   likedPostIds: Set<string>;
   onOpenCreateEvent: (community: Community) => void;
+  // FIX: Add onOpenEventDetail to handle opening event details.
+  onOpenEventDetail: (event: Event) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({ post, onOpenProfileModal, onOpenPostDetail, onOpenSharePost, onToggleLike, likedPostIds }) => {
@@ -74,8 +76,8 @@ const MemberItem: React.FC<{ member: User, onOpenProfileModal: (user: User) => v
     </div>
 );
 
-const EventCard: React.FC<{ event: Event }> = ({ event }) => (
-    <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 flex gap-4">
+const EventCard: React.FC<{ event: Event, onOpenEventDetail: (event: Event) => void }> = ({ event, onOpenEventDetail }) => (
+    <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 flex gap-4 cursor-pointer" onClick={() => onOpenEventDetail(event)}>
         <div className="flex flex-col items-center justify-center bg-primary/10 text-primary w-16 h-16 rounded-lg">
             <span className="text-xs font-bold uppercase">{new Date(event.date).toLocaleString('default', { month: 'short' })}</span>
             <span className="text-2xl font-bold">{new Date(event.date).getDate()}</span>
@@ -95,7 +97,7 @@ const EventCard: React.FC<{ event: Event }> = ({ event }) => (
 );
 
 
-export const CommunityDetailView: React.FC<CommunityDetailViewProps> = ({ community, currentUser, onOpenMap, onOpenSettings, onOpenCreateEvent, ...postCardHandlers }) => {
+export const CommunityDetailView: React.FC<CommunityDetailViewProps> = ({ community, currentUser, onOpenMap, onOpenSettings, onOpenCreateEvent, onOpenEventDetail, ...postCardHandlers }) => {
   const [activeTab, setActiveTab] = useState<'posts' | 'members' | 'events'>('posts');
   
   if (!community) {
@@ -184,7 +186,7 @@ export const CommunityDetailView: React.FC<CommunityDetailViewProps> = ({ commun
                         )}
                         <div className="space-y-4">
                             {community.events.length > 0 ? (
-                                community.events.map(event => <EventCard key={event.id} event={event} />)
+                                community.events.map(event => <EventCard key={event.id} event={event} onOpenEventDetail={onOpenEventDetail} />)
                             ) : (
                                 <div className="text-center py-10 text-gray-500 dark:text-gray-400 bg-white dark:bg-zinc-800 rounded-xl shadow-sm">
                                     <p className="font-semibold">No upcoming events</p>

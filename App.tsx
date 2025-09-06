@@ -32,6 +32,7 @@ import { SharePostModal } from './components/SharePostModal';
 import { CreateEventModal } from './components/CreateEventModal';
 import { SecurityModal } from './components/SecurityModal';
 import { ToastNotification } from './components/ToastNotification';
+import { EventDetailModal } from './components/EventDetailModal';
 
 import type { View, Post, User, Story, Community, Conversation, Notification, Permissions, Language, Comment, Event, Message, FeedItem } from './types';
 import { MOCK_USERS, MOCK_POSTS, MOCK_STORIES, MOCK_COMMUNITIES, MOCK_CONVERSATIONS, MOCK_NOTIFICATIONS, SUPPORTED_LANGUAGES } from './constants';
@@ -79,6 +80,7 @@ const App: React.FC = () => {
   const [isSharePostModalOpen, setSharePostModalOpen] = useState(false);
   const [isCreateEventModalOpen, setCreateEventModalOpen] = useState(false);
   const [isSecurityModalOpen, setSecurityModalOpen] = useState(false);
+  const [isEventDetailModalOpen, setEventDetailModalOpen] = useState(false);
   
   // Data for Modals
   const [selectedCommunityForMap, setSelectedCommunityForMap] = useState<Community | null>(null);
@@ -88,6 +90,7 @@ const App: React.FC = () => {
   const [userToBlock, setUserToBlock] = useState<User | null>(null);
   const [postForDetail, setPostForDetail] = useState<Post | null>(null);
   const [postToShare, setPostToShare] = useState<Post | null>(null);
+  const [eventForDetail, setEventForDetail] = useState<Event | null>(null);
   const [initialSearchTerm, setInitialSearchTerm] = useState('');
 
 
@@ -116,8 +119,12 @@ const App: React.FC = () => {
   const onAuthSuccess = useCallback((user: User) => {
     setCurrentUser(user);
     setIsLoggedIn(true);
+    setNavHistory([{ view: 'feed' }]);
   }, []);
-  const handleLogout = useCallback(() => setIsLoggedIn(false), []);
+  const handleLogout = useCallback(() => {
+    setIsLoggedIn(false);
+    setNavHistory([{ view: 'feed' }]);
+  }, []);
 
   const handleOpenProfileModal = useCallback((user: User) => {
     setSelectedUserForProfile(user);
@@ -167,12 +174,21 @@ const App: React.FC = () => {
       ...message
     };
     
-    setConversations(prev => prev.map(c => {
-      if (c.id === conversationId) {
-        return { ...c, messages: [...c.messages, newMessage] };
-      }
-      return c;
-    }));
+    setConversations(prev => {
+        const newConversations = prev.map(c => {
+          if (c.id === conversationId) {
+            return { ...c, messages: [...c.messages, newMessage] };
+          }
+          return c;
+        });
+        // Move updated conversation to the top
+        const updatedConvoIndex = newConversations.findIndex(c => c.id === conversationId);
+        if (updatedConvoIndex > 0) {
+            const updatedConvo = newConversations.splice(updatedConvoIndex, 1)[0];
+            newConversations.unshift(updatedConvo);
+        }
+        return newConversations;
+    });
   };
 
   const handleToggleFollow = (userId: string) => {
@@ -293,6 +309,11 @@ const App: React.FC = () => {
     setPostToShare(post);
     setSharePostModalOpen(true);
   }, []);
+  
+  const handleOpenEventDetail = useCallback((event: Event) => {
+    setEventForDetail(event);
+    setEventDetailModalOpen(true);
+  }, []);
 
   const handleCreateCommunity = useCallback((communityData: Omit<Community, 'id' | 'memberCount' | 'members' | 'posts' | 'isMember' | 'admins' | 'events'>) => {
     const newCommunity: Community = {
@@ -391,11 +412,11 @@ const App: React.FC = () => {
 
     switch (activeView) {
       case 'feed':
-        return <FeedView feedItems={feedItems} stories={filteredStories} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenCreateStory={() => setCreateStoryModalOpen(true)} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} {...commonPostHandlers} />;
+        return <FeedView feedItems={feedItems} stories={filteredStories} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenCreateStory={() => setCreateStoryModalOpen(true)} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenEventDetail={handleOpenEventDetail} {...commonPostHandlers} />;
       case 'discover':
         const allEvents = communities.flatMap(c => c.events);
         const suggestedUsers = MOCK_USERS.filter(u => u.id !== currentUser.id && !followingIds.has(u.id));
-        return <DiscoveryView communities={communities} events={allEvents} suggestedUsers={suggestedUsers} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenCreateCommunity={() => setCreateCommunityModalOpen(true)} currentUser={currentUser} followingIds={followingIds} onToggleFollow={handleToggleFollow} onOpenProfileModal={handleOpenProfileModal} />;
+        return <DiscoveryView communities={communities} events={allEvents} suggestedUsers={suggestedUsers} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenCreateCommunity={() => setCreateCommunityModalOpen(true)} currentUser={currentUser} followingIds={followingIds} onToggleFollow={handleToggleFollow} onOpenProfileModal={handleOpenProfileModal} onOpenEventDetail={handleOpenEventDetail} />;
       case 'community-detail':
         const community = communities.find(c => c.id === activeParams?.communityId);
         if (!community) return <div className="text-center p-8">Community not found</div>;
@@ -404,7 +425,7 @@ const App: React.FC = () => {
             posts: community.posts.filter(p => !blockedUserIds.has(p.user.id) && !p.isArchived),
             members: community.members.filter(m => !blockedUserIds.has(m.id)),
         };
-        return <CommunityDetailView community={communityWithFilteredContent} onOpenMap={handleOpenCommunityMap} onOpenSettings={handleOpenCommunitySettings} currentUser={currentUser} onOpenCreateEvent={handleOpenCreateEvent} {...commonPostHandlers}/>;
+        return <CommunityDetailView community={communityWithFilteredContent} onOpenMap={handleOpenCommunityMap} onOpenSettings={handleOpenCommunitySettings} currentUser={currentUser} onOpenCreateEvent={handleOpenCreateEvent} onOpenEventDetail={handleOpenEventDetail} {...commonPostHandlers}/>;
       case 'messages':
         return <MessagingView conversations={filteredConversations} currentUser={currentUser} onSendMessage={handleSendMessage} activeConversationIdParam={activeParams?.conversationId} />;
       case 'notifications':
@@ -421,13 +442,13 @@ const App: React.FC = () => {
       case 'settings':
         return <SettingsView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onLogout={handleLogout} onOpenPrivacyModal={() => setPrivacyModalOpen(true)} onOpenPermissionsModal={() => setPermissionsModalOpen(true)} onOpenHelpSupportModal={() => setHelpSupportModalOpen(true)} onOpenBlockedUsers={() => setBlockedUsersModalOpen(true)} onOpenVerification={() => setVerificationModalOpen(true)} onOpenLanguageModal={() => setLanguageModalOpen(true)} onOpenShareModal={() => setShareModalOpen(true)} language={language} onOpenSecurityModal={() => setSecurityModalOpen(true)} />;
       default:
-        return <FeedView feedItems={feedItems} stories={stories} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenCreateStory={() => setCreateStoryModalOpen(true)} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} {...commonPostHandlers} />;
+        return <FeedView feedItems={feedItems} stories={stories} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenCreateStory={() => setCreateStoryModalOpen(true)} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenEventDetail={handleOpenEventDetail} {...commonPostHandlers} />;
     }
   };
   
   const navigateToView = (view: View, params?: any) => {
     const navParams = (view === 'profile' && !params) ? { userId: currentUser.id } : params;
-    setNavHistory([{ view, params: navParams }]);
+    handleNavigate(view, navParams);
   };
 
   if (!isLoggedIn) {
@@ -465,6 +486,7 @@ const App: React.FC = () => {
       <SharePostModal isOpen={isSharePostModalOpen} onClose={() => setSharePostModalOpen(false)} post={postToShare} />
       <CreateEventModal isOpen={isCreateEventModalOpen} onClose={() => setCreateEventModalOpen(false)} community={selectedCommunityForEvent} onCreateEvent={handleCreateEvent} />
       <SecurityModal isOpen={isSecurityModalOpen} onClose={() => setSecurityModalOpen(false)} />
+      <EventDetailModal isOpen={isEventDetailModalOpen} onClose={() => setEventDetailModalOpen(false)} event={eventForDetail} onCommunitySelect={(id) => { setEventDetailModalOpen(false); handleNavigate('community-detail', { communityId: id })}} />
     </div>
   );
 };

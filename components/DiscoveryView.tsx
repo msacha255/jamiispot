@@ -12,6 +12,8 @@ interface DiscoveryViewProps {
     followingIds: Set<string>;
     onToggleFollow: (userId: string) => void;
     onOpenProfileModal: (user: User) => void;
+    // FIX: Add onOpenEventDetail to handle opening event details.
+    onOpenEventDetail: (event: Event) => void;
 }
 
 const FeaturedCommunityCard: React.FC<{ community: Community, onClick: () => void }> = ({ community, onClick }) => (
@@ -50,21 +52,21 @@ const SuggestedUserCard: React.FC<{user: User, isFollowing: boolean, onToggleFol
     </div>
 );
 
-const UpcomingEventCard: React.FC<{event: Event, onCommunitySelect: () => void}> = ({ event, onCommunitySelect }) => (
-    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-4 flex gap-4">
+const UpcomingEventCard: React.FC<{event: Event, onCommunitySelect: () => void, onOpenEventDetail: (event: Event) => void}> = ({ event, onCommunitySelect, onOpenEventDetail }) => (
+    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-4 flex gap-4 cursor-pointer" onClick={() => onOpenEventDetail(event)}>
         <div className="flex flex-col items-center justify-center bg-primary/10 text-primary w-16 h-16 rounded-lg flex-shrink-0">
             <span className="text-xs font-bold uppercase">{new Date(event.date).toLocaleString('default', { month: 'short' })}</span>
             <span className="text-2xl font-bold">{new Date(event.date).getDate()}</span>
         </div>
         <div>
             <h4 className="font-bold truncate">{event.title}</h4>
-            <p className="text-sm text-primary font-semibold mt-1 cursor-pointer hover:underline" onClick={onCommunitySelect}>{event.communityName}</p>
+            <p className="text-sm text-primary font-semibold mt-1 cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); onCommunitySelect() }}>{event.communityName}</p>
         </div>
     </div>
 );
 
 
-export const DiscoveryView: React.FC<DiscoveryViewProps> = ({ communities, events, suggestedUsers, onCommunitySelect, onOpenCreateCommunity, followingIds, onToggleFollow, onOpenProfileModal }) => {
+export const DiscoveryView: React.FC<DiscoveryViewProps> = ({ communities, events, suggestedUsers, onCommunitySelect, onOpenCreateCommunity, followingIds, onToggleFollow, onOpenProfileModal, onOpenEventDetail }) => {
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     
     const filteredCommunities = activeCategory ? communities.filter(c => c.category === activeCategory) : communities;
@@ -112,6 +114,7 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({ communities, event
                                 key={event.id}
                                 event={event}
                                 onCommunitySelect={() => onCommunitySelect(event.communityId)}
+                                onOpenEventDetail={onOpenEventDetail}
                             />
                         ))}
                     </div>

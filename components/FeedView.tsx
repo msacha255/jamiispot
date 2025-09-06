@@ -37,6 +37,8 @@ interface EventCardProps {
   event: Event;
   onCommunitySelect: (id: string) => void;
   onOpenProfileModal: (user: User) => void;
+  // FIX: Add onOpenEventDetail to handle opening event details.
+  onOpenEventDetail: (event: Event) => void;
 }
 
 interface FeedViewProps {
@@ -53,6 +55,8 @@ interface FeedViewProps {
   onCommunitySelect: (id: string) => void;
   onToggleArchive: (postId: string) => void;
   onHashtagClick: (hashtag: string) => void;
+  // FIX: Add onOpenEventDetail to handle opening event details.
+  onOpenEventDetail: (event: Event) => void;
 }
 
 const CreatePostTrigger: React.FC<{ user: User, onClick: () => void }> = ({ user, onClick }) => (
@@ -154,15 +158,15 @@ const PostCard: React.FC<PostCardProps> = ({ post, currentUser, onOpenProfileMod
   );
 };
 
-const EventCard: React.FC<EventCardProps> = ({ event, onCommunitySelect, onOpenProfileModal }) => (
-  <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden">
+const EventCard: React.FC<EventCardProps> = ({ event, onCommunitySelect, onOpenProfileModal, onOpenEventDetail }) => (
+  <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden cursor-pointer" onClick={() => onOpenEventDetail(event)}>
     <div className="p-5">
       <div className="flex items-center mb-4">
-        <img src={event.creator.avatarUrl} alt={event.creator.name} className="w-12 h-12 rounded-full cursor-pointer" onClick={() => onOpenProfileModal(event.creator)} />
+        <img src={event.creator.avatarUrl} alt={event.creator.name} className="w-12 h-12 rounded-full cursor-pointer" onClick={(e) => { e.stopPropagation(); onOpenProfileModal(event.creator); }} />
         <div className="ml-4">
-          <p className="font-bold text-deep-gray dark:text-white cursor-pointer" onClick={() => onOpenProfileModal(event.creator)}>{event.creator.name}</p>
+          <p className="font-bold text-deep-gray dark:text-white cursor-pointer" onClick={(e) => { e.stopPropagation(); onOpenProfileModal(event.creator); }}>{event.creator.name}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            posted an event in <span className="font-semibold text-primary cursor-pointer hover:underline" onClick={() => onCommunitySelect(event.communityId)}>{event.communityName}</span>
+            posted an event in <span className="font-semibold text-primary cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); onCommunitySelect(event.communityId); }}>{event.communityName}</span>
           </p>
         </div>
       </div>
@@ -190,7 +194,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onCommunitySelect, onOpenP
   </div>
 );
 
-export const FeedView: React.FC<FeedViewProps> = ({ feedItems, stories, currentUser, onOpenCreatePost, onOpenCreateStory, onCommunitySelect, ...postCardHandlers }) => {
+export const FeedView: React.FC<FeedViewProps> = ({ feedItems, stories, currentUser, onOpenCreatePost, onOpenCreateStory, onCommunitySelect, onOpenEventDetail, ...postCardHandlers }) => {
   return (
     <div className="max-w-3xl mx-auto">
       <Stories stories={stories} onAdd={onOpenCreateStory} onOpenProfileModal={postCardHandlers.onOpenProfileModal} />
@@ -202,7 +206,7 @@ export const FeedView: React.FC<FeedViewProps> = ({ feedItems, stories, currentU
               // FIX: Pass the `currentUser` prop to `PostCard` as it is a required prop. The `currentUser` was destructured from `FeedViewProps` and was not part of the `postCardHandlers` rest object.
               return <PostCard key={item.id} post={item} currentUser={currentUser} {...postCardHandlers} />;
             case 'event':
-              return <EventCard key={item.id} event={item} onCommunitySelect={onCommunitySelect} onOpenProfileModal={postCardHandlers.onOpenProfileModal} />;
+              return <EventCard key={item.id} event={item} onCommunitySelect={onCommunitySelect} onOpenProfileModal={postCardHandlers.onOpenProfileModal} onOpenEventDetail={onOpenEventDetail} />;
             default:
               return null;
           }
