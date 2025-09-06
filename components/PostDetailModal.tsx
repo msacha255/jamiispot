@@ -11,6 +11,9 @@ interface PostDetailModalProps {
   likedPostIds: Set<string>;
   onToggleLike: (postId: string) => void;
   onOpenShare: (post: Post) => void;
+  onToggleArchive: (postId: string) => void;
+  onHashtagClick: (hashtag: string) => void;
+  onOpenProfile: (user: User) => void;
 }
 
 const CommentItem: React.FC<{ comment: Comment }> = ({ comment }) => (

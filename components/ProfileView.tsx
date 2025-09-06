@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import type { User, Post, View, Community, Event } from '../types';
-import { MOCK_POSTS, COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, TwitterIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon, CalendarIcon } from '../constants';
+import { COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, TwitterIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon, CalendarIcon } from '../constants';
 
 interface ProfileViewProps { 
-    user: User; 
+    user: User;
+    posts: Post[];
     isOwnProfile: boolean; 
     onNavigate: (view: View, params?: any) => void; 
     onBlockUser: (user: User) => void;
@@ -11,6 +12,7 @@ interface ProfileViewProps {
     followingIds: Set<string>;
     onToggleFollow: (userId: string) => void;
     communities: Community[];
+    onToggleArchive: (postId: string) => void;
 }
 
 const Stat: React.FC<{ value?: number; label: string }> = ({ value, label }) => (
@@ -95,11 +97,10 @@ const AboutTab: React.FC<{ user: User }> = ({ user }) => {
     );
 };
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ user, isOwnProfile, onNavigate, onBlockUser, onSendMessage, followingIds, onToggleFollow, communities }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ user, posts: userPosts, isOwnProfile, onNavigate, onBlockUser, onSendMessage, followingIds, onToggleFollow, communities }) => {
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'posts' | 'about' | 'events'>('posts');
     
-    const userPosts = MOCK_POSTS.filter(p => p.user.id === user.id);
     const userEvents = communities.flatMap(c => c.events).filter(e => e.creator.id === user.id);
     const showContent = isOwnProfile || !user.isPrivate;
     const isFollowing = followingIds.has(user.id);

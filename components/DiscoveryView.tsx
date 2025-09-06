@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { COMMUNITY_CATEGORIES, SearchIcon, UsersIcon, PlusIcon } from '../constants';
-import type { Community } from '../types';
+import type { Community, Event, User } from '../types';
 
 interface DiscoveryViewProps {
     communities: Community[];
+    events: Event[];
     onCommunitySelect: (id: string) => void;
     onOpenCreateCommunity: () => void;
+    currentUser: User;
+    followingIds: Set<string>;
+    onToggleFollow: (userId: string) => void;
+    onOpenProfileModal: (user: User) => void;
 }
 
 const FeaturedCommunityCard: React.FC<{ community: Community, onClick: () => void }> = ({ community, onClick }) => (

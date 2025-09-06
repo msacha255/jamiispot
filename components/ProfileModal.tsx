@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { XIcon, LockIcon, HeartIcon, MessageCircleIcon, CheckBadgeIcon, MoreVerticalIcon, ShareIcon, TwitterIcon, LinkedinIcon, GithubIcon } from '../constants';
-import type { User, Post } from '../types';
+import type { User, Post, View } from '../types';
 import { MOCK_POSTS, COUNTRIES } from '../constants';
 
 interface ProfileModalProps {
@@ -12,6 +12,8 @@ interface ProfileModalProps {
   onSendMessage: (user: User) => void;
   followingIds: Set<string>;
   onToggleFollow: (userId: string) => void;
+  onNavigate: (view: View, params?: any) => void;
+  onOpenShare: (post: Post) => void;
 }
 
 const ProfilePostTile: React.FC<{ post: Post }> = ({ post }) => (

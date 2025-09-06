@@ -59,6 +59,7 @@ export interface Post {
   scheduledTime?: string;
   location?: string;
   mediaQuality?: 'standard' | 'high';
+  isArchived?: boolean;
 }
 
 export interface Message {

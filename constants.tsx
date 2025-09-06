@@ -1,4 +1,3 @@
-
 import React from 'react';
 import type { User, Post, Story, Conversation, Message, Community, Notification, Language, Comment, Event } from './types';
 
@@ -18,7 +17,7 @@ export const MOCK_USER: User = {
   country: 'KE',
   showFlag: true,
   socialLinks: {
-    twitter: 'https://twitter.com/jamii_spot',
+    twitter: 'https://x.com/jamii_spot',
     linkedin: 'https://linkedin.com/in/jamiispot',
     github: 'https://github.com/jamiispot',
   },
@@ -77,7 +76,7 @@ export const MOCK_POSTS: Post[] = [
   {
     id: 'p2',
     user: MOCK_USERS[2],
-    content: 'Nimetumia wikendi yangu kutengeneza mradi huu mdogo na wa kufurahisha kwa kutumia React na Tailwind. Inashangaza unachoweza kuunda kwa siku chache tu!',
+    content: 'Nimetumia wikendi yangu kutengeneza mradi huu mdogo na wa kufurahisha kwa kutumia React na Tailwind. Inashangaza unachoweza kuunda kwa siku chache tu! #reactdev #webdesign',
     likes: 302,
     commentsData: MOCK_COMMENTS.slice(0,1),
     shares: 15,
@@ -86,12 +85,13 @@ export const MOCK_POSTS: Post[] = [
   {
     id: 'p3',
     user: MOCK_USERS[5],
-    content: 'Chakula cha mchana leo kilikuwa kitamu sana! Pilau na kachumbari. Je, wewe umekula nini?',
+    content: 'Chakula cha mchana leo kilikuwa kitamu sana! Pilau na kachumbari. Je, wewe umekula nini? #chakula #mapishi',
     imageUrl: 'https://picsum.photos/seed/post3/600/800',
     likes: 543,
     commentsData: [],
     shares: 22,
     timestamp: '1d ago',
+    isArchived: true,
   },
 ];
 
@@ -106,7 +106,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
         {id: 'm2-2', sender: MOCK_USER, text: 'Wow, picha nzuri sana!', timestamp: "Yesterday"},
     ], unreadCount: 0 },
     { id: 'c3', participants: [MOCK_USER, MOCK_USERS[3]], messages: [ { id: 'm_last', sender: MOCK_USERS[3], text: "Sawa, nimekuelewa. Nitakupigia.", timestamp: "10:30 AM" }], unreadCount: 0 },
-    // FIX: Add the required `timestamp` property to the message object to conform to the `Message` type.
     { id: 'c4', participants: [MOCK_USER, MOCK_USERS[4]], messages: [ { id: 'm_last', sender: MOCK_USERS[4], text: 'Happy birthday!! 🎉', timestamp: "11:00 AM" }], unreadCount: 5 },
 ];
 
@@ -219,7 +218,7 @@ export const ChevronRightIcon: React.FC<{ className?: string }> = ({ className }
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
 );
 export const XIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 );
 export const ImageIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
@@ -332,4 +331,13 @@ export const CalendarIcon: React.FC<{ className?: string }> = ({ className }) =>
 );
 export const PaperclipIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+);
+export const ArchiveIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+);
+export const Trash2Icon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+);
+export const CalendarDaysIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
 );
