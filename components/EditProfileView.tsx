@@ -1,0 +1,198 @@
+import React, { useState, useRef } from 'react';
+import type { User } from '../types';
+import { ChevronLeftIcon, XIcon, COUNTRIES } from '../constants';
+
+interface EditProfileViewProps {
+    user: User;
+    onUpdateUser: (updatedUser: User) => void;
+    onCancel: () => void;
+}
+
+const TagInput: React.FC<{
+    label: string;
+    tags: string[];
+    setTags: (tags: string[]) => void;
+}> = ({ label, tags, setTags }) => {
+    const [currentTag, setCurrentTag] = useState('');
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && currentTag.trim()) {
+            e.preventDefault();
+            if (!tags.includes(currentTag.trim())) {
+                setTags([...tags, currentTag.trim()]);
+            }
+            setCurrentTag('');
+        }
+    };
+
+    const removeTag = (tagToRemove: string) => {
+        setTags(tags.filter(tag => tag !== tagToRemove));
+    };
+
+    return (
+        <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
+            <input 
+                type="text"
+                value={currentTag}
+                onChange={(e) => setCurrentTag(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={`Add ${label.toLowerCase()}... (press Enter)`}
+                className="w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
+            />
+            <div className="flex flex-wrap gap-2 mt-2">
+                {tags.map((tag) => (
+                    <div key={tag} className="flex items-center bg-gray-200 dark:bg-zinc-600 text-sm font-semibold pl-3 pr-2 py-1 rounded-full">
+                        <span>{tag}</span>
+                        <button onClick={() => removeTag(tag)} className="ml-1.5 text-gray-500 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-zinc-500 rounded-full">
+                            <XIcon className="w-4 h-4" />
+                        </button>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+
+export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdateUser, onCancel }) => {
+    const [formData, setFormData] = useState({
+        name: user.name,
+        username: user.username,
+        bio: user.bio || '',
+        location: user.location || '',
+        country: user.country || '',
+    });
+    const [showFlag, setShowFlag] = useState(user.showFlag || false);
+    const [interests, setInterests] = useState(user.interests || []);
+    const [skills, setSkills] = useState(user.skills || []);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(user.avatarUrl);
+    const [coverPreview, setCoverPreview] = useState<string | null>(user.coverUrl || null);
+
+    const avatarInputRef = useRef<HTMLInputElement>(null);
+    const coverInputRef = useRef<HTMLInputElement>(null);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (type === 'avatar') {
+                    setAvatarPreview(reader.result as string);
+                } else {
+                    setCoverPreview(reader.result as string);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleSave = () => {
+        const updatedUser: User = {
+            ...user,
+            ...formData,
+            avatarUrl: avatarPreview || user.avatarUrl,
+            coverUrl: coverPreview || user.coverUrl,
+            interests,
+            skills,
+            showFlag,
+        };
+        onUpdateUser(updatedUser);
+    };
+    
+    const FormSection: React.FC<{title: string; children: React.ReactNode}> = ({title, children}) => (
+        <div className="p-6 space-y-6">
+            <h2 className="text-lg font-bold border-b border-gray-200 dark:border-zinc-700 pb-2">{title}</h2>
+            {children}
+        </div>
+    );
+
+    return (
+        <div className="max-w-4xl mx-auto">
+            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm">
+                <div className="p-4 flex items-center border-b border-gray-200 dark:border-zinc-700">
+                    <button onClick={onCancel} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 mr-2">
+                        <ChevronLeftIcon className="w-6 h-6" />
+                    </button>
+                    <h1 className="text-xl font-bold font-display">Edit Profile</h1>
+                </div>
+
+                <div className="relative">
+                    <div className="h-48 bg-cover bg-center bg-gray-200 dark:bg-zinc-700" style={{ backgroundImage: `url(${coverPreview})` }}>
+                        <button onClick={() => coverInputRef.current?.click()} className="absolute inset-0 w-full h-full bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity text-white font-semibold">
+                            Change Cover Photo
+                        </button>
+                        <input type="file" accept="image/*" ref={coverInputRef} onChange={(e) => handleFileChange(e, 'cover')} className="hidden" />
+                    </div>
+                    <div className="absolute bottom-0 left-6 transform translate-y-1/2">
+                        <div className="relative group">
+                             <img src={avatarPreview || ''} alt="Avatar" className="w-28 h-28 rounded-full border-4 border-white dark:border-zinc-800 object-cover" />
+                             <button onClick={() => avatarInputRef.current?.click()} className="absolute inset-0 w-full h-full rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white font-semibold text-sm">
+                                Change
+                             </button>
+                             <input type="file" accept="image/*" ref={avatarInputRef} onChange={(e) => handleFileChange(e, 'avatar')} className="hidden" />
+                        </div>
+                    </div>
+                </div>
+                
+                <div className="pt-16 divide-y divide-gray-200 dark:divide-zinc-700">
+                    <FormSection title="Bio">
+                         <div>
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                            <input type="text" name="name" id="name" value={formData.name} onChange={handleInputChange} className="w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none" />
+                        </div>
+                         <div>
+                            <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+                            <input type="text" name="username" id="username" value={formData.username} onChange={handleInputChange} className="w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none" />
+                        </div>
+                         <div>
+                            <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bio</label>
+                            <textarea name="bio" id="bio" value={formData.bio} onChange={handleInputChange} rows={4} className="w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none" />
+                        </div>
+                    </FormSection>
+
+                    <FormSection title="Interests">
+                        <TagInput label="Interests" tags={interests} setTags={setInterests} />
+                    </FormSection>
+
+                     <FormSection title="Professional Skills">
+                        <TagInput label="Skills" tags={skills} setTags={setSkills} />
+                    </FormSection>
+
+                    <FormSection title="Other Settings">
+                         <div>
+                            <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
+                            <input type="text" name="location" id="location" value={formData.location} onChange={handleInputChange} className="w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none" />
+                        </div>
+                        <div>
+                            <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">National Flag Badge</label>
+                            <select name="country" id="country" value={formData.country} onChange={handleInputChange} className="w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none">
+                                <option value="">Select Country</option>
+                                {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.flag} {c.name}</option>)}
+                            </select>
+                            <div className="flex items-center mt-3">
+                                <button
+                                    onClick={() => setShowFlag(!showFlag)}
+                                    className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${showFlag ? 'bg-primary' : 'bg-gray-300 dark:bg-zinc-600'}`}
+                                >
+                                    <span className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${showFlag ? 'translate-x-6' : 'translate-x-1'}`} />
+                                </button>
+                                <span className="ml-3 text-sm text-gray-600 dark:text-gray-400">Show flag on profile</span>
+                            </div>
+                        </div>
+                    </FormSection>
+                </div>
+
+                <div className="p-6 flex justify-end gap-4 border-t border-gray-200 dark:border-zinc-700">
+                    <button onClick={onCancel} className="bg-gray-200 dark:bg-zinc-700 text-deep-gray dark:text-white font-semibold px-6 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-600 transition-colors">Cancel</button>
+                    <button onClick={handleSave} className="bg-primary text-white font-semibold px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    );
+};

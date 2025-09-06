@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { MOCK_USER, MOCK_USERS, XIcon, ImageIcon, BoldIcon, ItalicIcon, UnderlineIcon, ListIcon, ListOrderedIcon } from '../constants';
+import { MOCK_USERS, XIcon, ImageIcon, BoldIcon, ItalicIcon, UnderlineIcon, ListIcon, ListOrderedIcon } from '../constants';
 import type { User } from '../types';
 
 interface CreatePostModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreatePost: (content: string, imageUrl?: string, tags?: string[]) => void;
+  user: User;
 }
 
 const EditorToolbar: React.FC = () => {
@@ -57,7 +58,7 @@ const MentionSuggestions: React.FC<{
 };
 
 
-export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCreatePost }) => {
+export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCreatePost, user }) => {
   const [content, setContent] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [tags, setTags] = useState<string[]>([]);
@@ -212,7 +213,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
         
         <div className="p-4 max-h-[70vh] overflow-y-auto">
           <div className="flex items-start gap-4">
-            <img src={MOCK_USER.avatarUrl} alt={MOCK_USER.name} className="w-12 h-12 rounded-full" />
+            <img src={user.avatarUrl} alt={user.name} className="w-12 h-12 rounded-full" />
             <div className="flex-1">
                  <div className="w-full border border-gray-300 dark:border-zinc-600 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary">
                     <EditorToolbar />
@@ -221,7 +222,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                         onInput={handleContentChange}
                         contentEditable="true"
                         aria-label="Post content"
-                        data-placeholder={`What's on your mind, ${MOCK_USER.name.split(' ')[0]}?`}
+                        data-placeholder={`What's on your mind, ${user.name.split(' ')[0]}?`}
                         className="prose dark:prose-invert max-w-none p-3 min-h-[120px] focus:outline-none overflow-y-auto before:content-[attr(data-placeholder)] before:absolute before:text-gray-400 before:dark:text-gray-500 before:pointer-events-none empty:before:block"
                     ></div>
                 </div>
@@ -267,7 +268,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
         <div className="flex items-center justify-between p-4 border-t border-gray-200 dark:border-zinc-700">
           <label className="cursor-pointer p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 text-primary" title="Add image">
             <ImageIcon className="w-6 h-6" />
-            {/* Fix: Corrected a typo in the ref name from `fileInput-Ref` to `fileInputRef`. */}
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
           </label>
           <button 

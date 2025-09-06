@@ -1,10 +1,11 @@
 import React from 'react';
 import type { Story, Post, User } from '../types';
-import { MOCK_STORIES, MOCK_USER } from '../constants';
+import { MOCK_STORIES } from '../constants';
 import { HeartIcon, MessageCircleIcon, ShareIcon, PlusIcon } from '../constants';
 
 interface FeedViewProps {
   posts: Post[];
+  currentUser: User;
   onOpenCreatePost: () => void;
 }
 
@@ -90,11 +91,11 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => (
   </div>
 );
 
-export const FeedView: React.FC<FeedViewProps> = ({ posts, onOpenCreatePost }) => {
+export const FeedView: React.FC<FeedViewProps> = ({ posts, currentUser, onOpenCreatePost }) => {
   return (
     <div className="max-w-3xl mx-auto">
       <Stories stories={MOCK_STORIES} />
-      <CreatePostTrigger user={MOCK_USER} onClick={onOpenCreatePost} />
+      <CreatePostTrigger user={currentUser} onClick={onOpenCreatePost} />
       <div className="space-y-6">
         {posts.map(post => (
           <PostCard key={post.id} post={post} />

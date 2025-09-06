@@ -11,8 +11,9 @@ import { SettingsView } from './components/SettingsView';
 import { CommunityDetailView } from './components/GamificationView';
 import { BottomNavBar } from './components/BottomNavBar';
 import { CreatePostModal } from './components/CreatePostModal';
-import type { View, Post } from './types';
-import { MOCK_USER, MOCK_USERS, MOCK_POSTS } from './constants';
+import { EditProfileView } from './components/EditProfileView';
+import type { View, Post, User } from './types';
+import { MOCK_USERS, MOCK_POSTS } from './constants';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,6 +21,7 @@ const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
   const [isCreatePostModalOpen, setCreatePostModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User>(MOCK_USERS[0]);
 
   const { view: activeView, params: activeParams } = navHistory[navHistory.length - 1];
 
@@ -51,7 +53,7 @@ const App: React.FC = () => {
   const handleCreatePost = useCallback((content: string, imageUrl?: string, tags?: string[]) => {
     const newPost: Post = {
         id: `p${Date.now()}`,
-        user: MOCK_USER,
+        user: currentUser,
         content,
         imageUrl,
         tags,
@@ -61,12 +63,23 @@ const App: React.FC = () => {
         timestamp: 'Just now',
     };
     setPosts(prevPosts => [newPost, ...prevPosts]);
-  }, []);
+  }, [currentUser]);
+  
+  const handleUpdateUser = useCallback((updatedUser: User) => {
+    setCurrentUser(updatedUser);
+    // In a real app, you would also need to find all posts/comments by the user and update them.
+    // For this mock data setup, we'll update the posts array to reflect the user's new details.
+    setPosts(prevPosts => prevPosts.map(p => 
+      p.user.id === updatedUser.id ? { ...p, user: updatedUser } : p
+    ));
+    handleBack(); // Go back to profile view after saving.
+  }, [handleBack]);
+
 
   const renderView = () => {
     switch (activeView) {
       case 'feed':
-        return <FeedView posts={posts} onOpenCreatePost={() => setCreatePostModalOpen(true)} />;
+        return <FeedView posts={posts} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} />;
       case 'discover':
         return <DiscoveryView onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} />;
       case 'community-detail':
@@ -76,22 +89,22 @@ const App: React.FC = () => {
       case 'notifications':
         return <NotificationsView />;
       case 'profile':
-        const user = MOCK_USERS.find(u => u.id === activeParams?.userId) || MOCK_USER;
-        return <ProfileView user={user} />;
+        const user = activeParams?.userId ? MOCK_USERS.find(u => u.id === activeParams.userId) : currentUser;
+        if (!user) return <div className="text-center p-8">User not found</div>;
+        return <ProfileView user={user} isOwnProfile={user.id === currentUser.id} onNavigate={handleNavigate} />;
+      case 'edit-profile':
+        return <EditProfileView user={currentUser} onUpdateUser={handleUpdateUser} onCancel={handleBack} />;
       case 'settings':
         return <SettingsView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onLogout={handleLogout} />;
       default:
-        return <FeedView posts={posts} onOpenCreatePost={() => setCreatePostModalOpen(true)} />;
+        return <FeedView posts={posts} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} />;
     }
   };
   
   const navigateToView = (view: View, params?: any) => {
-    // If we're already on a detail page, replace it instead of stacking
-    if(navHistory.length > 1 && navHistory[navHistory.length -1].view !== 'feed') {
-       setNavHistory(prev => [{view: 'feed'}, { view, params }]);
-    } else {
-       setNavHistory([{ view, params }]);
-    }
+    const navParams = (view === 'profile' && !params) ? { userId: currentUser.id } : params;
+    // Reset history for main tab navigation
+    setNavHistory([{ view, params: navParams }]);
   };
 
   if (!isLoggedIn) {
@@ -100,10 +113,10 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-light-gray dark:bg-zinc-900 text-deep-gray dark:text-gray-200 font-sans">
-      <Sidebar activeView={activeView} setActiveView={navigateToView} />
+      <Sidebar activeView={activeView} setActiveView={navigateToView} user={currentUser} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header 
-          user={MOCK_USER} 
+          user={currentUser} 
           showBack={navHistory.length > 1} 
           onBack={handleBack}
           onOpenCreatePost={() => setCreatePostModalOpen(true)}
@@ -117,6 +130,7 @@ const App: React.FC = () => {
         isOpen={isCreatePostModalOpen}
         onClose={() => setCreatePostModalOpen(false)}
         onCreatePost={handleCreatePost}
+        user={currentUser}
       />
     </div>
   );

@@ -33,7 +33,7 @@ const SettingsToggle: React.FC<{label: string; enabled: boolean; onToggle: () =>
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout }) => {
     
-    const settingsSections = [
+    const generalSettings = [
         {
             title: "Privacy",
             description: "Control your profile visibility and data.",
@@ -58,13 +58,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDar
 
     return (
         <div className="max-w-3xl mx-auto">
-            <h1 className="text-3xl font-display font-bold text-deep-gray dark:text-white mb-8">App Settings</h1>
+            <h1 className="text-3xl font-display font-bold text-deep-gray dark:text-white mb-8">Settings</h1>
 
             <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm divide-y divide-gray-200 dark:divide-zinc-700">
                 <div className="p-6">
                     <h2 className="text-xl font-bold mb-2">General</h2>
                     <div className="divide-y divide-gray-200 dark:divide-zinc-700">
-                         {settingsSections.map(item => (
+                         {generalSettings.map(item => (
                              <SettingsItem key={item.title} label={item.title} description={item.description} onClick={item.action} />
                          ))}
                     </div>
@@ -80,17 +80,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDar
                 </div>
                  <div className="p-6">
                     <h2 className="text-xl font-bold mb-2">Account</h2>
-                     <div className="divide-y divide-gray-200 dark:divide-zinc-700">
-                        <SettingsItem label="Delete Account" description="Permanently delete your account and data." onClick={() => {}} />
-                        <div className="py-2">
-                             <button
-                                onClick={onLogout}
-                                className="w-full text-left text-red-600 font-semibold py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                            >
-                                Log Out
-                            </button>
-                        </div>
-                    </div>
+                    <button
+                        onClick={onLogout}
+                        className="w-full text-left text-red-600 font-semibold py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    >
+                        Log Out
+                    </button>
                 </div>
             </div>
         </div>

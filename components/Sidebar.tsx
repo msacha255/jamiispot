@@ -1,11 +1,11 @@
 import React from 'react';
 import { JamiiSpotFullLogo, HomeIcon, CompassIcon, MessageIcon, BellIcon, SettingsIcon } from '../constants';
-import type { View } from '../types';
-import { MOCK_USER } from '../constants';
+import type { View, User } from '../types';
 
 interface SidebarProps {
   activeView: View;
   setActiveView: (view: View) => void;
+  user: User;
 }
 
 const NavItem: React.FC<{
@@ -27,7 +27,7 @@ const NavItem: React.FC<{
   </button>
 );
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, user }) => {
   const navItems: {id: View, icon: React.ReactNode, label: string}[] = [
     { id: 'feed', icon: <HomeIcon className="w-6 h-6" />, label: 'Feed' },
     { id: 'discover', icon: <CompassIcon className="w-6 h-6" />, label: 'Discover' },
@@ -59,10 +59,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView }) =
                 className="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 cursor-pointer"
                 onClick={() => setActiveView('profile')}
              >
-                <img src={MOCK_USER.avatarUrl} alt={MOCK_USER.name} className="w-10 h-10 rounded-full" />
+                <img src={user.avatarUrl} alt={user.name} className="w-10 h-10 rounded-full" />
                 <div className="ml-3">
-                    <p className="font-bold text-sm text-deep-gray dark:text-white">{MOCK_USER.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">@{MOCK_USER.username}</p>
+                    <p className="font-bold text-sm text-deep-gray dark:text-white">{user.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">@{user.username}</p>
                 </div>
             </div>
              <NavItem

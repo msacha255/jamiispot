@@ -8,6 +8,11 @@ export interface User {
   badges: string[];
   profileCompleteness: number;
   isPrivate?: boolean;
+  interests?: string[];
+  skills?: string[];
+  location?: string;
+  country?: string;
+  showFlag?: boolean;
 }
 
 export interface Story {
@@ -64,4 +69,4 @@ export interface Notification {
 }
 
 
-export type View = 'feed' | 'discover' | 'messages' | 'notifications' | 'profile' | 'settings' | 'community-detail';
+export type View = 'feed' | 'discover' | 'messages' | 'notifications' | 'profile' | 'settings' | 'community-detail' | 'edit-profile';
