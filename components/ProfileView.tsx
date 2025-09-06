@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import type { User, Post, View } from '../types';
-import { MOCK_POSTS, COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, TwitterIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon } from '../constants';
+import type { User, Post, View, Community, Event } from '../types';
+import { MOCK_POSTS, COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, TwitterIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon, CalendarIcon } from '../constants';
 
 interface ProfileViewProps { 
     user: User; 
@@ -10,6 +10,7 @@ interface ProfileViewProps {
     onSendMessage: (user: User) => void;
     followingIds: Set<string>;
     onToggleFollow: (userId: string) => void;
+    communities: Community[];
 }
 
 const Stat: React.FC<{ value?: number; label: string }> = ({ value, label }) => (
@@ -24,9 +25,20 @@ const ProfilePostCard: React.FC<{ post: Post }> = ({ post }) => (
     {post.imageUrl && <img src={post.imageUrl} alt="Post content" className="w-full h-full object-cover" />}
     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white font-bold">
       <span className="flex items-center gap-1"><HeartIcon className="w-5 h-5" /> {post.likes}</span>
-      <span className="flex items-center gap-1"><MessageCircleIcon className="w-5 h-5" /> {post.comments}</span>
+      <span className="flex items-center gap-1"><MessageCircleIcon className="w-5 h-5" /> {post.commentsData.length}</span>
     </div>
   </div>
+);
+
+const EventCard: React.FC<{ event: Event }> = ({ event }) => (
+    <div className="bg-white dark:bg-zinc-800 rounded-lg p-4">
+        <h4 className="font-bold">{event.title}</h4>
+        <p className="text-sm text-primary font-semibold mt-1">{event.communityName}</p>
+        <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-2">
+            <CalendarIcon className="w-4 h-4"/>
+            <span>{new Date(event.date).toLocaleDateString()} at {event.time}</span>
+        </div>
+    </div>
 );
 
 const TagsDisplay: React.FC<{title: string, items: string[], color: 'primary' | 'accent'}> = ({ title, items, color }) => {
@@ -83,11 +95,12 @@ const AboutTab: React.FC<{ user: User }> = ({ user }) => {
     );
 };
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ user, isOwnProfile, onNavigate, onBlockUser, onSendMessage, followingIds, onToggleFollow }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ user, isOwnProfile, onNavigate, onBlockUser, onSendMessage, followingIds, onToggleFollow, communities }) => {
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'posts' | 'about'>('posts');
+    const [activeTab, setActiveTab] = useState<'posts' | 'about' | 'events'>('posts');
     
     const userPosts = MOCK_POSTS.filter(p => p.user.id === user.id);
+    const userEvents = communities.flatMap(c => c.events).filter(e => e.creator.id === user.id);
     const showContent = isOwnProfile || !user.isPrivate;
     const isFollowing = followingIds.has(user.id);
 
@@ -133,6 +146,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, isOwnProfile, on
                 <nav className="flex space-x-4">
                     <button onClick={() => setActiveTab('posts')} className={`px-3 py-2 font-semibold ${activeTab === 'posts' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'}`}>Posts</button>
                     <button onClick={() => setActiveTab('about')} className={`px-3 py-2 font-semibold ${activeTab === 'about' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'}`}>About</button>
+                    <button onClick={() => setActiveTab('events')} className={`px-3 py-2 font-semibold ${activeTab === 'events' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'}`}>Events</button>
                 </nav>
             </div>
 
@@ -159,6 +173,17 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, isOwnProfile, on
                            </div>
                        )}
                        {activeTab === 'about' && <AboutTab user={user} />}
+                       {activeTab === 'events' && (
+                           <div className="space-y-4">
+                                {userEvents.length > 0 ? (
+                                    userEvents.map(event => <EventCard key={event.id} event={event} />)
+                                ) : (
+                                    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-10 text-center text-gray-500">
+                                        This user hasn't created any events yet.
+                                    </div>
+                                )}
+                           </div>
+                       )}
                     </>
                  )}
             </div>

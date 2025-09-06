@@ -29,8 +29,19 @@ export interface User {
 export interface Story {
   id: string;
   user: User;
-  imageUrl: string;
+  type: 'image' | 'video' | 'text';
+  imageUrl?: string;
+  videoUrl?: string;
+  text?: string;
+  backgroundColor?: string;
   viewed: boolean;
+}
+
+export interface Comment {
+    id: string;
+    user: User;
+    text: string;
+    timestamp: string;
 }
 
 export interface Post {
@@ -38,25 +49,44 @@ export interface Post {
   user: User;
   content: string;
   imageUrl?: string;
+  videoUrl?: string;
   tags?: string[];
   likes: number;
-  comments: number;
   shares: number;
   timestamp: string;
+  commentsData: Comment[];
+  privacy?: 'public' | 'friends' | 'private';
+  scheduledTime?: string;
+  location?: string;
+  mediaQuality?: 'standard' | 'high';
 }
 
 export interface Message {
     id: string;
     sender: User;
-    text: string;
+    text?: string;
+    imageUrl?: string;
+    audioUrl?: string;
     timestamp: string;
 }
 
 export interface Conversation {
     id: string;
     participants: User[];
-    lastMessage: Message;
+    messages: Message[];
     unreadCount: number;
+}
+
+export interface Event {
+    id: string;
+    communityId: string;
+    communityName: string;
+    title: string;
+    description: string;
+    date: string;
+    time: string;
+    location: string;
+    creator: User;
 }
 
 export interface Community {
@@ -67,6 +97,7 @@ export interface Community {
     memberCount: number;
     members: User[];
     posts: Post[];
+    events: Event[];
     isMember: boolean;
     category: string;
     privacy: 'public' | 'private';

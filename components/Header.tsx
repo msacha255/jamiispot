@@ -1,7 +1,6 @@
-
 import React from 'react';
-import type { User } from '../types';
-import { SearchIcon, PlusIcon, ChevronLeftIcon, BellIcon } from '../constants';
+import type { User, View } from '../types';
+import { SearchIcon, PlusIcon, ChevronLeftIcon, BellIcon, JamiiSpotFullLogo } from '../constants';
 
 interface HeaderProps {
   user: User;
@@ -10,9 +9,10 @@ interface HeaderProps {
   onOpenCreatePost: () => void;
   onOpenNotificationsModal: () => void;
   onOpenSearch: () => void;
+  activeView: View;
 }
 
-export const Header: React.FC<HeaderProps> = ({ user, showBack, onBack, onOpenCreatePost, onOpenNotificationsModal, onOpenSearch }) => {
+export const Header: React.FC<HeaderProps> = ({ user, showBack, onBack, onOpenCreatePost, onOpenNotificationsModal, onOpenSearch, activeView }) => {
   return (
     <header className="bg-white dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 p-4 flex items-center justify-between gap-4">
       <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -20,6 +20,11 @@ export const Header: React.FC<HeaderProps> = ({ user, showBack, onBack, onOpenCr
             <button onClick={onBack} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 lg:hidden">
                 <ChevronLeftIcon className="w-6 h-6" />
             </button>
+         )}
+         {!showBack && activeView === 'feed' && (
+             <div className="lg:hidden">
+                <JamiiSpotFullLogo className="h-8 w-auto" />
+             </div>
          )}
          <div 
             onClick={onOpenSearch}

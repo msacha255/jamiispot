@@ -1,12 +1,13 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { MOCK_USERS, XIcon, ImageIcon, BoldIcon, ItalicIcon, UnderlineIcon, ListIcon, ListOrderedIcon, LinkIcon, PaletteIcon } from '../constants';
-import type { User } from '../types';
+import { MOCK_USERS, XIcon, ImageIcon, VideoIcon, BoldIcon, ItalicIcon, UnderlineIcon, ListIcon, ListOrderedIcon, LinkIcon, PaletteIcon, MapPinIcon, UsersIcon, LockIcon, ClockIcon } from '../constants';
+import type { User, Post } from '../types';
 
 interface CreatePostModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreatePost: (content: string, imageUrl?: string, tags?: string[]) => void;
+  onCreatePost: (postData: Partial<Post>) => void;
   user: User;
   blockedUserIds: Set<string>;
 }
@@ -78,13 +79,25 @@ const MentionSuggestions: React.FC<{
 
 export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCreatePost, user, blockedUserIds }) => {
   const [content, setContent] = useState('');
-  const [image, setImage] = useState<string | null>(null);
+  const [media, setMedia] = useState<{url: string, type: 'image' | 'video'} | null>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [currentTag, setCurrentTag] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [mentionSuggestions, setMentionSuggestions] = useState<User[]>([]);
   const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
   const [mentionRange, setMentionRange] = useState<Range | null>(null);
+  // FIX: Explicitly type the `postSettings` state to prevent type inference issues with string literals for `privacy` and `mediaQuality`.
+  const [postSettings, setPostSettings] = useState<{
+      privacy: 'public' | 'friends' | 'private';
+      location: string;
+      scheduledTime: string;
+      mediaQuality: 'standard' | 'high';
+  }>({
+      privacy: 'public',
+      location: '',
+      scheduledTime: '',
+      mediaQuality: 'standard'
+  });
 
   const editorRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -99,7 +112,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
   useEffect(() => {
       if (isOpen) {
           setContent('');
-          setImage(null);
+          setMedia(null);
           setTags([]);
           setCurrentTag('');
           setShowSuggestions(false);
@@ -113,18 +126,19 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
   
   if (!isOpen) return null;
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result as string);
+        setMedia({url: reader.result as string, type: file.type.startsWith('video') ? 'video' : 'image' });
       };
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleRemoveImage = () => {
-    setImage(null);
+  const handleRemoveMedia = () => {
+    setMedia(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -227,8 +241,15 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
   const handleSubmit = () => {
     const finalContent = editorRef.current?.innerHTML || '';
-    if (finalContent.trim() || image || tags.length > 0) {
-      onCreatePost(finalContent, image || undefined, tags);
+    if (finalContent.trim() || media || tags.length > 0) {
+      const postData: Partial<Post> = {
+          content: finalContent,
+          imageUrl: media?.type === 'image' ? media.url : undefined,
+          videoUrl: media?.type === 'video' ? media.url : undefined,
+          tags,
+          ...postSettings,
+      };
+      onCreatePost(postData);
       onClose();
     }
   };
@@ -262,14 +283,18 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
             </div>
           </div>
           
-          {image && (
+          {media && (
              <div className="mt-4 pl-16">
                 <div className="relative group p-2 bg-gray-100 dark:bg-zinc-700 rounded-xl">
-                    <img src={image} alt="Preview" className="w-full max-h-72 object-cover rounded-lg" />
+                    {media.type === 'image' ? (
+                        <img src={media.url} alt="Preview" className="w-full max-h-72 object-cover rounded-lg" />
+                    ) : (
+                        <video src={media.url} controls className="w-full max-h-72 rounded-lg bg-black"/>
+                    )}
                     <button 
-                        onClick={handleRemoveImage}
+                        onClick={handleRemoveMedia}
                         className="absolute top-4 right-4 p-1.5 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-75 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-800 focus:ring-white transition-opacity opacity-0 group-hover:opacity-100" 
-                        aria-label="Remove image"
+                        aria-label="Remove media"
                     >
                         <XIcon className="w-5 h-5" />
                     </button>
@@ -298,17 +323,26 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
         </div>
 
-        <div className="flex items-center justify-between p-4 border-t border-gray-200 dark:border-zinc-700">
-          <label className="cursor-pointer p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 text-primary" title="Add image">
-            <ImageIcon className="w-6 h-6" />
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-          </label>
-          <button 
-            onClick={handleSubmit} 
-            disabled={!content.trim() && !image && tags.length === 0}
-            className="bg-primary text-white font-semibold px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm disabled:bg-primary/50 disabled:cursor-not-allowed">
-            Post
-          </button>
+        <div className="p-4 border-t border-gray-200 dark:border-zinc-700 space-y-3">
+          <div className="flex items-center justify-between border border-gray-200 dark:border-zinc-700 rounded-lg p-2">
+            <span className="font-semibold ml-2">Add to Your Post</span>
+            <div className="flex items-center gap-1">
+              <label className="cursor-pointer p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 text-green-500" title="Add photo/video">
+                <ImageIcon className="w-6 h-6" />
+                <input ref={fileInputRef} type="file" accept="image/*,video/*" className="hidden" onChange={handleFileUpload} />
+              </label>
+              <button className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 text-blue-500" title="Tag location"><MapPinIcon className="w-6 h-6"/></button>
+              <button className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 text-purple-500" title="Schedule post"><ClockIcon className="w-6 h-6"/></button>
+            </div>
+          </div>
+          <div className="flex items-center justify-end">
+            <button 
+              onClick={handleSubmit} 
+              disabled={!content.trim() && !media && tags.length === 0}
+              className="bg-primary text-white font-semibold px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm disabled:bg-primary/50 disabled:cursor-not-allowed">
+              Post
+            </button>
+          </div>
         </div>
       </div>
       {showSuggestions && <MentionSuggestions users={mentionSuggestions} position={suggestionPosition} onSelect={handleMentionSelect} />}

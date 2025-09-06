@@ -1,5 +1,6 @@
+
 import React from 'react';
-import type { User, Post, Story, Conversation, Message, Community, Notification, Language } from './types';
+import type { User, Post, Story, Conversation, Message, Community, Notification, Language, Comment, Event } from './types';
 
 export const MOCK_USER: User = {
   id: 'u1',
@@ -38,58 +39,87 @@ export const MOCK_USERS: User[] = [
   { id: 'u7', name: 'Neema Nyerere', username: 'neema_nyerere', avatarUrl: 'https://picsum.photos/seed/user7/100/100', badges: [], profileCompleteness: 0, latitude: -1.2821, longitude: 36.8319, followers: 987, following: 123, joinDate: '2023-04-01' },
 ];
 
-export const MOCK_STORIES: Story[] = MOCK_USERS.map((user, i) => ({
-  id: `s${i + 1}`,
-  user,
-  imageUrl: `https://picsum.photos/seed/story${i}/200/300`,
-  viewed: i > 2,
-}));
+export const MOCK_STORIES: Story[] = [
+    ...MOCK_USERS.map((user, i) => ({
+      id: `s${i + 1}`,
+      user,
+      imageUrl: `https://picsum.photos/seed/story${i}/200/300`,
+      viewed: i > 2,
+      type: 'image' as 'image',
+    })),
+    {
+      id: 'stext1',
+      user: MOCK_USERS[6],
+      type: 'text',
+      text: 'Nafurahi sana kuwa sehemu ya jamii hii!',
+      backgroundColor: 'bg-gradient-to-tr from-purple-500 to-pink-500',
+      viewed: true,
+    }
+];
+
+export const MOCK_COMMENTS: Comment[] = [
+    { id: 'com1', user: MOCK_USERS[2], text: 'Picha nzuri sana! Hiyo ni wapi?', timestamp: '1h ago' },
+    { id: 'com2', user: MOCK_USERS[0], text: 'Asante! Hii ni kule Diani.', timestamp: '45m ago' },
+    { id: 'com3', user: MOCK_USERS[4], text: 'Wow, napenda sana pwani.', timestamp: '30m ago' },
+];
 
 export const MOCK_POSTS: Post[] = [
   {
     id: 'p1',
     user: MOCK_USERS[1],
-    content: '<strong>Just reached the summit!</strong> The view from up here is <em>absolutely breathtaking.</em><br><ul><li>#hiking</li><li>#adventure</li><li>#nature</li></ul>',
+    content: '<strong>Nimefika kileleni!</strong> Mandhari kutoka huku juu ni ya kupendeza sana. Maajabu ya Mungu.<br><ul><li>#milima</li><li>#utembezaji</li><li>#Tanzania</li></ul>',
     imageUrl: 'https://picsum.photos/seed/post1/600/400',
     likes: 125,
-    comments: 23,
+    commentsData: MOCK_COMMENTS,
     shares: 8,
     timestamp: '2h ago',
   },
   {
     id: 'p2',
     user: MOCK_USERS[2],
-    content: 'Spent the weekend building this fun little side project with React and Tailwind. It\'s amazing what you can create in a couple of days!',
+    content: 'Nimetumia wikendi yangu kutengeneza mradi huu mdogo na wa kufurahisha kwa kutumia React na Tailwind. Inashangaza unachoweza kuunda kwa siku chache tu!',
     likes: 302,
-    comments: 45,
+    commentsData: MOCK_COMMENTS.slice(0,1),
     shares: 15,
     timestamp: '5h ago',
   },
   {
     id: 'p3',
-    user: MOCK_USERS[3],
-    content: 'My new travel buddy for the trip to Southeast Asia! Any recommendations for must-see places in Vietnam? 🇻🇳',
+    user: MOCK_USERS[5],
+    content: 'Chakula cha mchana leo kilikuwa kitamu sana! Pilau na kachumbari. Je, wewe umekula nini?',
     imageUrl: 'https://picsum.photos/seed/post3/600/800',
     likes: 543,
-    comments: 102,
+    commentsData: [],
     shares: 22,
     timestamp: '1d ago',
   },
 ];
 
-const LAST_MESSAGE: Message = { id: 'm_last', sender: MOCK_USERS[1], text: "Hey, are you free for a call tomorrow?", timestamp: "10:30 AM" }
-
 export const MOCK_CONVERSATIONS: Conversation[] = [
-    { id: 'c1', participants: [MOCK_USER, MOCK_USERS[1]], lastMessage: LAST_MESSAGE, unreadCount: 2 },
-    { id: 'c2', participants: [MOCK_USER, MOCK_USERS[2]], lastMessage: { ...LAST_MESSAGE, text: 'Sounds good!', sender: MOCK_USER }, unreadCount: 0 },
-    { id: 'c3', participants: [MOCK_USER, MOCK_USERS[3]], lastMessage: { ...LAST_MESSAGE, text: 'Check out this link: ...' }, unreadCount: 0 },
-    { id: 'c4', participants: [MOCK_USER, MOCK_USERS[4]], lastMessage: { ...LAST_MESSAGE, text: 'Happy birthday!! 🎉' }, unreadCount: 5 },
+    { id: 'c1', participants: [MOCK_USER, MOCK_USERS[1]], messages: [
+        {id: 'm1-1', sender: MOCK_USERS[1], text: "Mambo vipi Florence, habari za siku?", timestamp: "9:30 AM"},
+        {id: 'm1-2', sender: MOCK_USER, text: "Nzuri sana Walter. Za kwako?", timestamp: "9:31 AM"},
+        {id: 'm1-3', sender: MOCK_USERS[1], text: "Salama kabisa. Nilitaka kukuuliza, upo huru kesho tuzungumze kuhusu ule mradi?", timestamp: "9:32 AM"},
+    ], unreadCount: 1 },
+    { id: 'c2', participants: [MOCK_USER, MOCK_USERS[2]], messages: [
+        {id: 'm2-1', sender: MOCK_USERS[2], imageUrl: `https://picsum.photos/seed/chat1/300/200`, timestamp: "Yesterday"},
+        {id: 'm2-2', sender: MOCK_USER, text: 'Wow, picha nzuri sana!', timestamp: "Yesterday"},
+    ], unreadCount: 0 },
+    { id: 'c3', participants: [MOCK_USER, MOCK_USERS[3]], messages: [ { id: 'm_last', sender: MOCK_USERS[3], text: "Sawa, nimekuelewa. Nitakupigia.", timestamp: "10:30 AM" }], unreadCount: 0 },
+    // FIX: Add the required `timestamp` property to the message object to conform to the `Message` type.
+    { id: 'c4', participants: [MOCK_USER, MOCK_USERS[4]], messages: [ { id: 'm_last', sender: MOCK_USERS[4], text: 'Happy birthday!! 🎉', timestamp: "11:00 AM" }], unreadCount: 5 },
 ];
 
+export const MOCK_EVENTS: Event[] = [
+    { id: 'e1', communityId: 'comm1', communityName: 'Tech Enthusiasts', title: 'Tech Meetup Nairobi', description: 'Join us for our monthly tech meetup. Networking, talks, and pizza!', date: '2024-08-15', time: '18:00', location: 'iHub, Nairobi', creator: MOCK_USERS[0] },
+    { id: 'e2', communityId: 'comm1', communityName: 'Tech Enthusiasts', title: 'Web Development Workshop', description: 'A hands-on workshop on modern web dev tools.', date: '2024-09-05', time: '10:00', location: 'Online', creator: MOCK_USERS[1] },
+];
+
+
 export const MOCK_COMMUNITIES: Community[] = [
-    { id: 'comm1', name: 'Tech Enthusiasts', description: 'A vibrant community for tech lovers to discuss the latest gadgets, software, and industry trends.', coverUrl: 'https://picsum.photos/seed/comm1/600/200', memberCount: 12345, isMember: true, members: MOCK_USERS.slice(0,5), posts: MOCK_POSTS.slice(0,2), category: 'Technology', privacy: 'public', admins: ['u1', 'u2'] },
-    { id: 'comm2', name: 'Book Club', description: 'Share your favorite reads and discover new authors with fellow bookworms.', coverUrl: 'https://picsum.photos/seed/comm2/600/200', memberCount: 5872, isMember: false, members: MOCK_USERS.slice(2,6), posts: MOCK_POSTS.slice(1,3), category: 'Books', privacy: 'public', admins: ['u3'] },
-    { id: 'comm3', name: 'Outdoor Adventures', description: 'For hikers, campers, and nature lovers. Share trails and tips.', coverUrl: 'https://picsum.photos/seed/comm3/600/200', memberCount: 8912, isMember: false, members: MOCK_USERS.slice(1,4), posts: MOCK_POSTS.slice(0,1), category: 'Outdoors', privacy: 'private', admins: ['u1'] },
+    { id: 'comm1', name: 'Tech Enthusiasts', description: 'A vibrant community for tech lovers to discuss the latest gadgets, software, and industry trends.', coverUrl: 'https://picsum.photos/seed/comm1/600/200', memberCount: 12345, isMember: true, members: MOCK_USERS.slice(0,5), posts: MOCK_POSTS.slice(0,2), category: 'Technology', privacy: 'public', admins: ['u1', 'u2'], events: MOCK_EVENTS },
+    { id: 'comm2', name: 'Book Club', description: 'Share your favorite reads and discover new authors with fellow bookworms.', coverUrl: 'https://picsum.photos/seed/comm2/600/200', memberCount: 5872, isMember: false, members: MOCK_USERS.slice(2,6), posts: MOCK_POSTS.slice(1,3), category: 'Books', privacy: 'public', admins: ['u3'], events: [] },
+    { id: 'comm3', name: 'Outdoor Adventures', description: 'For hikers, campers, and nature lovers. Share trails and tips.', coverUrl: 'https://picsum.photos/seed/comm3/600/200', memberCount: 8912, isMember: false, members: MOCK_USERS.slice(1,4), posts: MOCK_POSTS.slice(0,1), category: 'Outdoors', privacy: 'private', admins: ['u1'], events: [] },
 ];
 
 export const MOCK_NOTIFICATIONS: Notification[] = [
@@ -194,6 +224,12 @@ export const XIcon: React.FC<{ className?: string }> = ({ className }) => (
 export const ImageIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
 );
+export const VideoIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+);
+export const TypeIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+);
 export const BoldIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
 );
@@ -217,6 +253,12 @@ export const CheckCircleIcon: React.FC<{ className?: string }> = ({ className })
 );
 export const TwitterIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.39.106-.803.163-1.227.163-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z"></path></svg>
+);
+export const FacebookIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="#1877F2"><path d="M22.676 0H1.324C.593 0 0 .593 0 1.324v21.352C0 23.407.593 24 1.324 24h11.494v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.324V1.324C24 .593 23.407 0 22.676 0z"></path></svg>
+);
+export const WhatsAppIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="#25D366"><path d="M19.1 4.9C17.2 3 14.7 2 12 2S6.8 3 4.9 4.9C3 6.8 2 9.3 2 12s1 5.2 2.9 7.1c1.9 1.9 4.4 2.9 7.1 2.9h.1c2.6 0 5.1-.9 7-2.6l.1-.1.1-.1c1.9-1.9 2.8-4.4 2.8-7 0-2.7-1-5.2-2.9-7.1zM12 20.5c-2.3 0-4.5-1-6-2.5l-3 1 1-3c-1.6-1.6-2.5-3.8-2.5-6 0-4.7 3.8-8.5 8.5-8.5s8.5 3.8 8.5 8.5c0 4.7-3.8 8.5-8.5 8.5zM17.3 14.4c-.3-.1-1.8-1-2.1-1.1-.3-.1-.5-.1-.7.1-.2.2-.8.9-.9 1.1-.2.2-.3.2-.6.1s-1.2-.4-2.2-1.3c-.8-.7-1.3-1.6-1.5-1.9-.2-.3 0-.5.1-.6s.2-.3.4-.4c.1-.1.2-.3.3-.4s.1-.2 0-.4c-.1-.2-.7-1.8-.9-2.4-.2-.6-.4-.5-.6-.5h-.5c-.2 0-.5.2-.7.4s-.8.9-.8 2.1.8 2.5 1 2.6c.1.2 1.8 2.8 4.3 3.8.6.2 1.1.4 1.5.5.6.2 1.2.1 1.6-.1.5-.2 1.5-1.7 1.8-2.1.2-.4.2-.7 0-.8l-.4-.1z"></path></svg>
 );
 export const LinkedinIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"></path></svg>
@@ -259,8 +301,8 @@ export const MoreVerticalIcon: React.FC<{ className?: string }> = ({ className }
 );
 export const CheckBadgeIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.05 15.3-3.6-3.6L8.8 12.25l2.15 2.15 4.95-4.95L17.35 11l-6.4 6.3z" />
-        <path d="M10.95 17.3 7.35 13.7l1.45-1.45 2.15 2.15 4.95-4.95 1.45 1.45-6.4 6.3z" style={{fill: 'white'}}/>
+      <path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm5.05,8.53-6.4,6.4a1,1,0,0,1-1.41,0l-3.6-3.6a1,1,0,0,1,1.41-1.41L10,14.41l5.64-5.64a1,1,0,0,1,1.41,1.41Z" style={{fill: '#3B82F6'}}/>
+      <path d="M16.44,9.94a1,1,0,0,0-1.41,0L10,15.12l-2.12-2.12a1,1,0,1,0-1.41,1.41l2.83,2.83a1,1,0,0,0,1.41,0l6.36-6.36A1,1,0,0,0,16.44,9.94Z" style={{fill: 'white'}}/>
     </svg>
 );
 export const InfoIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -281,4 +323,13 @@ export const CopyIcon: React.FC<{ className?: string }> = ({ className }) => (
         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
     </svg>
+);
+export const ClockIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+);
+export const CalendarIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+);
+export const PaperclipIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
 );

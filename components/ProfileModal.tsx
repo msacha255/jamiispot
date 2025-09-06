@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { XIcon, LockIcon, HeartIcon, MessageCircleIcon, CheckBadgeIcon, MoreVerticalIcon, ShareIcon, TwitterIcon, LinkedinIcon, GithubIcon } from '../constants';
 import type { User, Post } from '../types';
@@ -18,7 +19,8 @@ const ProfilePostTile: React.FC<{ post: Post }> = ({ post }) => (
         {post.imageUrl && <img src={post.imageUrl} alt="Post" className="w-full h-full object-cover"/>}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white font-bold">
             <span className="flex items-center gap-1"><HeartIcon className="w-5 h-5"/> {post.likes}</span>
-            <span className="flex items-center gap-1"><MessageCircleIcon className="w-5 h-5"/> {post.comments}</span>
+            {/* FIX: Use `post.commentsData.length` to get the comment count, as `post.comments` does not exist on the `Post` type. */}
+            <span className="flex items-center gap-1"><MessageCircleIcon className="w-5 h-5"/> {post.commentsData.length}</span>
         </div>
     </div>
 );

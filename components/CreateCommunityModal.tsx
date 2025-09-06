@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { XIcon, ImageIcon, GlobeIcon, LockIcon } from '../constants';
 import { COMMUNITY_CATEGORIES } from '../constants';
@@ -6,7 +7,8 @@ import type { Community } from '../types';
 interface CreateCommunityModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (communityData: Omit<Community, 'id' | 'memberCount' | 'members' | 'posts' | 'isMember' | 'admins'>) => void;
+  // FIX: Update `onCreate` prop type to omit `events`, aligning it with the parent component's handler.
+  onCreate: (communityData: Omit<Community, 'id' | 'memberCount' | 'members' | 'posts' | 'isMember' | 'admins' | 'events'>) => void;
 }
 
 export const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({ isOpen, onClose, onCreate }) => {
