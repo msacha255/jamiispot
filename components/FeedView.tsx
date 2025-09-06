@@ -1,19 +1,38 @@
-
 import React from 'react';
-// FIX: Import FeedItem, Event type, and additional icons to handle mixed content types in the feed.
 import type { Story, Post, User, FeedItem, Event } from '../types';
-import { HeartIcon, MessageCircleIcon, ShareIcon, PlusIcon, CalendarIcon, MapPinIcon } from '../constants';
+import { HeartIcon, MessageCircleIcon, ShareIcon, PlusIcon, CalendarIcon, MapPinIcon, MoreHorizontalIcon, ArchiveIcon } from '../constants';
+
+const ParsedContent: React.FC<{ content: string, onHashtagClick: (hashtag: string) => void }> = ({ content, onHashtagClick }) => {
+    const parts = content.split(/(#\w+)/g);
+    return (
+        <p>
+            {parts.map((part, index) => {
+                if (part.startsWith('#')) {
+                    return (
+                        <a key={index} href="#" onClick={(e) => { e.preventDefault(); onHashtagClick(part); }} className="text-accent font-semibold hover:underline">
+                            {part}
+                        </a>
+                    );
+                }
+                return <span key={index} dangerouslySetInnerHTML={{ __html: part.replace(/\n/g, '<br />') }}></span>;
+            })}
+        </p>
+    );
+};
+
 
 interface PostCardProps {
   post: Post;
+  currentUser: User;
   onOpenProfileModal: (user: User) => void;
   onOpenPostDetail: (post: Post) => void;
   onOpenSharePost: (post: Post) => void;
   onToggleLike: (postId: string) => void;
   likedPostIds: Set<string>;
+  onToggleArchive: (postId: string) => void;
+  onHashtagClick: (hashtag: string) => void;
 }
 
-// FIX: Add EventCardProps interface
 interface EventCardProps {
   event: Event;
   onCommunitySelect: (id: string) => void;
@@ -21,7 +40,6 @@ interface EventCardProps {
 }
 
 interface FeedViewProps {
-  // FIX: Changed `posts` prop to `feedItems` to correctly reflect the data being passed.
   feedItems: FeedItem[];
   stories: Story[];
   currentUser: User;
@@ -32,8 +50,9 @@ interface FeedViewProps {
   onOpenSharePost: (post: Post) => void;
   onToggleLike: (postId: string) => void;
   likedPostIds: Set<string>;
-  // FIX: Add onCommunitySelect prop to handle navigation to community details from events.
   onCommunitySelect: (id: string) => void;
+  onToggleArchive: (postId: string) => void;
+  onHashtagClick: (hashtag: string) => void;
 }
 
 const CreatePostTrigger: React.FC<{ user: User, onClick: () => void }> = ({ user, onClick }) => (
@@ -76,31 +95,40 @@ const Stories: React.FC<{ stories: Story[], onAdd: () => void, onOpenProfileModa
   </div>
 );
 
-const PostCard: React.FC<PostCardProps> = ({ post, onOpenProfileModal, onOpenPostDetail, onOpenSharePost, onToggleLike, likedPostIds }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, currentUser, onOpenProfileModal, onOpenPostDetail, onOpenSharePost, onToggleLike, likedPostIds, onToggleArchive, onHashtagClick }) => {
+  const [isOptionsOpen, setIsOptionsOpen] = React.useState(false);
   const isLiked = likedPostIds.has(post.id);
+  const isOwnPost = post.user.id === currentUser.id;
+
   return (
     <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden">
       <div className="p-5">
-        <div className="flex items-center mb-4">
-          <img src={post.user.avatarUrl} alt={post.user.name} className="w-12 h-12 rounded-full cursor-pointer" onClick={() => onOpenProfileModal(post.user)} />
-          <div className="ml-4">
-            <p className="font-bold text-deep-gray dark:text-white cursor-pointer" onClick={() => onOpenProfileModal(post.user)}>{post.user.name}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username} · {post.timestamp}</p>
-          </div>
+        <div className="flex items-start justify-between">
+            <div className="flex items-center mb-4">
+              <img src={post.user.avatarUrl} alt={post.user.name} className="w-12 h-12 rounded-full cursor-pointer" onClick={() => onOpenProfileModal(post.user)} />
+              <div className="ml-4">
+                <p className="font-bold text-deep-gray dark:text-white cursor-pointer" onClick={() => onOpenProfileModal(post.user)}>{post.user.name}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username} · {new Date(post.timestamp).toLocaleDateString()}</p>
+              </div>
+            </div>
+            {isOwnPost && (
+                 <div className="relative">
+                    <button onClick={() => setIsOptionsOpen(p => !p)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700">
+                        <MoreHorizontalIcon className="w-5 h-5"/>
+                    </button>
+                    {isOptionsOpen && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border dark:border-zinc-700 z-10">
+                             <button onClick={() => { onToggleArchive(post.id); setIsOptionsOpen(false); }} className="w-full flex items-center gap-3 text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg">
+                                <ArchiveIcon className="w-5 h-5"/> Archive Post
+                            </button>
+                        </div>
+                    )}
+                 </div>
+            )}
         </div>
-        <div 
-          className="text-gray-800 dark:text-gray-300 [&_strong]:font-bold [&_em]:italic [&_u]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
-          dangerouslySetInnerHTML={{ __html: post.content }} 
-        />
-         {post.tags && post.tags.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {post.tags.map((tag, index) => (
-              <span key={index} className="bg-accent/10 text-accent text-xs font-semibold px-2.5 py-1 rounded-full">
-                #{tag}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="text-gray-800 dark:text-gray-300">
+          <ParsedContent content={post.content} onHashtagClick={onHashtagClick} />
+        </div>
       </div>
       {post.imageUrl && <img src={post.imageUrl} alt="Post content" className="w-full h-auto object-cover" />}
       {post.videoUrl && (
@@ -126,7 +154,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, onOpenProfileModal, onOpenPos
   );
 };
 
-// FIX: Add EventCard component to render events in the feed.
 const EventCard: React.FC<EventCardProps> = ({ event, onCommunitySelect, onOpenProfileModal }) => (
   <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden">
     <div className="p-5">
@@ -169,11 +196,11 @@ export const FeedView: React.FC<FeedViewProps> = ({ feedItems, stories, currentU
       <Stories stories={stories} onAdd={onOpenCreateStory} onOpenProfileModal={postCardHandlers.onOpenProfileModal} />
       <CreatePostTrigger user={currentUser} onClick={onOpenCreatePost} />
       <div className="space-y-6">
-        {/* FIX: Map over `feedItems` and conditionally render `PostCard` or `EventCard`. */}
         {feedItems.map(item => {
           switch (item.type) {
             case 'post':
-              return <PostCard key={item.id} post={item} {...postCardHandlers} />;
+              // FIX: Pass the `currentUser` prop to `PostCard` as it is a required prop. The `currentUser` was destructured from `FeedViewProps` and was not part of the `postCardHandlers` rest object.
+              return <PostCard key={item.id} post={item} currentUser={currentUser} {...postCardHandlers} />;
             case 'event':
               return <EventCard key={item.id} event={item} onCommunitySelect={onCommunitySelect} onOpenProfileModal={postCardHandlers.onOpenProfileModal} />;
             default:

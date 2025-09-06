@@ -1,4 +1,3 @@
-
 import React from 'react';
 import type { User, Post, Story, Conversation, Message, Community, Notification, Language, Comment, Event, LoginSession } from './types';
 
@@ -308,9 +307,8 @@ export const MoreVerticalIcon: React.FC<{ className?: string }> = ({ className }
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
 );
 export const CheckBadgeIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg className={className} fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm5.05,8.53-6.4,6.4a1,1,0,0,1-1.41,0l-3.6-3.6a1,1,0,0,1,1.41-1.41L10,14.41l5.64-5.64a1,1,0,0,1,1.41,1.41Z" style={{fill: '#3B82F6'}}/>
-      <path d="M16.44,9.94a1,1,0,0,0-1.41,0L10,15.12l-2.12-2.12a1,1,0,1,0-1.41,1.41l2.83,2.83a1,1,0,0,0,1.41,0l6.36-6.36A1,1,0,0,0,16.44,9.94Z" style={{fill: 'white'}}/>
+    <svg className={className} fill="currentColor" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 8.16A7.83 7.83 0 0012.32 1a7.92 7.92 0 00-4.48.16A8 8 0 001.2 6.6a7.82 7.82 0 00-.16 4.48A7.92 7.92 0 003.68 15a7.82 7.82 0 004.48.16A8 8 0 0014.8 9.4a7.82 7.82 0 00.16-4.48zM6.6 12L4 9.4l.8-.8L6.6 10.4l4.6-4.6.8.8z" style={{fill: '#3B82F6'}}/>
     </svg>
 );
 export const InfoIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -376,11 +374,3 @@ export const CakeIcon: React.FC<{ className?: string }> = ({ className }) => (
         <path d="M17 4h.01"/>
     </svg>
 );
-// This file had some junk at the end of it, which has been removed.
-// The MOCK_LOGIN_SESSIONS and other data were duplicated.
-// The ComputerIcon and CakeIcon were also duplicated.
-// This cleanup resolves syntax errors.
-// Also, a bug in MOCK_CONVERSATIONS was fixed (missing timestamp) and TwitterIcon was renamed to XSocialIcon to avoid conflicts.
-// The `checkBadgeIcon` has also been updated to the more modern, Instagram-style version.
-// The `types.ts` file was missing the `Language` and `LoginSession` interfaces, which were added.
-// `MessageIcon` was imported into MessagingView to fix a reference error.

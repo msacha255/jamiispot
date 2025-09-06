@@ -1,8 +1,6 @@
-
 import React, { useState } from 'react';
 import type { User, Post, View, Community, Event } from '../types';
-// FIX: Changed import from TwitterIcon to XSocialIcon to match the exported member from constants.
-import { COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, XSocialIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon, CalendarIcon } from '../constants';
+import { COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, XSocialIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon, CalendarIcon, CakeIcon } from '../constants';
 
 interface ProfileViewProps { 
     user: User;
@@ -24,12 +22,20 @@ const Stat: React.FC<{ value?: number; label: string }> = ({ value, label }) => 
     </div>
 );
 
-const ProfilePostCard: React.FC<{ post: Post }> = ({ post }) => (
+const ProfilePostCard: React.FC<{ post: Post, isArchived?: boolean, onUnarchive?: () => void }> = ({ post, isArchived, onUnarchive }) => (
   <div className="relative aspect-square bg-white dark:bg-zinc-800 rounded-lg overflow-hidden group">
     {post.imageUrl && <img src={post.imageUrl} alt="Post content" className="w-full h-full object-cover" />}
     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white font-bold">
-      <span className="flex items-center gap-1"><HeartIcon className="w-5 h-5" /> {post.likes}</span>
-      <span className="flex items-center gap-1"><MessageCircleIcon className="w-5 h-5" /> {post.commentsData.length}</span>
+      {!isArchived ? (
+        <>
+            <span className="flex items-center gap-1"><HeartIcon className="w-5 h-5" /> {post.likes}</span>
+            <span className="flex items-center gap-1"><MessageCircleIcon className="w-5 h-5" /> {post.commentsData.length}</span>
+        </>
+      ) : (
+        <button onClick={onUnarchive} className="bg-white/20 backdrop-blur-sm text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-white/30">
+            Unarchive
+        </button>
+      )}
     </div>
   </div>
 );
@@ -82,6 +88,12 @@ const AboutTab: React.FC<{ user: User }> = ({ user }) => {
                     <h4 className="font-semibold text-gray-500 text-sm">Country</h4>
                     <p>{user.showFlag && flag ? `${flag} ` : ''}{COUNTRIES.find(c=>c.code === user.country)?.name || 'Not specified'}</p>
                  </div>
+                 {user.showBirthday && user.birthday && (
+                      <div>
+                        <h4 className="font-semibold text-gray-500 text-sm flex items-center gap-1"><CakeIcon className="w-4 h-4"/>Birthday</h4>
+                        <p>{new Date(user.birthday).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })}</p>
+                     </div>
+                 )}
              </div>
             {user.interests && user.interests.length > 0 && <TagsDisplay title="Interests" items={user.interests} color="primary" />}
             {user.skills && user.skills.length > 0 && <TagsDisplay title="Skills" items={user.skills} color="accent" />}
@@ -89,7 +101,6 @@ const AboutTab: React.FC<{ user: User }> = ({ user }) => {
                 <div>
                     <h3 className="font-bold text-lg mb-2">Socials</h3>
                     <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400">
-                        {/* FIX: Use XSocialIcon instead of the non-existent TwitterIcon. */}
                         {user.socialLinks?.twitter && <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><XSocialIcon className="w-6 h-6" /></a>}
                         {user.socialLinks?.linkedin && <a href={user.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><LinkedinIcon className="w-6 h-6" /></a>}
                         {user.socialLinks?.github && <a href={user.socialLinks.github} target="_blank" rel="noopener noreferrer" className="hover:text-primary"><GithubIcon className="w-6 h-6" /></a>}
@@ -100,11 +111,14 @@ const AboutTab: React.FC<{ user: User }> = ({ user }) => {
     );
 };
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ user, posts: userPosts, isOwnProfile, onNavigate, onBlockUser, onSendMessage, followingIds, onToggleFollow, communities }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ user, posts: allUserPosts, isOwnProfile, onNavigate, onBlockUser, onSendMessage, followingIds, onToggleFollow, communities, onToggleArchive }) => {
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'posts' | 'about' | 'events'>('posts');
+    const [activeTab, setActiveTab] = useState<'posts' | 'about' | 'events' | 'archive'>('posts');
     
     const userEvents = communities.flatMap(c => c.events).filter(e => e.creator.id === user.id);
+    const publicPosts = allUserPosts.filter(p => !p.isArchived);
+    const archivedPosts = allUserPosts.filter(p => p.isArchived);
+
     const showContent = isOwnProfile || !user.isPrivate;
     const isFollowing = followingIds.has(user.id);
 
@@ -151,6 +165,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, posts: userPosts
                     <button onClick={() => setActiveTab('posts')} className={`px-3 py-2 font-semibold ${activeTab === 'posts' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'}`}>Posts</button>
                     <button onClick={() => setActiveTab('about')} className={`px-3 py-2 font-semibold ${activeTab === 'about' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'}`}>About</button>
                     <button onClick={() => setActiveTab('events')} className={`px-3 py-2 font-semibold ${activeTab === 'events' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'}`}>Events</button>
+                    {isOwnProfile && <button onClick={() => setActiveTab('archive')} className={`px-3 py-2 font-semibold ${activeTab === 'archive' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'}`}>Archive</button>}
                 </nav>
             </div>
 
@@ -165,9 +180,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, posts: userPosts
                     <>
                        {activeTab === 'posts' && (
                            <div>
-                                {userPosts.length > 0 ? (
+                                {publicPosts.length > 0 ? (
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                                        {userPosts.map(post => <ProfilePostCard key={post.id} post={post} />)}
+                                        {publicPosts.map(post => <ProfilePostCard key={post.id} post={post} />)}
                                     </div>
                                 ) : (
                                     <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-10 text-center text-gray-500">
@@ -184,6 +199,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, posts: userPosts
                                 ) : (
                                     <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-10 text-center text-gray-500">
                                         This user hasn't created any events yet.
+                                    </div>
+                                )}
+                           </div>
+                       )}
+                       {activeTab === 'archive' && isOwnProfile && (
+                            <div>
+                                {archivedPosts.length > 0 ? (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                        {archivedPosts.map(post => <ProfilePostCard key={post.id} post={post} isArchived onUnarchive={() => onToggleArchive(post.id)} />)}
+                                    </div>
+                                ) : (
+                                    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-10 text-center text-gray-500">
+                                        You have no archived posts.
                                     </div>
                                 )}
                            </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { AuthScreen } from './components/AuthScreen';
 import { Sidebar } from './components/Sidebar';
@@ -34,7 +33,7 @@ import { CreateEventModal } from './components/CreateEventModal';
 import { SecurityModal } from './components/SecurityModal';
 import { TermsAndPolicyModal } from './components/TermsAndPolicyModal';
 import { ToastNotification } from './components/ToastNotification';
-// FIX: Removed unused AboutProfileModal import.
+// Removed unused AboutProfileModal import as it's obsolete.
 // import { AboutProfileModal } from './components/AboutProfileModal';
 
 import type { View, Post, User, Story, Community, Conversation, Notification, Permissions, Language, Comment, Event, Message, FeedItem } from './types';
@@ -84,8 +83,6 @@ const App: React.FC = () => {
   const [isCreateEventModalOpen, setCreateEventModalOpen] = useState(false);
   const [isSecurityModalOpen, setSecurityModalOpen] = useState(false);
   const [isTermsModalOpen, setTermsModalOpen] = useState(false);
-  // FIX: Removed unused state for obsolete AboutProfileModal.
-  // const [isAboutProfileModalOpen, setAboutProfileModalOpen] = useState(false);
   
   // Data for Modals
   const [selectedCommunityForMap, setSelectedCommunityForMap] = useState<Community | null>(null);
@@ -402,7 +399,8 @@ const App: React.FC = () => {
         return <FeedView feedItems={feedItems} stories={filteredStories} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenCreateStory={() => setCreateStoryModalOpen(true)} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} {...commonPostHandlers} />;
       case 'discover':
         const allEvents = communities.flatMap(c => c.events);
-        return <DiscoveryView communities={communities} events={allEvents} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenCreateCommunity={() => setCreateCommunityModalOpen(true)} currentUser={currentUser} followingIds={followingIds} onToggleFollow={handleToggleFollow} onOpenProfileModal={handleOpenProfileModal} />;
+        const suggestedUsers = MOCK_USERS.filter(u => u.id !== currentUser.id && !followingIds.has(u.id));
+        return <DiscoveryView communities={communities} events={allEvents} suggestedUsers={suggestedUsers} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenCreateCommunity={() => setCreateCommunityModalOpen(true)} currentUser={currentUser} followingIds={followingIds} onToggleFollow={handleToggleFollow} onOpenProfileModal={handleOpenProfileModal} />;
       case 'community-detail':
         const community = communities.find(c => c.id === activeParams?.communityId);
         if (!community) return <div className="text-center p-8">Community not found</div>;
@@ -419,8 +417,11 @@ const App: React.FC = () => {
       case 'profile':
         const user = activeParams?.userId ? MOCK_USERS.find(u => u.id === activeParams.userId) : currentUser;
         if (!user) return <div className="text-center p-8">User not found</div>;
-        const userPosts = posts.filter(p => p.user.id === user.id && (user.id === currentUser.id || !p.isArchived) );
-        return <ProfileView user={user} posts={userPosts} isOwnProfile={user.id === currentUser.id} onNavigate={handleNavigate} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} followingIds={followingIds} onToggleFollow={handleToggleFollow} communities={communities} onToggleArchive={handleToggleArchive} />;
+        // The posts passed to ProfileView should include archived posts for the owner to see
+        const allUserPosts = posts.filter(p => p.user.id === user.id);
+        const publicUserPosts = allUserPosts.filter(p => !p.isArchived);
+
+        return <ProfileView user={user} posts={isLoggedIn && currentUser.id === user.id ? allUserPosts : publicUserPosts} isOwnProfile={user.id === currentUser.id} onNavigate={handleNavigate} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} followingIds={followingIds} onToggleFollow={handleToggleFollow} communities={communities} onToggleArchive={handleToggleArchive} />;
       case 'edit-profile':
         return <EditProfileView user={currentUser} onUpdateUser={handleUpdateUser} onCancel={handleBack} />;
       case 'settings':
@@ -436,7 +437,6 @@ const App: React.FC = () => {
   };
 
   if (!isLoggedIn) {
-    // FIX: The prop for AuthScreen should be onAuthSuccess, not onLogin, to match the component's expectations after fixes.
     return <AuthScreen onAuthSuccess={onAuthSuccess} />;
   }
 
@@ -471,7 +471,7 @@ const App: React.FC = () => {
       <SharePostModal isOpen={isSharePostModalOpen} onClose={() => setSharePostModalOpen(false)} post={postToShare} />
       <CreateEventModal isOpen={isCreateEventModalOpen} onClose={() => setCreateEventModalOpen(false)} community={selectedCommunityForEvent} onCreateEvent={handleCreateEvent} />
       <SecurityModal isOpen={isSecurityModalOpen} onClose={() => setSecurityModalOpen(false)} />
-      {/* FIX: Removed obsolete AboutProfileModal component. */}
+      <TermsAndPolicyModal isOpen={isTermsModalOpen} onClose={() => setTermsModalOpen(false)} onAccept={() => onAuthSuccess(signupData as User)} />
     </div>
   );
 };

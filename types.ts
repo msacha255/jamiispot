@@ -1,9 +1,11 @@
-
 export interface User {
   id: string;
   name: string;
   username: string;
   avatarUrl: string;
+  // FIX: Add optional email and password to the User type for use in forms.
+  email?: string;
+  password?: string;
   coverUrl?: string;
   bio?: string;
   badges: string[];
@@ -62,7 +64,7 @@ export interface Post {
   location?: string;
   mediaQuality?: 'standard' | 'high';
   isArchived?: boolean;
-  // FIX: Add optional `tags` property to the Post interface.
+  // FIX: Add optional tags array to support post tagging.
   tags?: string[];
 }
 

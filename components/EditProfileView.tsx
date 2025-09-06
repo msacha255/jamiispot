@@ -1,8 +1,6 @@
-
 import React, { useState, useRef } from 'react';
 import type { User } from '../types';
-// FIX: Changed import from TwitterIcon to XSocialIcon to match the exported member from constants.
-import { ChevronLeftIcon, XIcon, COUNTRIES, XSocialIcon, LinkedinIcon, GithubIcon } from '../constants';
+import { ChevronLeftIcon, XIcon, COUNTRIES, XSocialIcon, LinkedinIcon, GithubIcon, CakeIcon } from '../constants';
 
 interface EditProfileViewProps {
     user: User;
@@ -84,6 +82,7 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
         bio: user.bio || '',
         location: user.location || '',
         country: user.country || '',
+        birthday: user.birthday || '',
         socialLinks: {
             twitter: user.socialLinks?.twitter || '',
             linkedin: user.socialLinks?.linkedin || '',
@@ -91,6 +90,7 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
         }
     });
     const [showFlag, setShowFlag] = useState(user.showFlag || false);
+    const [showBirthday, setShowBirthday] = useState(user.showBirthday || false);
     const [interests, setInterests] = useState(user.interests || []);
     const [skills, setSkills] = useState(user.skills || []);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(user.avatarUrl);
@@ -139,6 +139,7 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
             interests,
             skills,
             showFlag,
+            showBirthday,
         };
         onUpdateUser(updatedUser);
     };
@@ -152,7 +153,6 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
     
     const SocialInput: React.FC<{name: 'twitter' | 'linkedin' | 'github', value: string, onChange: (e: React.ChangeEvent<HTMLInputElement>) => void}> = ({ name, value, onChange }) => {
         const icons = {
-            // FIX: Use XSocialIcon instead of the non-existent TwitterIcon.
             twitter: <XSocialIcon className="w-5 h-5 text-gray-400" />,
             linkedin: <LinkedinIcon className="w-5 h-5 text-gray-400" />,
             github: <GithubIcon className="w-5 h-5 text-gray-400" />
@@ -234,6 +234,19 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
                          <div>
                             <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
                             <input type="text" name="location" id="location" value={formData.location} onChange={handleInputChange} className="w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none" />
+                        </div>
+                         <div>
+                            <label htmlFor="birthday" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Birthday</label>
+                            <input type="date" name="birthday" id="birthday" value={formData.birthday} onChange={handleInputChange} className="w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none" />
+                             <div className="flex items-center mt-3">
+                                <button
+                                    onClick={() => setShowBirthday(!showBirthday)}
+                                    className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${showBirthday ? 'bg-primary' : 'bg-gray-300 dark:bg-zinc-600'}`}
+                                >
+                                    <span className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${showBirthday ? 'translate-x-6' : 'translate-x-1'}`} />
+                                </button>
+                                <span className="ml-3 text-sm text-gray-600 dark:text-gray-400">Show birthday on profile</span>
+                            </div>
                         </div>
                         <div>
                             <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">National Flag Badge</label>
