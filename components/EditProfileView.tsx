@@ -251,7 +251,7 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
                     </FormSection>
                 </div>
 
-                <div className="p-6 flex justify-end gap-4 border-t border-gray-200 dark:border-zinc-700">
+                <div className="p-6 flex flex-col-reverse sm:flex-row justify-end gap-4 border-t border-gray-200 dark:border-zinc-700">
                     <button onClick={onCancel} className="bg-gray-200 dark:bg-zinc-700 text-deep-gray dark:text-white font-semibold px-6 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-600 transition-colors">Cancel</button>
                     <button onClick={handleSave} className="bg-primary text-white font-semibold px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm">Save Changes</button>
                 </div>

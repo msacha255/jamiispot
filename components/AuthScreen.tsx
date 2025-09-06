@@ -102,7 +102,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
                 return (
                      <AuthContainer title="Create an account" onBack={() => setStep('welcome')}>
                         <form onSubmit={handleSignupSubmit} className="space-y-4">
-                            <div className="flex gap-4">
+                            <div className="flex flex-col sm:flex-row gap-4">
                                 <div className="flex-1">
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="firstName">First Name</label>
                                     <IconInput type="text" name="firstName" id="firstName" value={formData.firstName} onChange={handleInputChange} required icon={<UserIcon className="w-5 h-5 text-gray-400" />} />

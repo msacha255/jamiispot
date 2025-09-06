@@ -104,11 +104,11 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, use
                 <div className="flex-1 overflow-y-auto">
                     <div className="h-32 bg-cover bg-center" style={{ backgroundImage: `url(${user.coverUrl})` }} />
                     <div className="p-6">
-                        <div className="flex justify-between -mt-16 items-end">
+                        <div className="flex flex-col sm:flex-row justify-between -mt-16 sm:items-end gap-4">
                             <img src={user.avatarUrl} alt={user.name} className="w-24 h-24 rounded-full border-4 border-white dark:border-zinc-800 object-cover"/>
-                             <div className="flex items-center gap-2">
-                                <button onClick={() => onToggleFollow(user.id)} className={`font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm ${isFollowing ? 'bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300' : 'bg-primary text-white hover:bg-orange-600'}`}>{isFollowing ? 'Following' : 'Follow'}</button>
-                                <button onClick={() => onSendMessage(user)} className="bg-gray-200 dark:bg-zinc-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-600 transition-colors">Message</button>
+                             <div className="flex items-center gap-2 self-start sm:self-end">
+                                <button onClick={() => onToggleFollow(user.id)} className={`font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm flex-1 sm:flex-auto ${isFollowing ? 'bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300' : 'bg-primary text-white hover:bg-orange-600'}`}>{isFollowing ? 'Following' : 'Follow'}</button>
+                                <button onClick={() => onSendMessage(user)} className="bg-gray-200 dark:bg-zinc-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-600 transition-colors flex-1 sm:flex-auto">Message</button>
                             </div>
                         </div>
 
