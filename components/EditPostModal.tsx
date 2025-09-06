@@ -1,6 +1,7 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import type { User, Post } from '../types';
-import { XIcon, ImageIcon, MapPinIcon, ClockIcon } from '../constants';
+import { XIcon } from '../constants';
 
 interface EditPostModalProps {
   isOpen: boolean;

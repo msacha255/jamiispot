@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import type { Community, Post, User, Event } from '../types';
 import { HeartIcon, MessageCircleIcon, ShareIcon, UsersIcon, SettingsIcon, MapIcon, PlusIcon, CalendarIcon, MapPinIcon, MoreHorizontalIcon, EditIcon, ArchiveIcon } from '../constants';

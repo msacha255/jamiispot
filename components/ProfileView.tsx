@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import type { User, Post, View, Community, Event } from '../types';
 import { COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, XSocialIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon, CalendarIcon, CakeIcon, SettingsIcon } from '../constants';
