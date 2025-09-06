@@ -1,7 +1,9 @@
 
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { XIcon, SearchIcon } from '../constants';
-import { MOCK_USERS, MOCK_POSTS, MOCK_COMMUNITIES } from '../constants';
+// FIX: Removed MOCK_POSTS and MOCK_COMMUNITIES as they will be passed via props.
+import { MOCK_USERS } from '../constants';
 import type { User, Post, Community, View } from '../types';
 
 interface SearchModalProps {
@@ -11,6 +13,10 @@ interface SearchModalProps {
   onOpenProfile: (user: User) => void;
   // FIX: Add optional `initialSearchTerm` prop to pre-fill the search input.
   initialSearchTerm?: string;
+  // FIX: Add props for dynamic data searching.
+  allPosts: Post[];
+  communities: Community[];
+  onOpenPostDetail: (post: Post) => void;
 }
 
 const useDebounce = (value: string, delay: number) => {
@@ -26,7 +32,7 @@ const useDebounce = (value: string, delay: number) => {
     return debouncedValue;
 };
 
-export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNavigate, onOpenProfile, initialSearchTerm = '' }) => {
+export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNavigate, onOpenProfile, initialSearchTerm = '', allPosts, communities, onOpenPostDetail }) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [activeTab, setActiveTab] = useState('all');
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -47,10 +53,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNav
         }
         const lowercasedTerm = debouncedSearchTerm.toLowerCase();
         const people = MOCK_USERS.filter(u => u.name.toLowerCase().includes(lowercasedTerm) || u.username.toLowerCase().includes(lowercasedTerm));
-        const posts = MOCK_POSTS.filter(p => p.content.toLowerCase().includes(lowercasedTerm));
-        const communities = MOCK_COMMUNITIES.filter(c => c.name.toLowerCase().includes(lowercasedTerm) || c.description.toLowerCase().includes(lowercasedTerm));
-        return { people, posts, communities };
-    }, [debouncedSearchTerm]);
+        // FIX: Use `allPosts` and `communities` from props for searching instead of mock data.
+        const posts = allPosts.filter(p => p.content.toLowerCase().includes(lowercasedTerm));
+        const communitiesResult = communities.filter(c => c.name.toLowerCase().includes(lowercasedTerm) || c.description.toLowerCase().includes(lowercasedTerm));
+        return { people, posts, communities: communitiesResult };
+    }, [debouncedSearchTerm, allPosts, communities]);
 
     const tabs = [
         { id: 'all', label: 'All' },
@@ -125,7 +132,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNav
                      <section>
                         <h2 className="text-lg font-bold mb-2">Posts</h2>
                         {searchResults.posts.map(post => (
-                            <div key={post.id} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer">
+                            // FIX: Added onClick to open post detail modal.
+                            <div key={post.id} onClick={() => { onClose(); onOpenPostDetail(post); }} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer">
                                 <div className="flex items-center mb-2">
                                     <img src={post.user.avatarUrl} alt={post.user.name} className="w-8 h-8 rounded-full" />
                                     <p className="ml-2 font-semibold">{post.user.name}</p>

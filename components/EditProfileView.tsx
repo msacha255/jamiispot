@@ -74,6 +74,45 @@ const TagInput: React.FC<TagInputProps> = ({ label, tags, setTags, color }) => {
     );
 };
 
+const BirthdaySelector: React.FC<{ value: string; onChange: (value: string) => void;}> = ({ value, onChange }) => {
+    const [year, month, day] = value ? value.split('-').map(v => parseInt(v, 10)) : [undefined, undefined, undefined];
+    
+    const handleDateChange = (part: 'year' | 'month' | 'day', val: number) => {
+        const newDate = new Date(year || new Date().getFullYear(), (month-1) || 0, day || 1);
+        if (part === 'year') newDate.setFullYear(val);
+        if (part === 'month') newDate.setMonth(val - 1);
+        if (part === 'day') newDate.setDate(val);
+        onChange(newDate.toISOString().split('T')[0]);
+    };
+
+    const months = Array.from({ length: 12 }, (_, i) => ({ value: i + 1, label: new Date(0, i).toLocaleString('default', { month: 'long' }) }));
+    const days = Array.from({ length: 31 }, (_, i) => i + 1);
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
+
+    const selectClasses = "w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none";
+
+    return (
+        <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Birthday</label>
+            <div className="grid grid-cols-3 gap-2">
+                <select value={month || ''} onChange={(e) => handleDateChange('month', parseInt(e.target.value))} className={selectClasses} aria-label="Month">
+                    <option value="" disabled>Month</option>
+                    {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                </select>
+                <select value={day || ''} onChange={(e) => handleDateChange('day', parseInt(e.target.value))} className={selectClasses} aria-label="Day">
+                    <option value="" disabled>Day</option>
+                    {days.map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
+                <select value={year || ''} onChange={(e) => handleDateChange('year', parseInt(e.target.value))} className={selectClasses} aria-label="Year">
+                    <option value="" disabled>Year</option>
+                    {years.map(y => <option key={y} value={y}>{y}</option>)}
+                </select>
+            </div>
+        </div>
+    );
+};
+
 
 export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdateUser, onCancel }) => {
     const [formData, setFormData] = useState({
@@ -236,8 +275,7 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
                             <input type="text" name="location" id="location" value={formData.location} onChange={handleInputChange} className="w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none" />
                         </div>
                          <div>
-                            <label htmlFor="birthday" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Birthday</label>
-                            <input type="date" name="birthday" id="birthday" value={formData.birthday} onChange={handleInputChange} className="w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none" />
+                            <BirthdaySelector value={formData.birthday} onChange={(val) => setFormData(p => ({...p, birthday: val}))} />
                              <div className="flex items-center mt-3">
                                 <button
                                     onClick={() => setShowBirthday(!showBirthday)}

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// FIX: Import `MOCK_USERS` from constants to be used in the mock login handler.
 import { JamiiSpotFullLogo, ChevronLeftIcon, MailIcon, UserIcon, LockIcon, CheckCircleIcon, CakeIcon, MOCK_USERS } from '../constants';
 import { ForgotPasswordModal } from './ForgotPasswordModal';
 import { TermsAndPolicyModal } from './TermsAndPolicyModal';
@@ -44,6 +43,45 @@ const IconInput: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { icon: 
         />
     </div>
 );
+
+const BirthdaySelector: React.FC<{ value: string; onChange: (value: string) => void;}> = ({ value, onChange }) => {
+    const [month, day, year] = value.split('-').map(v => parseInt(v, 10));
+
+    const handleDateChange = (part: 'year' | 'month' | 'day', val: number) => {
+        const newDate = new Date(year || new Date().getFullYear(), (month-1) || 0, day || 1);
+        if (part === 'year') newDate.setFullYear(val);
+        if (part === 'month') newDate.setMonth(val - 1);
+        if (part === 'day') newDate.setDate(val);
+        onChange(newDate.toISOString().split('T')[0]);
+    };
+
+    const months = Array.from({ length: 12 }, (_, i) => ({ value: i + 1, label: new Date(0, i).toLocaleString('default', { month: 'long' }) }));
+    const days = Array.from({ length: 31 }, (_, i) => i + 1);
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
+
+    const selectClasses = "w-full bg-light-gray dark:bg-zinc-700 border-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none";
+
+    return (
+        <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Birthday</label>
+            <div className="grid grid-cols-3 gap-2">
+                <select value={month || ''} onChange={(e) => handleDateChange('month', parseInt(e.target.value))} className={selectClasses} aria-label="Month">
+                    <option value="" disabled>Month</option>
+                    {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                </select>
+                <select value={day || ''} onChange={(e) => handleDateChange('day', parseInt(e.target.value))} className={selectClasses} aria-label="Day">
+                    <option value="" disabled>Day</option>
+                    {days.map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
+                <select value={year || ''} onChange={(e) => handleDateChange('year', parseInt(e.target.value))} className={selectClasses} aria-label="Year">
+                    <option value="" disabled>Year</option>
+                    {years.map(y => <option key={y} value={y}>{y}</option>)}
+                </select>
+            </div>
+        </div>
+    );
+};
 
 
 export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
@@ -137,7 +175,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
                                      <IconInput type="text" name="name" placeholder="Full Name" value={formData.name || ''} onChange={handleInputChange} required icon={<UserIcon className="w-5 h-5 text-gray-400" />} />
                                      <IconInput type="email" name="email" placeholder="Email Address" value={formData.email || ''} onChange={handleInputChange} required icon={<MailIcon className="w-5 h-5 text-gray-400" />} />
                                      <IconInput type="password" name="password" placeholder="Password (8+ characters)" value={formData.password || ''} onChange={handleInputChange} required minLength={8} icon={<LockIcon className="w-5 h-5 text-gray-400" />} />
-                                     <IconInput type="date" name="birthday" value={formData.birthday || ''} onChange={handleInputChange} required icon={<CakeIcon className="w-5 h-5 text-gray-400" />} />
+                                     <BirthdaySelector value={formData.birthday || ''} onChange={(val) => setFormData(p => ({...p, birthday: val}))} />
                                      <button type="submit" className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition duration-300 shadow-md !mt-6">Next</button>
                                      <p className="text-center text-sm text-gray-500 dark:text-gray-400 pt-2">
                                         Already have an account? <a href="#" onClick={(e) => { e.preventDefault(); setStep('login'); }} className="font-semibold text-primary hover:underline">Log In</a>
