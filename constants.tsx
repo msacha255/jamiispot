@@ -1,10 +1,10 @@
 import React from 'react';
-import type { User, Post, Story, Conversation, Message, Community, Notification } from './types';
+import type { User, Post, Story, Conversation, Message, Community, Notification, Language } from './types';
 
 export const MOCK_USER: User = {
   id: 'u1',
-  name: 'Alex Doe',
-  username: 'alexdoe',
+  name: 'Florence Sakaya',
+  username: 'florencesakaya',
   avatarUrl: 'https://picsum.photos/seed/user1/100/100',
   coverUrl: 'https://picsum.photos/seed/cover1/1000/300',
   bio: 'Explorer, developer, and coffee enthusiast. Building cool things and sharing my journey.',
@@ -13,16 +13,16 @@ export const MOCK_USER: User = {
   isVerified: true,
   interests: ['Hiking', 'Photography', 'Coding', 'Travel'],
   skills: ['React', 'TypeScript', 'Node.js', 'GraphQL', 'UI/UX Design'],
-  location: 'San Francisco, CA',
-  country: 'US',
+  location: 'Nairobi, Kenya',
+  country: 'KE',
   showFlag: true,
   socialLinks: {
     twitter: 'https://twitter.com/jamii_spot',
     linkedin: 'https://linkedin.com/in/jamiispot',
     github: 'https://github.com/jamiispot',
   },
-  latitude: 37.7749,
-  longitude: -122.4194,
+  latitude: -1.2921,
+  longitude: 36.8219,
   followers: 1258,
   following: 342,
   joinDate: '2022-08-15',
@@ -30,12 +30,12 @@ export const MOCK_USER: User = {
 
 export const MOCK_USERS: User[] = [
   MOCK_USER,
-  { id: 'u2', name: 'Jane Smith', username: 'janesmith', avatarUrl: 'https://picsum.photos/seed/user2/100/100', badges: [], profileCompleteness: 0, isVerified: true, skills: ['Project Management', 'Agile'], latitude: 37.7851, longitude: -122.4064, followers: 2043, following: 501, joinDate: '2023-01-20' },
-  { id: 'u3', name: 'Sam Wilson', username: 'samwilson', avatarUrl: 'https://picsum.photos/seed/user3/100/100', badges: [], profileCompleteness: 0, interests: ['Reading', 'Baking'], latitude: 37.7915, longitude: -122.3951, followers: 890, following: 623, joinDate: '2022-11-05' },
-  { id: 'u4', name: 'Maria Garcia', username: 'mariagarcia', avatarUrl: 'https://picsum.photos/seed/user4/100/100', badges: [], profileCompleteness: 0, isPrivate: true, latitude: 37.7634, longitude: -122.4357, followers: 500, following: 50, joinDate: '2023-05-10' },
-  { id: 'u5', name: 'Kenji Tanaka', username: 'kenjitanaka', avatarUrl: 'https://picsum.photos/seed/user5/100/100', badges: [], profileCompleteness: 0, latitude: 37.7510, longitude: -122.4190, followers: 150, following: 180, joinDate: '2023-02-18' },
-  { id: 'u6', name: 'Aisha Diallo', username: 'aishadiallo', avatarUrl: 'https://picsum.photos/seed/user6/100/100', badges: [], profileCompleteness: 0, latitude: 37.8044, longitude: -122.4194, followers: 432, following: 430, joinDate: '2023-03-22' },
-  { id: 'u7', name: 'Ethan Carter', username: 'ethancarter', avatarUrl: 'https://picsum.photos/seed/user7/100/100', badges: [], profileCompleteness: 0, latitude: 37.7749, longitude: -122.4494, followers: 987, following: 123, joinDate: '2023-04-01' },
+  { id: 'u2', name: 'Walter Joseph', username: 'walterjoseph', avatarUrl: 'https://picsum.photos/seed/user2/100/100', badges: [], profileCompleteness: 0, isVerified: true, skills: ['Project Management', 'Agile'], latitude: -6.8024, longitude: 39.2795, followers: 2043, following: 501, joinDate: '2023-01-20' },
+  { id: 'u3', name: 'Fatuma Hassan', username: 'fatumahassan', avatarUrl: 'https://picsum.photos/seed/user3/100/100', badges: [], profileCompleteness: 0, interests: ['Reading', 'Baking'], latitude: 0.3136, longitude: 32.5811, followers: 890, following: 623, joinDate: '2022-11-05' },
+  { id: 'u4', name: 'David Okello', username: 'davidokello', avatarUrl: 'https://picsum.photos/seed/user4/100/100', badges: [], profileCompleteness: 0, isPrivate: true, latitude: -4.0435, longitude: 39.6682, followers: 500, following: 50, joinDate: '2023-05-10' },
+  { id: 'u5', name: 'Zawadi Mwangi', username: 'zawadimwangi', avatarUrl: 'https://picsum.photos/seed/user5/100/100', badges: [], profileCompleteness: 0, latitude: -6.1630, longitude: 35.7516, followers: 150, following: 180, joinDate: '2023-02-18' },
+  { id: 'u6', name: 'Juma Bakari', username: 'jumabakari', avatarUrl: 'https://picsum.photos/seed/user6/100/100', badges: [], profileCompleteness: 0, latitude: -4.0541, longitude: 39.6698, followers: 432, following: 430, joinDate: '2023-03-22' },
+  { id: 'u7', name: 'Neema Nyerere', username: 'neema_nyerere', avatarUrl: 'https://picsum.photos/seed/user7/100/100', badges: [], profileCompleteness: 0, latitude: -1.2821, longitude: 36.8319, followers: 987, following: 123, joinDate: '2023-04-01' },
 ];
 
 export const MOCK_STORIES: Story[] = MOCK_USERS.map((user, i) => ({
@@ -109,9 +109,26 @@ export const COUNTRIES = [
     { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
     { code: 'IN', name: 'India', flag: '🇮🇳' },
     { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
+    { code: 'KE', name: 'Kenya', flag: '🇰🇪' },
+    { code: 'TZ', name: 'Tanzania', flag: '🇹🇿' },
+    { code: 'UG', name: 'Uganda', flag: '🇺🇬' },
 ];
 
 export const COMMUNITY_CATEGORIES = ['Technology', 'Books', 'Outdoors', 'Social', 'Art', 'Music', 'Gaming', 'Health'];
+
+export const SUPPORTED_LANGUAGES: Language[] = [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'es', name: 'Spanish', nativeName: 'Español' },
+    { code: 'fr', name: 'French', nativeName: 'Français' },
+    { code: 'de', name: 'German', nativeName: 'Deutsch' },
+    { code: 'pt', name: 'Portuguese', nativeName: 'Português' },
+    { code: 'sw', name: 'Swahili', nativeName: 'Kiswahili' },
+    { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी' },
+    { code: 'zh', name: 'Chinese', nativeName: '中文' },
+    { code: 'ja', name: 'Japanese', nativeName: '日本語' },
+    { code: 'ar', name: 'Arabic', nativeName: 'العربية' },
+];
+
 
 export const JamiiSpotFullLogo: React.FC<{ className?: string }> = ({ className }) => (
     <img 
@@ -241,11 +258,21 @@ export const MoreVerticalIcon: React.FC<{ className?: string }> = ({ className }
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
 );
 export const CheckBadgeIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M22.5 12.06c0 .5-.21 1.01-.58 1.38l-1.9 1.91c-.37.37-.88.58-1.38.58h-2.58c-.53 0-1.04.21-1.42.58l-1.55 1.55c-.37.37-.88.58-1.38.58s-1.01-.21-1.38-.58l-1.55-1.55c-.38-.37-.89-.58-1.42-.58H5.29c-.5 0-1.01-.21-1.38-.58l-1.9-1.91c-.37-.37-.58-.88-.58-1.38v-2.58c0-.53.21-1.04.58-1.42l-1.55-1.55c.37-.37.58-.88.58-1.38s-.21-1.01-.58-1.38l-1.55-1.55c-.38-.37-.58-.89-.58-1.42V5.29c0-.5.21-1.01.58-1.38l1.9-1.91c.37-.37.88-.58 1.38-.58h2.58c.53 0 1.04-.21 1.42-.58l1.55-1.55c.37-.37.88-.58 1.38-.58s1.01.21 1.38.58l1.55 1.55c.38.37.89.58 1.42.58h2.58c.5 0 1.01.21 1.38.58l1.9 1.91c.37.37.58.88.58 1.38v2.58c0 .53-.21 1.04-.58 1.42l-1.55 1.55c-.37.37-.58.88-.58 1.38s.21 1.01.58 1.38l1.55 1.55c.38.37.58.89.58 1.42v2.58z" />
-        <path fill="#fff" d="m10.46 15.65-3.32-3.32a.75.75 0 0 1 1.06-1.06l2.26 2.26 4.97-4.97a.75.75 0 0 1 1.06 1.06l-6.03 6.03z" />
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19.965 8.521C19.988 8.347 20 8.17 20 8c0-2.21-1.79-4-4-4s-4 1.79-4 4c0 .17.012.347.035.521C11.413 8.192 10.74 7.5 10 7.5c-1.895 0-3.475 1.42-3.873 3.25C6.066 10.928 6 11.107 6 11.3c0 1.21.99 2.2 2.2 2.2.193 0 .38-.026.568-.077C9.176 15.36 10.428 16.5 12 16.5c2.478 0 4.5-2.022 4.5-4.5 0-.74-.18-1.432-.501-2.04.188.02.38.03.571.03.953 0 1.8-.448 2.395-1.18.237-.286.39-.623.4-1.29z" />
+      <path fill="#fff" d="m10.46 15.65-3.32-3.32a.75.75 0 0 1 1.06-1.06l2.26 2.26 4.97-4.97a.75.75 0 0 1 1.06 1.06l-6.03 6.03z" />
     </svg>
 );
 export const InfoIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+);
+export const TranslateIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m5 12 7 7 7-7"/>
+        <path d="m12 19V3"/>
+        <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"/>
+        <path d="M12 3v2"/>
+        <path d="m21 15-4-4-4 4"/>
+        <path d="M17 11v8"/>
+    </svg>
 );

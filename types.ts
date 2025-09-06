@@ -82,5 +82,18 @@ export interface Notification {
     isRead: boolean;
 }
 
+export interface Language {
+  code: string;
+  name: string;
+  nativeName: string;
+}
+
+export interface Permissions {
+    camera: boolean;
+    location: boolean;
+    microphone: boolean;
+    notifications: boolean;
+}
+
 
 export type View = 'feed' | 'discover' | 'messages' | 'notifications' | 'profile' | 'settings' | 'community-detail' | 'edit-profile';

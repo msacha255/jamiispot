@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { XIcon, CameraIcon, MicIcon, MapPinIcon, SmartphoneIcon } from '../constants';
+import React from 'react';
+import { XIcon, CameraIcon, MicIcon, MapPinIcon, BellIcon } from '../constants';
+import type { Permissions } from '../types';
 
 interface PermissionsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  permissions: Permissions;
+  onPermissionsChange: (newPermissions: Permissions) => void;
 }
 
 const PermissionToggle: React.FC<{
@@ -28,25 +31,19 @@ const PermissionToggle: React.FC<{
     </div>
 );
 
-export const PermissionsModal: React.FC<PermissionsModalProps> = ({ isOpen, onClose }) => {
-    const [permissions, setPermissions] = useState({
-        camera: true,
-        location: false,
-        microphone: true,
-        contacts: false,
-    });
-
-    const togglePermission = (key: keyof typeof permissions) => {
-        setPermissions(prev => ({ ...prev, [key]: !prev[key] }));
+export const PermissionsModal: React.FC<PermissionsModalProps> = ({ isOpen, onClose, permissions, onPermissionsChange }) => {
+    
+    const togglePermission = (key: keyof Permissions) => {
+        onPermissionsChange({ ...permissions, [key]: !permissions[key] });
     };
 
     if (!isOpen) return null;
 
     const permissionItems = [
-        { key: 'camera', icon: <CameraIcon className="w-6 h-6"/>, label: 'Camera', description: 'To take photos and videos for posts and stories.' },
-        { key: 'location', icon: <MapPinIcon className="w-6 h-6"/>, label: 'Location', description: 'To discover nearby people and places.' },
-        { key: 'microphone', icon: <MicIcon className="w-6 h-6"/>, label: 'Microphone', description: 'To record audio for videos and voice messages.' },
-        { key: 'contacts', icon: <SmartphoneIcon className="w-6 h-6"/>, label: 'Contacts', description: 'To find your friends on JamiiSpot.' },
+        { key: 'camera', icon: <CameraIcon className="w-6 h-6"/>, label: 'Camera', description: 'For posts, stories, and your profile picture.' },
+        { key: 'location', icon: <MapPinIcon className="w-6 h-6"/>, label: 'Location', description: 'To discover nearby people, communities, and tag posts.' },
+        { key: 'microphone', icon: <MicIcon className="w-6 h-6"/>, label: 'Microphone', description: 'To record audio for videos and future voice messages.' },
+        { key: 'notifications', icon: <BellIcon className="w-6 h-6"/>, label: 'Push Notifications', description: 'To receive alerts for likes, comments, and follows.' },
     ];
 
     return (

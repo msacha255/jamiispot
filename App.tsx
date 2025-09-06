@@ -25,9 +25,9 @@ import { BlockUserModal } from './components/BlockUserModal';
 import { BlockedUsersModal } from './components/BlockedUsersModal';
 import { VerificationRequestModal } from './components/VerificationRequestModal';
 import { SearchModal } from './components/SearchModal';
-import { AboutProfileModal } from './components/AboutProfileModal';
-import type { View, Post, User, Story, Community, Conversation, Notification } from './types';
-import { MOCK_USERS, MOCK_POSTS, MOCK_STORIES, MOCK_COMMUNITIES, MOCK_CONVERSATIONS, MOCK_NOTIFICATIONS } from './constants';
+import { LanguageChangeModal } from './components/LanguageChangeModal';
+import type { View, Post, User, Story, Community, Conversation, Notification, Permissions, Language } from './types';
+import { MOCK_USERS, MOCK_POSTS, MOCK_STORIES, MOCK_COMMUNITIES, MOCK_CONVERSATIONS, MOCK_NOTIFICATIONS, SUPPORTED_LANGUAGES } from './constants';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,6 +38,15 @@ const App: React.FC = () => {
   const [communities, setCommunities] = useState<Community[]>(MOCK_COMMUNITIES);
   const [currentUser, setCurrentUser] = useState<User>(MOCK_USERS[0]);
   const [blockedUserIds, setBlockedUserIds] = useState<Set<string>>(new Set(['u4']));
+  const [followingIds, setFollowingIds] = useState<Set<string>>(new Set(['u2', 'u3']));
+  const [language, setLanguage] = useState<Language>(SUPPORTED_LANGUAGES[0]);
+  const [permissions, setPermissions] = useState<Permissions>({
+    camera: true,
+    location: false,
+    microphone: true,
+    notifications: true,
+  });
+
 
   // Modal States
   const [isCreatePostModalOpen, setCreatePostModalOpen] = useState(false);
@@ -54,14 +63,13 @@ const App: React.FC = () => {
   const [isBlockedUsersModalOpen, setBlockedUsersModalOpen] = useState(false);
   const [isVerificationModalOpen, setVerificationModalOpen] = useState(false);
   const [isSearchModalOpen, setSearchModalOpen] = useState(false);
-  const [isAboutProfileModalOpen, setAboutProfileModalOpen] = useState(false);
+  const [isLanguageModalOpen, setLanguageModalOpen] = useState(false);
 
   // Data for Modals
   const [selectedCommunityForMap, setSelectedCommunityForMap] = useState<Community | null>(null);
   const [selectedCommunityForSettings, setSelectedCommunityForSettings] = useState<Community | null>(null);
   const [selectedUserForProfile, setSelectedUserForProfile] = useState<User | null>(null);
   const [userToBlock, setUserToBlock] = useState<User | null>(null);
-  const [selectedUserForAbout, setSelectedUserForAbout] = useState<User | null>(null);
 
   const { view: activeView, params: activeParams } = navHistory[navHistory.length - 1];
 
@@ -105,15 +113,26 @@ const App: React.FC = () => {
     setBlockUserModalOpen(true);
   };
 
-  const handleOpenAboutProfileModal = (user: User) => {
-    setSelectedUserForAbout(user);
-    setAboutProfileModalOpen(true);
-  };
-
   const handleSendMessageFromProfile = (user: User) => {
     setProfileModalOpen(false);
     const conversation = MOCK_CONVERSATIONS.find(c => c.participants.some(p => p.id === user.id));
     handleNavigate('messages', { conversationId: conversation?.id });
+  };
+
+  const handleToggleFollow = (userId: string) => {
+    setFollowingIds(prev => {
+        const newSet = new Set(prev);
+        if (newSet.has(userId)) {
+            newSet.delete(userId);
+        } else {
+            newSet.add(userId);
+        }
+        return newSet;
+    });
+  };
+
+  const handlePermissionsChange = (newPermissions: Permissions) => {
+    setPermissions(newPermissions);
   };
 
   // --- Filtering based on blocked users ---
@@ -196,11 +215,11 @@ const App: React.FC = () => {
       case 'profile':
         const user = activeParams?.userId ? MOCK_USERS.find(u => u.id === activeParams.userId) : currentUser;
         if (!user) return <div className="text-center p-8">User not found</div>;
-        return <ProfileView user={user} isOwnProfile={user.id === currentUser.id} onNavigate={handleNavigate} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} />;
+        return <ProfileView user={user} isOwnProfile={user.id === currentUser.id} onNavigate={handleNavigate} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} followingIds={followingIds} onToggleFollow={handleToggleFollow} />;
       case 'edit-profile':
         return <EditProfileView user={currentUser} onUpdateUser={handleUpdateUser} onCancel={handleBack} />;
       case 'settings':
-        return <SettingsView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onLogout={handleLogout} onOpenPrivacyModal={() => setPrivacyModalOpen(true)} onOpenPermissionsModal={() => setPermissionsModalOpen(true)} onOpenHelpSupportModal={() => setHelpSupportModalOpen(true)} onOpenBlockedUsers={() => setBlockedUsersModalOpen(true)} onOpenVerification={() => setVerificationModalOpen(true)} />;
+        return <SettingsView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onLogout={handleLogout} onOpenPrivacyModal={() => setPrivacyModalOpen(true)} onOpenPermissionsModal={() => setPermissionsModalOpen(true)} onOpenHelpSupportModal={() => setHelpSupportModalOpen(true)} onOpenBlockedUsers={() => setBlockedUsersModalOpen(true)} onOpenVerification={() => setVerificationModalOpen(true)} onOpenLanguageModal={() => setLanguageModalOpen(true)} language={language} />;
       default:
         return <FeedView posts={filteredPosts} stories={filteredStories} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenCreateStory={() => setCreateStoryModalOpen(true)} onOpenProfileModal={handleOpenProfileModal} />;
     }
@@ -228,18 +247,18 @@ const App: React.FC = () => {
       <CreatePostModal isOpen={isCreatePostModalOpen} onClose={() => setCreatePostModalOpen(false)} onCreatePost={handleCreatePost} user={currentUser} blockedUserIds={blockedUserIds} />
       <CreateStoryModal isOpen={isCreateStoryModalOpen} onClose={() => setCreateStoryModalOpen(false)} onCreateStory={handleCreateStory} />
       <PrivacyModal isOpen={isPrivacyModalOpen} onClose={() => setPrivacyModalOpen(false)} />
-      <PermissionsModal isOpen={isPermissionsModalOpen} onClose={() => setPermissionsModalOpen(false)} />
+      <PermissionsModal isOpen={isPermissionsModalOpen} onClose={() => setPermissionsModalOpen(false)} permissions={permissions} onPermissionsChange={handlePermissionsChange} />
       <HelpSupportModal isOpen={isHelpSupportModalOpen} onClose={() => setHelpSupportModalOpen(false)} />
       <NotificationsModal isOpen={isNotificationsModalOpen} onClose={() => setNotificationsModalOpen(false)} onViewAll={handleViewAllNotifications} />
       <CommunityMapModal isOpen={isCommunityMapModalOpen} onClose={() => setCommunityMapModalOpen(false)} community={selectedCommunityForMap} />
       <CreateCommunityModal isOpen={isCreateCommunityModalOpen} onClose={() => setCreateCommunityModalOpen(false)} onCreate={handleCreateCommunity} />
       <CommunitySettingsModal isOpen={isCommunitySettingsModalOpen} onClose={() => setCommunitySettingsModalOpen(false)} community={selectedCommunityForSettings} setCommunities={setCommunities} />
-      <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} user={selectedUserForProfile} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} onOpenAbout={handleOpenAboutProfileModal} />
+      <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} user={selectedUserForProfile} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} followingIds={followingIds} onToggleFollow={handleToggleFollow} />
       <BlockUserModal isOpen={isBlockUserModalOpen} onClose={() => setBlockUserModalOpen(false)} user={userToBlock} onConfirmBlock={handleBlockUser} />
       <BlockedUsersModal isOpen={isBlockedUsersModalOpen} onClose={() => setBlockedUsersModalOpen(false)} blockedUserIds={[...blockedUserIds]} onUnblockUser={handleUnblockUser} />
       <VerificationRequestModal isOpen={isVerificationModalOpen} onClose={() => setVerificationModalOpen(false)} />
       <SearchModal isOpen={isSearchModalOpen} onClose={() => setSearchModalOpen(false)} onNavigate={handleNavigate} onOpenProfile={handleOpenProfileModal} />
-      <AboutProfileModal isOpen={isAboutProfileModalOpen} onClose={() => setAboutProfileModalOpen(false)} user={selectedUserForAbout} />
+      <LanguageChangeModal isOpen={isLanguageModalOpen} onClose={() => setLanguageModalOpen(false)} currentLanguage={language} onLanguageChange={setLanguage} />
     </div>
   );
 };
