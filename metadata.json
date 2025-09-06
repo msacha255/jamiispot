@@ -1,5 +1,7 @@
 {
   "name": "JamiiSpot",
   "description": "A modern, vibrant social networking platform designed to connect people through communities, shared interests, and a local marketplace. Discover, connect, and thrive with JamiiSpot.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "camera"
+  ]
 }

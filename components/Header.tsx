@@ -7,9 +7,10 @@ interface HeaderProps {
   user: User;
   showBack: boolean;
   onBack: () => void;
+  onOpenCreatePost: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ user, showBack, onBack }) => {
+export const Header: React.FC<HeaderProps> = ({ user, showBack, onBack, onOpenCreatePost }) => {
   return (
     <header className="bg-white dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 p-4 flex items-center justify-between gap-4">
       <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -28,7 +29,10 @@ export const Header: React.FC<HeaderProps> = ({ user, showBack, onBack }) => {
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <button className="bg-primary text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-600 transition-colors shadow-sm">
+        <button 
+          onClick={onOpenCreatePost}
+          className="bg-primary text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-600 transition-colors shadow-sm"
+        >
           <PlusIcon className="w-5 h-5" />
           <span className="hidden sm:inline">Create Post</span>
         </button>

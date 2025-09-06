@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -23,6 +22,7 @@ export interface Post {
   user: User;
   content: string;
   imageUrl?: string;
+  tags?: string[];
   likes: number;
   comments: number;
   shares: number;

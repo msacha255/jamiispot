@@ -1,24 +1,27 @@
-
 import React from 'react';
 import type { Story, Post, User } from '../types';
-import { MOCK_STORIES, MOCK_POSTS, MOCK_USER } from '../constants';
+import { MOCK_STORIES, MOCK_USER } from '../constants';
 import { HeartIcon, MessageCircleIcon, ShareIcon, PlusIcon } from '../constants';
 
-const CreatePost: React.FC<{ user: User }> = ({ user }) => (
-  <div className="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-sm mb-6">
-    <div className="flex items-start gap-4">
-      <img src={user.avatarUrl} alt={user.name} className="w-12 h-12 rounded-full" />
-      <textarea
-        placeholder={`What's on your mind, ${user.name.split(' ')[0]}?`}
-        className="flex-1 bg-light-gray dark:bg-zinc-700 border-none rounded-lg p-3 focus:ring-2 focus:ring-primary focus:outline-none resize-none"
-        rows={2}
-      />
-    </div>
-    <div className="flex justify-end mt-4">
-      <button className="bg-primary text-white font-semibold px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm">
-        Post
-      </button>
-    </div>
+interface FeedViewProps {
+  posts: Post[];
+  onOpenCreatePost: () => void;
+}
+
+const CreatePostTrigger: React.FC<{ user: User, onClick: () => void }> = ({ user, onClick }) => (
+  <div className="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-sm mb-6 flex items-center gap-4">
+    <img src={user.avatarUrl} alt={user.name} className="w-12 h-12 rounded-full" />
+    <button 
+      onClick={onClick}
+      className="flex-1 text-left bg-light-gray dark:bg-zinc-700 border-none rounded-lg p-3 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors cursor-pointer"
+    >
+      {`What's on your mind, ${user.name.split(' ')[0]}?`}
+    </button>
+    <button 
+      onClick={onClick}
+      className="bg-primary text-white font-semibold px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm hidden sm:block">
+      Post
+    </button>
   </div>
 );
 
@@ -53,9 +56,21 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => (
           <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username} · {post.timestamp}</p>
         </div>
       </div>
-      <p className="mb-4 text-gray-800 dark:text-gray-300">{post.content}</p>
+      <div 
+        className="text-gray-800 dark:text-gray-300 [&_strong]:font-bold [&_em]:italic [&_u]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+        dangerouslySetInnerHTML={{ __html: post.content }} 
+      />
+       {post.tags && post.tags.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {post.tags.map((tag, index) => (
+            <span key={index} className="bg-accent/10 text-accent text-xs font-semibold px-2.5 py-1 rounded-full">
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
-    {post.imageUrl && <img src={post.imageUrl} alt="Post content" className="w-full h-auto" />}
+    {post.imageUrl && <img src={post.imageUrl} alt="Post content" className="w-full h-auto object-cover" />}
     <div className="p-5">
       <div className="flex justify-between items-center text-gray-500 dark:text-gray-400">
         <button className="flex items-center gap-2 hover:text-red-500 transition-colors">
@@ -75,13 +90,13 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => (
   </div>
 );
 
-export const FeedView: React.FC = () => {
+export const FeedView: React.FC<FeedViewProps> = ({ posts, onOpenCreatePost }) => {
   return (
     <div className="max-w-3xl mx-auto">
       <Stories stories={MOCK_STORIES} />
-      <CreatePost user={MOCK_USER} />
+      <CreatePostTrigger user={MOCK_USER} onClick={onOpenCreatePost} />
       <div className="space-y-6">
-        {MOCK_POSTS.map(post => (
+        {posts.map(post => (
           <PostCard key={post.id} post={post} />
         ))}
       </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { AuthScreen } from './components/AuthScreen';
 import { Sidebar } from './components/Sidebar';
@@ -11,13 +10,16 @@ import { NotificationsView } from './components/NotificationsView';
 import { SettingsView } from './components/SettingsView';
 import { CommunityDetailView } from './components/GamificationView';
 import { BottomNavBar } from './components/BottomNavBar';
-import type { View } from './types';
-import { MOCK_USER, MOCK_USERS } from './constants';
+import { CreatePostModal } from './components/CreatePostModal';
+import type { View, Post } from './types';
+import { MOCK_USER, MOCK_USERS, MOCK_POSTS } from './constants';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [navHistory, setNavHistory] = useState<{view: View, params?: any}[]>([{ view: 'feed' }]);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
+  const [isCreatePostModalOpen, setCreatePostModalOpen] = useState(false);
 
   const { view: activeView, params: activeParams } = navHistory[navHistory.length - 1];
 
@@ -46,10 +48,25 @@ const App: React.FC = () => {
     setIsLoggedIn(false);
   }, []);
 
+  const handleCreatePost = useCallback((content: string, imageUrl?: string, tags?: string[]) => {
+    const newPost: Post = {
+        id: `p${Date.now()}`,
+        user: MOCK_USER,
+        content,
+        imageUrl,
+        tags,
+        likes: 0,
+        comments: 0,
+        shares: 0,
+        timestamp: 'Just now',
+    };
+    setPosts(prevPosts => [newPost, ...prevPosts]);
+  }, []);
+
   const renderView = () => {
     switch (activeView) {
       case 'feed':
-        return <FeedView />;
+        return <FeedView posts={posts} onOpenCreatePost={() => setCreatePostModalOpen(true)} />;
       case 'discover':
         return <DiscoveryView onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} />;
       case 'community-detail':
@@ -64,16 +81,16 @@ const App: React.FC = () => {
       case 'settings':
         return <SettingsView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onLogout={handleLogout} />;
       default:
-        return <FeedView />;
+        return <FeedView posts={posts} onOpenCreatePost={() => setCreatePostModalOpen(true)} />;
     }
   };
   
   const navigateToView = (view: View, params?: any) => {
     // If we're already on a detail page, replace it instead of stacking
-    if(navHistory.length > 1) {
-       setNavHistory(prev => [...prev.slice(0, -1), { view, params }]);
+    if(navHistory.length > 1 && navHistory[navHistory.length -1].view !== 'feed') {
+       setNavHistory(prev => [{view: 'feed'}, { view, params }]);
     } else {
-       handleNavigate(view, params);
+       setNavHistory([{ view, params }]);
     }
   };
 
@@ -89,12 +106,18 @@ const App: React.FC = () => {
           user={MOCK_USER} 
           showBack={navHistory.length > 1} 
           onBack={handleBack}
+          onOpenCreatePost={() => setCreatePostModalOpen(true)}
         />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
           {renderView()}
         </main>
         <BottomNavBar activeView={activeView} setActiveView={navigateToView} />
       </div>
+      <CreatePostModal 
+        isOpen={isCreatePostModalOpen}
+        onClose={() => setCreatePostModalOpen(false)}
+        onCreatePost={handleCreatePost}
+      />
     </div>
   );
 };
