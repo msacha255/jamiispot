@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { ChevronRightIcon, TranslateIcon } from '../constants';
 import type { Language } from '../types';
@@ -131,7 +132,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDar
                  <div className="p-6">
                     <h2 className="text-xl font-bold mb-2">Account</h2>
                     <div className="divide-y divide-gray-200 dark:divide-zinc-700">
-                        {/* FIX: Add SettingsItem for Security. */}
                         <SettingsItem label="Security" description="Manage 2FA and login sessions." onClick={onOpenSecurityModal} />
                         <SettingsItem label="Blocked Users" description="Manage users you've blocked." onClick={onOpenBlockedUsers} />
                         <SettingsItem label="Request Verification" description="Get a badge to show your authenticity." onClick={onOpenVerification} />

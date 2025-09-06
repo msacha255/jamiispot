@@ -23,7 +23,8 @@ const NavItem: React.FC<{
     }`}
   >
     {/* FIX: Use React.isValidElement to safely clone the icon and add classes, resolving TypeScript errors. */}
-    {React.isValidElement(icon) ? React.cloneElement(icon, { className: `${icon.props.className || ''} transition-transform group-hover:scale-110` }) : icon}
+    {/* FIX: Add a generic type to React.isValidElement to provide type hints for the icon's props, resolving the cloneElement error. */}
+    {React.isValidElement<{ className?: string }>(icon) ? React.cloneElement(icon, { className: `${icon.props.className || ''} transition-transform group-hover:scale-110` }) : icon}
     <span className="ml-4 font-semibold">{label}</span>
   </button>
 );

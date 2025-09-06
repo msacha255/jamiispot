@@ -64,7 +64,7 @@ const BirthdaySelector: React.FC<{ value: string; onChange: (value: string) => v
 
     return (
         <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Birthday</label>
+            <label className="block text-sm font-medium text-deep-gray dark:text-white mb-1">Date of Birth</label>
             <div className="grid grid-cols-3 gap-2">
                 <select value={month || ''} onChange={(e) => handleDateChange('month', parseInt(e.target.value))} className={selectClasses} aria-label="Month">
                     <option value="" disabled>Month</option>
@@ -172,9 +172,18 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
                         return (
                              <AuthContainer title="Create an account" onBack={() => setStep('welcome')} progress={{step:1, total:3}}>
                                 <form onSubmit={(e) => { e.preventDefault(); setSignupStep(2); }} className="space-y-4">
-                                     <IconInput type="text" name="name" placeholder="Full Name" value={formData.name || ''} onChange={handleInputChange} required icon={<UserIcon className="w-5 h-5 text-gray-400" />} />
-                                     <IconInput type="email" name="email" placeholder="Email Address" value={formData.email || ''} onChange={handleInputChange} required icon={<MailIcon className="w-5 h-5 text-gray-400" />} />
-                                     <IconInput type="password" name="password" placeholder="Password (8+ characters)" value={formData.password || ''} onChange={handleInputChange} required minLength={8} icon={<LockIcon className="w-5 h-5 text-gray-400" />} />
+                                     <div>
+                                        <label htmlFor="signup-name" className="block text-sm font-medium text-deep-gray dark:text-white mb-1">Full Name</label>
+                                        <IconInput id="signup-name" type="text" name="name" placeholder="e.g. Florence Sakaya" value={formData.name || ''} onChange={handleInputChange} required icon={<UserIcon className="w-5 h-5 text-gray-400" />} />
+                                    </div>
+                                     <div>
+                                        <label htmlFor="signup-email" className="block text-sm font-medium text-deep-gray dark:text-white mb-1">Email Address</label>
+                                        <IconInput id="signup-email" type="email" name="email" placeholder="you@example.com" value={formData.email || ''} onChange={handleInputChange} required icon={<MailIcon className="w-5 h-5 text-gray-400" />} />
+                                    </div>
+                                     <div>
+                                        <label htmlFor="signup-password" className="block text-sm font-medium text-deep-gray dark:text-white mb-1">Password</label>
+                                        <IconInput id="signup-password" type="password" name="password" placeholder="8+ characters" value={formData.password || ''} onChange={handleInputChange} required minLength={8} icon={<LockIcon className="w-5 h-5 text-gray-400" />} />
+                                    </div>
                                      <BirthdaySelector value={formData.birthday || ''} onChange={(val) => setFormData(p => ({...p, birthday: val}))} />
                                      <button type="submit" className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition duration-300 shadow-md !mt-6">Next</button>
                                      <p className="text-center text-sm text-gray-500 dark:text-gray-400 pt-2">

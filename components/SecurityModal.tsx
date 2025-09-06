@@ -136,7 +136,7 @@ const LoginActivityTab: React.FC = () => {
 
 
 export const SecurityModal: React.FC<SecurityModalProps> = ({ isOpen, onClose }) => {
-    const [activeTab, setActiveTab] = useState('password');
+    const [activeTab, setActiveTab] = useState('activity');
     
     if (!isOpen) return null;
     

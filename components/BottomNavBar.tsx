@@ -1,6 +1,7 @@
 
 
 
+
 import React from 'react';
 import type { View } from '../types';
 import { HomeIcon, CompassIcon, MessageIcon, SettingsIcon, UserIcon } from '../constants';
@@ -24,7 +25,8 @@ const NavItem: React.FC<{
     }`}
   >
     {/* FIX: Use React.isValidElement to safely clone the icon and add classes, resolving TypeScript errors. */}
-    {React.isValidElement(icon) ? React.cloneElement(icon, { className: `${icon.props.className || ''} transition-transform group-hover:-translate-y-1` }) : icon}
+    {/* FIX: Add a generic type to React.isValidElement to provide type hints for the icon's props, resolving the cloneElement error. */}
+    {React.isValidElement<{ className?: string }>(icon) ? React.cloneElement(icon, { className: `${icon.props.className || ''} transition-transform group-hover:-translate-y-1` }) : icon}
     <span className="text-xs mt-1 font-medium">{label}</span>
   </button>
 );
