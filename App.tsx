@@ -31,10 +31,7 @@ import { PostDetailModal } from './components/PostDetailModal';
 import { SharePostModal } from './components/SharePostModal';
 import { CreateEventModal } from './components/CreateEventModal';
 import { SecurityModal } from './components/SecurityModal';
-import { TermsAndPolicyModal } from './components/TermsAndPolicyModal';
 import { ToastNotification } from './components/ToastNotification';
-// Removed unused AboutProfileModal import as it's obsolete.
-// import { AboutProfileModal } from './components/AboutProfileModal';
 
 import type { View, Post, User, Story, Community, Conversation, Notification, Permissions, Language, Comment, Event, Message, FeedItem } from './types';
 import { MOCK_USERS, MOCK_POSTS, MOCK_STORIES, MOCK_COMMUNITIES, MOCK_CONVERSATIONS, MOCK_NOTIFICATIONS, SUPPORTED_LANGUAGES } from './constants';
@@ -82,7 +79,6 @@ const App: React.FC = () => {
   const [isSharePostModalOpen, setSharePostModalOpen] = useState(false);
   const [isCreateEventModalOpen, setCreateEventModalOpen] = useState(false);
   const [isSecurityModalOpen, setSecurityModalOpen] = useState(false);
-  const [isTermsModalOpen, setTermsModalOpen] = useState(false);
   
   // Data for Modals
   const [selectedCommunityForMap, setSelectedCommunityForMap] = useState<Community | null>(null);
@@ -93,7 +89,6 @@ const App: React.FC = () => {
   const [postForDetail, setPostForDetail] = useState<Post | null>(null);
   const [postToShare, setPostToShare] = useState<Post | null>(null);
   const [initialSearchTerm, setInitialSearchTerm] = useState('');
-  const [signupData, setSignupData] = useState<Partial<User>>({});
 
 
   const { view: activeView, params: activeParams } = navHistory[navHistory.length - 1];
@@ -417,8 +412,7 @@ const App: React.FC = () => {
       case 'profile':
         const user = activeParams?.userId ? MOCK_USERS.find(u => u.id === activeParams.userId) : currentUser;
         if (!user) return <div className="text-center p-8">User not found</div>;
-        // The posts passed to ProfileView should include archived posts for the owner to see
-        const allUserPosts = posts.filter(p => p.user.id === user.id);
+        const allUserPosts = [...posts, ...communities.flatMap(c => c.posts)].filter(p => p.user.id === user.id);
         const publicUserPosts = allUserPosts.filter(p => !p.isArchived);
 
         return <ProfileView user={user} posts={isLoggedIn && currentUser.id === user.id ? allUserPosts : publicUserPosts} isOwnProfile={user.id === currentUser.id} onNavigate={handleNavigate} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} followingIds={followingIds} onToggleFollow={handleToggleFollow} communities={communities} onToggleArchive={handleToggleArchive} />;
@@ -460,7 +454,7 @@ const App: React.FC = () => {
       <CommunityMapModal isOpen={isCommunityMapModalOpen} onClose={() => setCommunityMapModalOpen(false)} community={selectedCommunityForMap} />
       <CreateCommunityModal isOpen={isCreateCommunityModalOpen} onClose={() => setCreateCommunityModalOpen(false)} onCreate={handleCreateCommunity} />
       <CommunitySettingsModal isOpen={isCommunitySettingsModalOpen} onClose={() => setCommunitySettingsModalOpen(false)} community={selectedCommunityForSettings} setCommunities={setCommunities} />
-      <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} user={selectedUserForProfile} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} followingIds={followingIds} onToggleFollow={handleToggleFollow} isOwnProfile={selectedUserForProfile?.id === currentUser.id} posts={posts.filter(p => p.user.id === selectedUserForProfile?.id)} communities={communities} onToggleArchive={handleToggleArchive}/>
+      <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} user={selectedUserForProfile} onBlockUser={handleOpenBlockUserModal} onSendMessage={handleSendMessageFromProfile} followingIds={followingIds} onToggleFollow={handleToggleFollow} isOwnProfile={selectedUserForProfile?.id === currentUser.id} posts={posts} communities={communities} onToggleArchive={handleToggleArchive}/>
       <BlockUserModal isOpen={isBlockUserModalOpen} onClose={() => setBlockUserModalOpen(false)} user={userToBlock} onConfirmBlock={handleBlockUser} />
       <BlockedUsersModal isOpen={isBlockedUsersModalOpen} onClose={() => setBlockedUsersModalOpen(false)} blockedUserIds={[...blockedUserIds]} onUnblockUser={handleUnblockUser} />
       <VerificationRequestModal isOpen={isVerificationModalOpen} onClose={() => setVerificationModalOpen(false)} />
@@ -471,7 +465,8 @@ const App: React.FC = () => {
       <SharePostModal isOpen={isSharePostModalOpen} onClose={() => setSharePostModalOpen(false)} post={postToShare} />
       <CreateEventModal isOpen={isCreateEventModalOpen} onClose={() => setCreateEventModalOpen(false)} community={selectedCommunityForEvent} onCreateEvent={handleCreateEvent} />
       <SecurityModal isOpen={isSecurityModalOpen} onClose={() => setSecurityModalOpen(false)} />
-      <TermsAndPolicyModal isOpen={isTermsModalOpen} onClose={() => setTermsModalOpen(false)} onAccept={() => onAuthSuccess(signupData as User)} />
+      {/* This component is now managed inside AuthScreen to fix a bug */}
+      {/* <TermsAndPolicyModal isOpen={isTermsModalOpen} onClose={() => setTermsModalOpen(false)} onAccept={() => onAuthSuccess(signupData as User)} /> */}
     </div>
   );
 };
