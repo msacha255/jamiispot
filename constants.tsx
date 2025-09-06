@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import type { User, Post, Story, Conversation, Message, Community, Notification, Language, Comment, Event, LoginSession, MarketplaceListing } from './types';
 
@@ -146,6 +147,17 @@ export const MOCK_LOGIN_SESSIONS: LoginSession[] = [
     { id: 'ls3', device: 'Firefox on Windows', location: 'Dar es Salaam, TZ', ip: '172.16.0.1', timestamp: '1 day ago' },
 ];
 
+export const MARKETPLACE_CATEGORIES = [
+    { name: 'Digital Services', icon: '💻' },
+    { name: 'Creative Arts', icon: '🎨' },
+    { name: 'Tutoring & Education', icon: '📚' },
+    { name: 'Handmade Goods', icon: '🧵' },
+    { name: 'Local Experiences', icon: '🏞️' },
+    { name: 'Home Services', icon: '🛠️' },
+    { name: 'Wellness & Fitness', icon: '🧘' },
+    { name: 'Consulting', icon: '📈' },
+];
+
 export const MOCK_MARKETPLACE_LISTINGS: { [key: string]: MarketplaceListing[] } = {
     'Digital Services': [
         { id: 'ds1', category: 'Digital Services', title: 'React Frontend Development', description: 'Building fast and responsive web apps.', price: '$50/hr', seller: MOCK_USERS[1] },
@@ -196,6 +208,31 @@ export const SUPPORTED_LANGUAGES: Language[] = [
     { code: 'ar', name: 'Arabic', nativeName: 'العربية' },
 ];
 
+export const SUGGESTED_INTERESTS = [
+    'Art',
+    'Cooking',
+    'Gaming',
+    'Music',
+    'Sports',
+    'Technology',
+    'Writing',
+    'Fashion',
+    'Movies',
+    'Fitness',
+];
+
+export const SUGGESTED_SKILLS = [
+    'JavaScript',
+    'Python',
+    'Graphic Design',
+    'Marketing',
+    'Public Speaking',
+    'Data Analysis',
+    'Video Editing',
+    'Photography',
+    'Content Writing',
+    'SEO',
+];
 
 export const JamiiSpotFullLogo: React.FC<{ className?: string }> = ({ className }) => (
     <img 

@@ -38,9 +38,11 @@ import { SecurityModal } from './components/SecurityModal';
 import { ToastNotification } from './components/ToastNotification';
 import { EventDetailModal } from './components/EventDetailModal';
 import { MarketplaceDetailModal } from './components/MarketplaceDetailModal';
+import { CreateListingModal } from './components/CreateListingModal';
+import { MarketplaceListingDetailModal } from './components/MarketplaceListingDetailModal';
 
-import type { View, Post, User, Story, Community, Conversation, Notification, Permissions, Language, Comment, Event, Message, FeedItem } from './types';
-import { MOCK_USERS, MOCK_POSTS, MOCK_STORIES, MOCK_COMMUNITIES, MOCK_CONVERSATIONS, MOCK_NOTIFICATIONS, SUPPORTED_LANGUAGES } from './constants';
+import type { View, Post, User, Story, Community, Conversation, Notification, Permissions, Language, Comment, Event, Message, FeedItem, MarketplaceListing } from './types';
+import { MOCK_USERS, MOCK_POSTS, MOCK_STORIES, MOCK_COMMUNITIES, MOCK_CONVERSATIONS, MOCK_NOTIFICATIONS, SUPPORTED_LANGUAGES, MOCK_MARKETPLACE_LISTINGS } from './constants';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -63,6 +65,7 @@ const App: React.FC = () => {
     notifications: true,
   });
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [marketplaceListings, setMarketplaceListings] = useState(MOCK_MARKETPLACE_LISTINGS);
 
   // Modal States
   const [isCreatePostModalOpen, setCreatePostModalOpen] = useState(false);
@@ -88,7 +91,9 @@ const App: React.FC = () => {
   const [isSecurityModalOpen, setSecurityModalOpen] = useState(false);
   const [isEventDetailModalOpen, setEventDetailModalOpen] = useState(false);
   const [isMarketplaceDetailModalOpen, setMarketplaceDetailModalOpen] = useState(false);
-  
+  const [isCreateListingModalOpen, setCreateListingModalOpen] = useState(false);
+  const [isMarketplaceListingDetailModalOpen, setMarketplaceListingDetailModalOpen] = useState(false);
+
   // Data for Modals
   const [selectedCommunityForMap, setSelectedCommunityForMap] = useState<Community | null>(null);
   const [selectedCommunityForSettings, setSelectedCommunityForSettings] = useState<Community | null>(null);
@@ -101,6 +106,7 @@ const App: React.FC = () => {
   const [eventForDetail, setEventForDetail] = useState<Event | null>(null);
   const [initialSearchTerm, setInitialSearchTerm] = useState('');
   const [selectedMarketplaceCategory, setSelectedMarketplaceCategory] = useState<{ name: string; icon: string } | null>(null);
+  const [selectedListingForDetail, setSelectedListingForDetail] = useState<MarketplaceListing | null>(null);
 
 
   const { view: activeView, params: activeParams } = navHistory[navHistory.length - 1];
@@ -407,6 +413,33 @@ const App: React.FC = () => {
     setMarketplaceDetailModalOpen(true);
   }, []);
   
+  const handleOpenListingDetail = useCallback((listing: MarketplaceListing) => {
+      setSelectedListingForDetail(listing);
+      setMarketplaceDetailModalOpen(false); // close the category modal
+      setMarketplaceListingDetailModalOpen(true);
+  }, []);
+
+  const handleCreateListing = useCallback((listingData: Omit<MarketplaceListing, 'id' | 'seller'>) => {
+      const newListing: MarketplaceListing = {
+          ...listingData,
+          id: `l${Date.now()}`,
+          seller: currentUser,
+      };
+      setMarketplaceListings(prev => {
+          const categoryListings = prev[newListing.category] ? [...prev[newListing.category], newListing] : [newListing];
+          return {
+              ...prev,
+              [newListing.category]: categoryListings,
+          };
+      });
+      setToastMessage(`Your listing "${newListing.title}" has been published!`);
+  }, [currentUser]);
+
+  const handleContactSeller = (user: User) => {
+      setMarketplaceListingDetailModalOpen(false);
+      handleSendMessageFromProfile(user);
+  };
+
   // --- Filtering based on blocked users ---
   const memberCommunities = useMemo(() => communities.filter(c => c.isMember), [communities]);
 
@@ -483,7 +516,7 @@ const App: React.FC = () => {
       case 'settings':
         return <SettingsView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onLogout={handleLogout} onOpenPrivacyModal={() => setPrivacyModalOpen(true)} onOpenPermissionsModal={() => setPermissionsModalOpen(true)} onOpenHelpSupportModal={() => setHelpSupportModalOpen(true)} onOpenBlockedUsers={() => setBlockedUsersModalOpen(true)} onOpenVerification={() => setVerificationModalOpen(true)} onOpenLanguageModal={() => setLanguageModalOpen(true)} onOpenShareModal={() => setShareModalOpen(true)} language={language} onOpenSecurityModal={() => setSecurityModalOpen(true)} />;
       case 'marketplace':
-        return <MarketplaceView onCategorySelect={handleOpenMarketplaceCategory} />;
+        return <MarketplaceView onCategorySelect={handleOpenMarketplaceCategory} onOpenCreateListing={() => setCreateListingModalOpen(true)} />;
       default:
         return <FeedView feedItems={feedItems} stories={stories} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenCreateStory={() => setCreateStoryModalOpen(true)} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenEventDetail={handleOpenEventDetail} {...commonPostHandlers} />;
     }
@@ -531,7 +564,9 @@ const App: React.FC = () => {
       <CreateEventModal isOpen={isCreateEventModalOpen} onClose={() => setCreateEventModalOpen(false)} community={selectedCommunityForEvent} onCreateEvent={handleCreateEvent} />
       <SecurityModal isOpen={isSecurityModalOpen} onClose={() => setSecurityModalOpen(false)} />
       <EventDetailModal isOpen={isEventDetailModalOpen} onClose={() => setEventDetailModalOpen(false)} event={eventForDetail} onCommunitySelect={(id) => { setEventDetailModalOpen(false); handleNavigate('community-detail', { communityId: id })}} />
-      <MarketplaceDetailModal isOpen={isMarketplaceDetailModalOpen} onClose={() => setMarketplaceDetailModalOpen(false)} category={selectedMarketplaceCategory} />
+      <MarketplaceDetailModal isOpen={isMarketplaceDetailModalOpen} onClose={() => setMarketplaceDetailModalOpen(false)} category={selectedMarketplaceCategory} listings={marketplaceListings} onListingSelect={handleOpenListingDetail} />
+      <CreateListingModal isOpen={isCreateListingModalOpen} onClose={() => setCreateListingModalOpen(false)} onCreateListing={handleCreateListing} />
+      <MarketplaceListingDetailModal isOpen={isMarketplaceListingDetailModalOpen} onClose={() => setMarketplaceListingDetailModalOpen(false)} listing={selectedListingForDetail} onContactSeller={handleContactSeller} />
     </div>
   );
 };

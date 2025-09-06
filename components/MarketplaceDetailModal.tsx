@@ -1,16 +1,18 @@
+
 import React from 'react';
 import { XIcon } from '../constants';
 import type { MarketplaceListing } from '../types';
-import { MOCK_MARKETPLACE_LISTINGS } from '../constants';
 
 interface MarketplaceDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   category: { name: string; icon: string } | null;
+  listings: { [key: string]: MarketplaceListing[] };
+  onListingSelect: (listing: MarketplaceListing) => void;
 }
 
-const ListingCard: React.FC<{ listing: MarketplaceListing }> = ({ listing }) => (
-    <div className="bg-light-gray dark:bg-zinc-700/50 p-4 rounded-lg flex items-center gap-4 hover:shadow-md transition-shadow">
+const ListingCard: React.FC<{ listing: MarketplaceListing; onClick: () => void }> = ({ listing, onClick }) => (
+    <div onClick={onClick} className="bg-light-gray dark:bg-zinc-700/50 p-4 rounded-lg flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer">
         <img src={listing.seller.avatarUrl} alt={listing.seller.name} className="w-16 h-16 rounded-lg object-cover"/>
         <div className="flex-1">
             <h4 className="font-bold">{listing.title}</h4>
@@ -23,10 +25,10 @@ const ListingCard: React.FC<{ listing: MarketplaceListing }> = ({ listing }) => 
     </div>
 );
 
-export const MarketplaceDetailModal: React.FC<MarketplaceDetailModalProps> = ({ isOpen, onClose, category }) => {
+export const MarketplaceDetailModal: React.FC<MarketplaceDetailModalProps> = ({ isOpen, onClose, category, listings, onListingSelect }) => {
     if (!isOpen || !category) return null;
 
-    const listings = MOCK_MARKETPLACE_LISTINGS[category.name] || [];
+    const listingsForCategory = listings[category.name] || [];
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose} aria-modal="true" role="dialog">
@@ -42,8 +44,8 @@ export const MarketplaceDetailModal: React.FC<MarketplaceDetailModalProps> = ({ 
                 </div>
 
                 <div className="flex-1 p-6 space-y-4 overflow-y-auto">
-                    {listings.length > 0 ? (
-                        listings.map(listing => <ListingCard key={listing.id} listing={listing} />)
+                    {listingsForCategory.length > 0 ? (
+                        listingsForCategory.map(listing => <ListingCard key={listing.id} listing={listing} onClick={() => onListingSelect(listing)} />)
                     ) : (
                         <div className="text-center py-20 text-gray-500">
                             <p className="font-semibold text-lg">No listings found</p>

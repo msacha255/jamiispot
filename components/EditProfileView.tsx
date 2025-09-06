@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import type { User } from '../types';
-import { ChevronLeftIcon, XIcon, COUNTRIES, XSocialIcon, LinkedinIcon, GithubIcon, CakeIcon } from '../constants';
+import { ChevronLeftIcon, XIcon, COUNTRIES, XSocialIcon, LinkedinIcon, GithubIcon, CakeIcon, SUGGESTED_INTERESTS, SUGGESTED_SKILLS } from '../constants';
 
 interface EditProfileViewProps {
     user: User;
@@ -13,9 +13,10 @@ interface TagInputProps {
     tags: string[];
     setTags: (tags: string[]) => void;
     color: 'primary' | 'accent';
+    suggestions?: string[];
 }
 
-const TagInput: React.FC<TagInputProps> = ({ label, tags, setTags, color }) => {
+const TagInput: React.FC<TagInputProps> = ({ label, tags, setTags, color, suggestions }) => {
     const [currentTag, setCurrentTag] = useState('');
 
     const colorClasses = {
@@ -30,13 +31,16 @@ const TagInput: React.FC<TagInputProps> = ({ label, tags, setTags, color }) => {
     };
     const selectedColor = colorClasses[color];
 
+    const addTag = (tag: string) => {
+        if (tag.trim() && !tags.includes(tag.trim())) {
+            setTags([...tags, tag.trim()]);
+        }
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && currentTag.trim()) {
             e.preventDefault();
-            if (!tags.includes(currentTag.trim())) {
-                setTags([...tags, currentTag.trim()]);
-            }
+            addTag(currentTag);
             setCurrentTag('');
         }
     };
@@ -44,6 +48,12 @@ const TagInput: React.FC<TagInputProps> = ({ label, tags, setTags, color }) => {
     const removeTag = (tagToRemove: string) => {
         setTags(tags.filter(tag => tag !== tagToRemove));
     };
+
+    const handleSuggestionClick = (suggestion: string) => {
+        addTag(suggestion);
+    };
+    
+    const availableSuggestions = suggestions?.filter(s => !tags.includes(s)) || [];
 
     return (
         <div>
@@ -70,6 +80,23 @@ const TagInput: React.FC<TagInputProps> = ({ label, tags, setTags, color }) => {
                     </div>
                 ))}
             </div>
+            {availableSuggestions.length > 0 && (
+                 <div className="mt-3 border-t border-gray-200 dark:border-zinc-700 pt-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Suggestions:</p>
+                    <div className="flex flex-wrap gap-2">
+                        {availableSuggestions.map(suggestion => (
+                            <button
+                                key={suggestion}
+                                type="button"
+                                onClick={() => handleSuggestionClick(suggestion)}
+                                className="bg-gray-200 dark:bg-zinc-600 text-sm px-3 py-1 rounded-full hover:bg-gray-300 dark:hover:bg-zinc-500 transition-colors"
+                            >
+                                {suggestion}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -256,11 +283,11 @@ export const EditProfileView: React.FC<EditProfileViewProps> = ({ user, onUpdate
                     </FormSection>
 
                     <FormSection title="Interests">
-                        <TagInput label="Interests" tags={interests} setTags={setInterests} color="primary" />
+                        <TagInput label="Interests" tags={interests} setTags={setInterests} color="primary" suggestions={SUGGESTED_INTERESTS} />
                     </FormSection>
 
                      <FormSection title="Professional Skills">
-                        <TagInput label="Skills" tags={skills} setTags={setSkills} color="accent" />
+                        <TagInput label="Skills" tags={skills} setTags={setSkills} color="accent" suggestions={SUGGESTED_SKILLS} />
                     </FormSection>
 
                     <FormSection title="Social Links">
