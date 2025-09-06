@@ -8,6 +8,8 @@ interface SettingsViewProps {
     onOpenPrivacyModal: () => void;
     onOpenPermissionsModal: () => void;
     onOpenHelpSupportModal: () => void;
+    onOpenBlockedUsers: () => void;
+    onOpenVerification: () => void;
 }
 
 const SettingsItem: React.FC<{label: string; description: string; onClick: () => void; hasChevron?: boolean;}> = ({ label, description, onClick, hasChevron = true }) => (
@@ -33,7 +35,7 @@ const SettingsToggle: React.FC<{label: string; enabled: boolean; onToggle: () =>
 );
 
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout, onOpenPrivacyModal, onOpenPermissionsModal, onOpenHelpSupportModal }) => {
+export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout, onOpenPrivacyModal, onOpenPermissionsModal, onOpenHelpSupportModal, onOpenBlockedUsers, onOpenVerification }) => {
     const [isNotificationsExpanded, setNotificationsExpanded] = useState(false);
     const [notificationPrefs, setNotificationPrefs] = useState({ likes: true, comments: true, follows: false });
     
@@ -91,9 +93,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDar
                 </div>
                  <div className="p-6">
                     <h2 className="text-xl font-bold mb-2">Account</h2>
+                    <div className="divide-y divide-gray-200 dark:divide-zinc-700">
+                        <SettingsItem label="Blocked Users" description="Manage users you've blocked." onClick={onOpenBlockedUsers} />
+                        <SettingsItem label="Request Verification" description="Get a badge to show your authenticity." onClick={onOpenVerification} />
+                    </div>
                     <button
                         onClick={onLogout}
-                        className="w-full text-left text-red-600 font-semibold py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                        className="w-full text-left text-red-600 font-semibold py-3 mt-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                     >
                         Log Out
                     </button>

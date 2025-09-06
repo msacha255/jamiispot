@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { User, Post, View } from '../types';
-import { MOCK_POSTS, COUNTRIES, HeartIcon, MessageCircleIcon, ShareIcon, LockIcon, TwitterIcon, LinkedinIcon, GithubIcon } from '../constants';
+import { MOCK_POSTS, COUNTRIES, HeartIcon, MessageCircleIcon, LockIcon, TwitterIcon, LinkedinIcon, GithubIcon, MoreVerticalIcon, CheckBadgeIcon } from '../constants';
 
 
 const ProfilePostCard: React.FC<{ post: Post }> = ({ post }) => (
@@ -16,15 +16,6 @@ const ProfilePostCard: React.FC<{ post: Post }> = ({ post }) => (
     </div>
   </div>
 );
-
-const TabButton: React.FC<{label: string, isActive: boolean, onClick: () => void}> = ({ label, isActive, onClick}) => (
-    <button
-        onClick={onClick}
-        className={`px-4 py-2 font-semibold rounded-lg transition-colors ${isActive ? 'bg-primary text-white' : 'hover:bg-gray-200 dark:hover:bg-zinc-700'}`}
-    >
-        {label}
-    </button>
-)
 
 const TagsDisplay: React.FC<{items: string[], color: 'primary' | 'accent'}> = ({ items, color }) => {
     const colorClasses = {
@@ -42,11 +33,11 @@ const TagsDisplay: React.FC<{items: string[], color: 'primary' | 'accent'}> = ({
     );
 }
 
-export const ProfileView: React.FC<{ user: User; isOwnProfile: boolean; onNavigate: (view: View, params?: any) => void; }> = ({ user, isOwnProfile, onNavigate }) => {
-    const [activeTab, setActiveTab] = useState<'posts' | 'interests' | 'skills'>('posts');
-
+export const ProfileView: React.FC<{ user: User; isOwnProfile: boolean; onNavigate: (view: View, params?: any) => void; onBlockUser: (user: User) => void; }> = ({ user, isOwnProfile, onNavigate, onBlockUser }) => {
+    const [isOptionsOpen, setIsOptionsOpen] = useState(false);
     const flag = COUNTRIES.find(c => c.code === user.country)?.flag;
     const hasSocials = user.socialLinks && Object.values(user.socialLinks).some(link => !!link);
+    const userPosts = MOCK_POSTS.filter(p => p.user.id === user.id);
     
     return (
         <div className="max-w-5xl mx-auto">
@@ -65,11 +56,26 @@ export const ProfileView: React.FC<{ user: User; isOwnProfile: boolean; onNaviga
                             <div className="flex items-center gap-2">
                                 <button className="bg-primary text-white font-semibold px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm">Follow</button>
                                 <button className="ml-2 bg-gray-200 dark:bg-zinc-700 text-deep-gray dark:text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-600 transition-colors">Message</button>
+                                <div className="relative">
+                                    <button onClick={() => setIsOptionsOpen(!isOptionsOpen)} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700">
+                                        <MoreVerticalIcon className="w-6 h-6" />
+                                    </button>
+                                    {isOptionsOpen && (
+                                        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-800 rounded-lg shadow-lg border dark:border-zinc-700 z-10">
+                                            <button onClick={() => { onBlockUser(user); setIsOptionsOpen(false); }} className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg">
+                                                Block @{user.username}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </div>
                     <div className="pt-8">
-                        <h1 className="text-3xl font-bold font-display">{user.name}</h1>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-3xl font-bold font-display">{user.name}</h1>
+                            {user.isVerified && <CheckBadgeIcon className="w-6 h-6 text-accent" />}
+                        </div>
                         <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
                         
                         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-2">
@@ -93,12 +99,6 @@ export const ProfileView: React.FC<{ user: User; isOwnProfile: boolean; onNaviga
                 </div>
             </div>
             
-            <div className="flex items-center gap-2 mb-6 bg-white dark:bg-zinc-800 p-2 rounded-xl shadow-sm">
-                <TabButton label="Posts" isActive={activeTab === 'posts'} onClick={() => setActiveTab('posts')} />
-                <TabButton label="Interests" isActive={activeTab === 'interests'} onClick={() => setActiveTab('interests')} />
-                <TabButton label="Skills" isActive={activeTab === 'skills'} onClick={() => setActiveTab('skills')} />
-            </div>
-            
             <div>
                  {user.isPrivate && !isOwnProfile ? (
                     <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-10 text-center">
@@ -108,19 +108,34 @@ export const ProfileView: React.FC<{ user: User; isOwnProfile: boolean; onNaviga
                         <button className="mt-6 bg-primary text-white font-semibold px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors">Follow</button>
                     </div>
                  ) : (
-                    <>
-                        {activeTab === 'posts' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {MOCK_POSTS.map(post => <ProfilePostCard key={post.id} post={post} />)}
+                    <div className="space-y-8">
+                        <div>
+                            <h2 className="text-2xl font-bold font-display mb-4">Posts</h2>
+                            {userPosts.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {userPosts.map(post => <ProfilePostCard key={post.id} post={post} />)}
+                                </div>
+                            ) : (
+                                <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-10 text-center text-gray-500">
+                                    This user hasn't posted anything yet.
+                                </div>
+                            )}
+                        </div>
+
+                        {user.interests && user.interests.length > 0 && (
+                            <div>
+                                <h2 className="text-2xl font-bold font-display mb-4">Interests</h2>
+                                <TagsDisplay items={user.interests} color="primary" />
                             </div>
                         )}
-                         {activeTab === 'interests' && user.interests && user.interests.length > 0 && (
-                            <TagsDisplay items={user.interests} color="primary" />
-                         )}
-                         {activeTab === 'skills' && user.skills && user.skills.length > 0 && (
-                            <TagsDisplay items={user.skills} color="accent" />
-                         )}
-                    </>
+                        
+                        {user.skills && user.skills.length > 0 && (
+                            <div>
+                                <h2 className="text-2xl font-bold font-display mb-4">Skills</h2>
+                                <TagsDisplay items={user.skills} color="accent" />
+                            </div>
+                        )}
+                    </div>
                  )}
             </div>
         </div>

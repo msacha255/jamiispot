@@ -1,20 +1,22 @@
-
 import React, { useState } from 'react';
-import { MOCK_COMMUNITIES } from '../constants';
 import type { Community, Post, User } from '../types';
-import { HeartIcon, MessageCircleIcon, ShareIcon, UsersIcon, MoreHorizontalIcon } from '../constants';
+import { HeartIcon, MessageCircleIcon, ShareIcon, UsersIcon, SettingsIcon, MapIcon } from '../constants';
 
 interface CommunityDetailViewProps {
-  communityId: string;
+  community: Community;
+  currentUser: User;
+  onOpenMap: (community: Community) => void;
+  onOpenSettings: (community: Community) => void;
+  onOpenProfileModal: (user: User) => void;
 }
 
-const PostCard: React.FC<{ post: Post }> = ({ post }) => (
+const PostCard: React.FC<{ post: Post, onOpenProfileModal: (user: User) => void }> = ({ post, onOpenProfileModal }) => (
   <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden">
     <div className="p-5">
       <div className="flex items-center mb-4">
-        <img src={post.user.avatarUrl} alt={post.user.name} className="w-12 h-12 rounded-full" />
+        <img src={post.user.avatarUrl} alt={post.user.name} className="w-12 h-12 rounded-full cursor-pointer" onClick={() => onOpenProfileModal(post.user)} />
         <div className="ml-4">
-          <p className="font-bold text-deep-gray dark:text-white">{post.user.name}</p>
+          <p className="font-bold text-deep-gray dark:text-white cursor-pointer" onClick={() => onOpenProfileModal(post.user)}>{post.user.name}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username} · {post.timestamp}</p>
         </div>
       </div>
@@ -43,8 +45,8 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => (
   </div>
 );
 
-const MemberItem: React.FC<{ member: User }> = ({ member }) => (
-    <div className="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-700">
+const MemberItem: React.FC<{ member: User, onOpenProfileModal: (user: User) => void }> = ({ member, onOpenProfileModal }) => (
+    <div className="flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-700 cursor-pointer" onClick={() => onOpenProfileModal(member)}>
         <img src={member.avatarUrl} alt={member.name} className="w-12 h-12 rounded-full"/>
         <div className="ml-4">
             <p className="font-bold text-deep-gray dark:text-white">{member.name}</p>
@@ -54,15 +56,15 @@ const MemberItem: React.FC<{ member: User }> = ({ member }) => (
 );
 
 
-export const CommunityDetailView: React.FC<CommunityDetailViewProps> = ({ communityId }) => {
+export const CommunityDetailView: React.FC<CommunityDetailViewProps> = ({ community, currentUser, onOpenMap, onOpenSettings, onOpenProfileModal }) => {
   const [activeTab, setActiveTab] = useState<'posts' | 'members'>('posts');
-  const community = MOCK_COMMUNITIES.find(c => c.id === communityId);
-
+  
   if (!community) {
     return <div className="text-center p-10">Community not found.</div>;
   }
   
   const [isMember, setIsMember] = useState(community.isMember);
+  const isAdmin = community.admins.includes(currentUser.id);
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -79,7 +81,8 @@ export const CommunityDetailView: React.FC<CommunityDetailViewProps> = ({ commun
                        <div className="ml-4">
                           <h1 className="text-3xl font-bold font-display">{community.name}</h1>
                            <div className="flex items-center text-gray-500 dark:text-gray-400 mt-1">
-                                <UsersIcon className="w-5 h-5 mr-2" />
+                                <span className="text-sm font-semibold px-2 py-1 bg-accent/10 text-accent rounded-full mr-2">{community.category}</span>
+                                <UsersIcon className="w-5 h-5 mr-1" />
                                 <span>{community.memberCount.toLocaleString()} members</span>
                            </div>
                        </div>
@@ -90,9 +93,14 @@ export const CommunityDetailView: React.FC<CommunityDetailViewProps> = ({ commun
                             className={`px-6 py-2 rounded-lg font-semibold transition-colors w-full sm:w-auto ${isMember ? 'bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300' : 'bg-primary text-white hover:bg-orange-600'}`}>
                             {isMember ? 'Joined' : 'Join'}
                          </button>
-                         <button className="p-2 rounded-lg bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300">
-                            <MoreHorizontalIcon className="w-6 h-6"/>
+                         <button onClick={() => onOpenMap(community)} className="p-2 rounded-lg bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300" title="View Map">
+                            <MapIcon className="w-6 h-6"/>
                          </button>
+                         {isAdmin && (
+                            <button onClick={() => onOpenSettings(community)} className="p-2 rounded-lg bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300" title="Admin Settings">
+                                <SettingsIcon className="w-6 h-6"/>
+                            </button>
+                         )}
                     </div>
                 </div>
                  <p className="mt-4 text-gray-700 dark:text-gray-300">{community.description}</p>
@@ -110,7 +118,7 @@ export const CommunityDetailView: React.FC<CommunityDetailViewProps> = ({ commun
                 {activeTab === 'posts' && (
                     <div className="space-y-6">
                         {community.posts.length > 0 ? (
-                            community.posts.map(post => <PostCard key={post.id} post={post} />)
+                            community.posts.map(post => <PostCard key={post.id} post={post} onOpenProfileModal={onOpenProfileModal} />)
                         ) : (
                             <div className="text-center py-10 text-gray-500 dark:text-gray-400 bg-white dark:bg-zinc-800 rounded-xl shadow-sm">
                                 <p className="font-semibold">No posts yet</p>
@@ -121,7 +129,7 @@ export const CommunityDetailView: React.FC<CommunityDetailViewProps> = ({ commun
                 )}
                 {activeTab === 'members' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {community.members.map(member => <MemberItem key={member.id} member={member} />)}
+                        {community.members.map(member => <MemberItem key={member.id} member={member} onOpenProfileModal={onOpenProfileModal}/>)}
                     </div>
                 )}
             </div>

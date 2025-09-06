@@ -8,6 +8,7 @@ interface CreatePostModalProps {
   onClose: () => void;
   onCreatePost: (content: string, imageUrl?: string, tags?: string[]) => void;
   user: User;
+  blockedUserIds: Set<string>;
 }
 
 const EditorToolbar: React.FC = () => {
@@ -75,7 +76,7 @@ const MentionSuggestions: React.FC<{
 };
 
 
-export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCreatePost, user }) => {
+export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onCreatePost, user, blockedUserIds }) => {
   const [content, setContent] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [tags, setTags] = useState<string[]>([]);
@@ -162,7 +163,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
           
           if (mentionMatch) {
               const query = mentionMatch[1].toLowerCase();
-              const filteredUsers = MOCK_USERS.filter(u => u.name.toLowerCase().includes(query) || u.username.toLowerCase().includes(query));
+              const filteredUsers = MOCK_USERS.filter(u => 
+                !blockedUserIds.has(u.id) &&
+                (u.name.toLowerCase().includes(query) || u.username.toLowerCase().includes(query))
+              );
               
               if (filteredUsers.length > 0) {
                   const tempRange = range.cloneRange();

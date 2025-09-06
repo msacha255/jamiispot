@@ -8,6 +8,7 @@ export interface User {
   badges: string[];
   profileCompleteness: number;
   isPrivate?: boolean;
+  isVerified?: boolean;
   interests?: string[];
   skills?: string[];
   location?: string;
@@ -18,6 +19,8 @@ export interface User {
     linkedin?: string;
     github?: string;
   };
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface Story {
@@ -62,6 +65,9 @@ export interface Community {
     members: User[];
     posts: Post[];
     isMember: boolean;
+    category: string;
+    privacy: 'public' | 'private';
+    admins: string[]; // array of user IDs
 }
 
 export interface Notification {

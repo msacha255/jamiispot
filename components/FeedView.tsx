@@ -8,6 +8,7 @@ interface FeedViewProps {
   currentUser: User;
   onOpenCreatePost: () => void;
   onOpenCreateStory: () => void;
+  onOpenProfileModal: (user: User) => void;
 }
 
 const CreatePostTrigger: React.FC<{ user: User, onClick: () => void }> = ({ user, onClick }) => (
@@ -27,7 +28,7 @@ const CreatePostTrigger: React.FC<{ user: User, onClick: () => void }> = ({ user
   </div>
 );
 
-const Stories: React.FC<{ stories: Story[], onAdd: () => void }> = ({ stories, onAdd }) => (
+const Stories: React.FC<{ stories: Story[], onAdd: () => void, onOpenProfileModal: (user: User) => void }> = ({ stories, onAdd, onOpenProfileModal }) => (
   <div className="mb-6">
     <div className="flex space-x-4 overflow-x-auto pb-4">
       <div className="flex-shrink-0 text-center w-20">
@@ -39,7 +40,7 @@ const Stories: React.FC<{ stories: Story[], onAdd: () => void }> = ({ stories, o
         <p className="text-xs mt-2 font-medium">Add Story</p>
       </div>
       {stories.map(story => (
-        <div key={story.id} className="flex-shrink-0 text-center w-20">
+        <div key={story.id} className="flex-shrink-0 text-center w-20 cursor-pointer" onClick={() => onOpenProfileModal(story.user)}>
           <div className={`w-16 h-16 rounded-full p-0.5 ${story.viewed ? 'bg-gray-300 dark:bg-zinc-600' : 'bg-gradient-to-tr from-yellow-400 to-primary'}`}>
             <img src={story.user.avatarUrl} alt={story.user.name} className="w-full h-full rounded-full border-2 border-white dark:border-zinc-800" />
           </div>
@@ -50,13 +51,13 @@ const Stories: React.FC<{ stories: Story[], onAdd: () => void }> = ({ stories, o
   </div>
 );
 
-const PostCard: React.FC<{ post: Post }> = ({ post }) => (
+const PostCard: React.FC<{ post: Post, onOpenProfileModal: (user: User) => void }> = ({ post, onOpenProfileModal }) => (
   <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden">
     <div className="p-5">
       <div className="flex items-center mb-4">
-        <img src={post.user.avatarUrl} alt={post.user.name} className="w-12 h-12 rounded-full" />
+        <img src={post.user.avatarUrl} alt={post.user.name} className="w-12 h-12 rounded-full cursor-pointer" onClick={() => onOpenProfileModal(post.user)} />
         <div className="ml-4">
-          <p className="font-bold text-deep-gray dark:text-white">{post.user.name}</p>
+          <p className="font-bold text-deep-gray dark:text-white cursor-pointer" onClick={() => onOpenProfileModal(post.user)}>{post.user.name}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username} · {post.timestamp}</p>
         </div>
       </div>
@@ -94,14 +95,14 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => (
   </div>
 );
 
-export const FeedView: React.FC<FeedViewProps> = ({ posts, stories, currentUser, onOpenCreatePost, onOpenCreateStory }) => {
+export const FeedView: React.FC<FeedViewProps> = ({ posts, stories, currentUser, onOpenCreatePost, onOpenCreateStory, onOpenProfileModal }) => {
   return (
     <div className="max-w-3xl mx-auto">
-      <Stories stories={stories} onAdd={onOpenCreateStory} />
+      <Stories stories={stories} onAdd={onOpenCreateStory} onOpenProfileModal={onOpenProfileModal} />
       <CreatePostTrigger user={currentUser} onClick={onOpenCreatePost} />
       <div className="space-y-6">
         {posts.map(post => (
-          <PostCard key={post.id} post={post} />
+          <PostCard key={post.id} post={post} onOpenProfileModal={onOpenProfileModal} />
         ))}
       </div>
     </div>

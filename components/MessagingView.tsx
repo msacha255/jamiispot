@@ -1,8 +1,12 @@
-
 import React, { useState } from 'react';
 import type { Conversation } from '../types';
-import { MOCK_CONVERSATIONS, MOCK_USER } from '../constants';
-import { SearchIcon } from '../constants';
+import { MOCK_USER } from '../constants';
+// FIX: Imported `MessageIcon` to resolve reference error.
+import { SearchIcon, MessageIcon } from '../constants';
+
+interface MessagingViewProps {
+    conversations: Conversation[];
+}
 
 const ConversationItem: React.FC<{ conversation: Conversation; isActive: boolean; onClick: () => void }> = ({ conversation, isActive, onClick }) => {
     const otherParticipant = conversation.participants.find(p => p.id !== MOCK_USER.id)!;
@@ -24,9 +28,22 @@ const ConversationItem: React.FC<{ conversation: Conversation; isActive: boolean
     );
 };
 
-export const MessagingView: React.FC = () => {
-    const [activeConversationId, setActiveConversationId] = useState(MOCK_CONVERSATIONS[0].id);
-    const activeConversation = MOCK_CONVERSATIONS.find(c => c.id === activeConversationId)!;
+export const MessagingView: React.FC<MessagingViewProps> = ({ conversations }) => {
+    const [activeConversationId, setActiveConversationId] = useState(conversations.length > 0 ? conversations[0].id : null);
+    
+    if (conversations.length === 0) {
+        return (
+             <div className="flex h-[calc(100vh-140px)] bg-white dark:bg-zinc-800 rounded-xl shadow-sm items-center justify-center">
+                <div className="text-center text-gray-500">
+                    <MessageIcon className="w-16 h-16 mx-auto mb-4"/>
+                    <h2 className="text-xl font-bold">No Messages</h2>
+                    <p>Start a new conversation to see it here.</p>
+                </div>
+            </div>
+        )
+    }
+
+    const activeConversation = conversations.find(c => c.id === activeConversationId)!;
     const otherParticipant = activeConversation.participants.find(p => p.id !== MOCK_USER.id)!;
 
     return (
@@ -45,7 +62,7 @@ export const MessagingView: React.FC = () => {
                     </div>
                 </div>
                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                    {MOCK_CONVERSATIONS.map(convo => (
+                    {conversations.map(convo => (
                         <ConversationItem
                             key={convo.id}
                             conversation={convo}

@@ -10,6 +10,7 @@ export const MOCK_USER: User = {
   bio: 'Explorer, developer, and coffee enthusiast. Building cool things and sharing my journey.',
   badges: ['Pioneer', 'Top Contributor', 'Globetrotter'],
   profileCompleteness: 85,
+  isVerified: true,
   interests: ['Hiking', 'Photography', 'Coding', 'Travel'],
   skills: ['React', 'TypeScript', 'Node.js', 'GraphQL', 'UI/UX Design'],
   location: 'San Francisco, CA',
@@ -19,17 +20,19 @@ export const MOCK_USER: User = {
     twitter: 'https://twitter.com/jamii_spot',
     linkedin: 'https://linkedin.com/in/jamiispot',
     github: 'https://github.com/jamiispot',
-  }
+  },
+  latitude: 37.7749,
+  longitude: -122.4194,
 };
 
 export const MOCK_USERS: User[] = [
   MOCK_USER,
-  { id: 'u2', name: 'Jane Smith', username: 'janesmith', avatarUrl: 'https://picsum.photos/seed/user2/100/100', badges: [], profileCompleteness: 0, skills: ['Project Management', 'Agile'] },
-  { id: 'u3', name: 'Sam Wilson', username: 'samwilson', avatarUrl: 'https://picsum.photos/seed/user3/100/100', badges: [], profileCompleteness: 0, interests: ['Reading', 'Baking'] },
-  { id: 'u4', name: 'Maria Garcia', username: 'mariagarcia', avatarUrl: 'https://picsum.photos/seed/user4/100/100', badges: [], profileCompleteness: 0, isPrivate: true },
-  { id: 'u5', name: 'Kenji Tanaka', username: 'kenjitanaka', avatarUrl: 'https://picsum.photos/seed/user5/100/100', badges: [], profileCompleteness: 0 },
-  { id: 'u6', name: 'Aisha Diallo', username: 'aishadiallo', avatarUrl: 'https://picsum.photos/seed/user6/100/100', badges: [], profileCompleteness: 0 },
-  { id: 'u7', name: 'Ethan Carter', username: 'ethancarter', avatarUrl: 'https://picsum.photos/seed/user7/100/100', badges: [], profileCompleteness: 0 },
+  { id: 'u2', name: 'Jane Smith', username: 'janesmith', avatarUrl: 'https://picsum.photos/seed/user2/100/100', badges: [], profileCompleteness: 0, isVerified: true, skills: ['Project Management', 'Agile'], latitude: 37.7851, longitude: -122.4064 },
+  { id: 'u3', name: 'Sam Wilson', username: 'samwilson', avatarUrl: 'https://picsum.photos/seed/user3/100/100', badges: [], profileCompleteness: 0, interests: ['Reading', 'Baking'], latitude: 37.7915, longitude: -122.3951 },
+  { id: 'u4', name: 'Maria Garcia', username: 'mariagarcia', avatarUrl: 'https://picsum.photos/seed/user4/100/100', badges: [], profileCompleteness: 0, isPrivate: true, latitude: 37.7634, longitude: -122.4357 },
+  { id: 'u5', name: 'Kenji Tanaka', username: 'kenjitanaka', avatarUrl: 'https://picsum.photos/seed/user5/100/100', badges: [], profileCompleteness: 0, latitude: 37.7510, longitude: -122.4190 },
+  { id: 'u6', name: 'Aisha Diallo', username: 'aishadiallo', avatarUrl: 'https://picsum.photos/seed/user6/100/100', badges: [], profileCompleteness: 0, latitude: 37.8044, longitude: -122.4194 },
+  { id: 'u7', name: 'Ethan Carter', username: 'ethancarter', avatarUrl: 'https://picsum.photos/seed/user7/100/100', badges: [], profileCompleteness: 0, latitude: 37.7749, longitude: -122.4494 },
 ];
 
 export const MOCK_STORIES: Story[] = MOCK_USERS.map((user, i) => ({
@@ -81,9 +84,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
 ];
 
 export const MOCK_COMMUNITIES: Community[] = [
-    { id: 'comm1', name: 'Tech Enthusiasts', description: 'A vibrant community for tech lovers to discuss the latest gadgets, software, and industry trends.', coverUrl: 'https://picsum.photos/seed/comm1/600/200', memberCount: 12345, isMember: true, members: MOCK_USERS.slice(0,5), posts: MOCK_POSTS.slice(0,2) },
-    { id: 'comm2', name: 'Book Club', description: 'Share your favorite reads and discover new authors with fellow bookworms.', coverUrl: 'https://picsum.photos/seed/comm2/600/200', memberCount: 5872, isMember: false, members: MOCK_USERS.slice(2,6), posts: MOCK_POSTS.slice(1,3) },
-    { id: 'comm3', name: 'Outdoor Adventures', description: 'For hikers, campers, and nature lovers. Share trails and tips.', coverUrl: 'https://picsum.photos/seed/comm3/600/200', memberCount: 8912, isMember: false, members: MOCK_USERS.slice(1,4), posts: MOCK_POSTS.slice(0,1) },
+    { id: 'comm1', name: 'Tech Enthusiasts', description: 'A vibrant community for tech lovers to discuss the latest gadgets, software, and industry trends.', coverUrl: 'https://picsum.photos/seed/comm1/600/200', memberCount: 12345, isMember: true, members: MOCK_USERS.slice(0,5), posts: MOCK_POSTS.slice(0,2), category: 'Technology', privacy: 'public', admins: ['u1', 'u2'] },
+    { id: 'comm2', name: 'Book Club', description: 'Share your favorite reads and discover new authors with fellow bookworms.', coverUrl: 'https://picsum.photos/seed/comm2/600/200', memberCount: 5872, isMember: false, members: MOCK_USERS.slice(2,6), posts: MOCK_POSTS.slice(1,3), category: 'Books', privacy: 'public', admins: ['u3'] },
+    { id: 'comm3', name: 'Outdoor Adventures', description: 'For hikers, campers, and nature lovers. Share trails and tips.', coverUrl: 'https://picsum.photos/seed/comm3/600/200', memberCount: 8912, isMember: false, members: MOCK_USERS.slice(1,4), posts: MOCK_POSTS.slice(0,1), category: 'Outdoors', privacy: 'private', admins: ['u1'] },
 ];
 
 export const MOCK_NOTIFICATIONS: Notification[] = [
@@ -105,6 +108,7 @@ export const COUNTRIES = [
     { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
 ];
 
+export const COMMUNITY_CATEGORIES = ['Technology', 'Books', 'Outdoors', 'Social', 'Art', 'Music', 'Gaming', 'Health'];
 
 export const JamiiSpotFullLogo: React.FC<{ className?: string }> = ({ className }) => (
     <img 
@@ -226,4 +230,16 @@ export const HelpCircleIcon: React.FC<{ className?: string }> = ({ className }) 
 );
 export const SendIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+);
+export const MapIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+);
+export const MoreVerticalIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+);
+export const CheckBadgeIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3.85 8.62a4 4 0 0 1 4.78-4.78l.22.22a.68.68 0 0 0 .96.02l2.74-2.74a.68.68 0 0 1 .96 0l2.74 2.74a.68.68 0 0 0 .96-.02l.22-.22a4 4 0 0 1 4.78 4.78l-.22.22a.68.68 0 0 0-.02.96l2.74 2.74a.68.68 0 0 1 0 .96l-2.74 2.74a.68.68 0 0 0 .02.96l.22.22a4 4 0 0 1-4.78 4.78l-.22-.22a.68.68 0 0 0-.96-.02l-2.74-2.74a.68.68 0 0 1-.96 0l-2.74 2.74a.68.68 0 0 0-.96.02l-.22.22a4 4 0 0 1-4.78-4.78l.22-.22a.68.68 0 0 0 .02-.96l-2.74-2.74a.68.68 0 0 1 0-.96l2.74-2.74a.68.68 0 0 0-.02-.96z" />
+        <path d="m9 12 2 2 4-4" />
+    </svg>
 );
