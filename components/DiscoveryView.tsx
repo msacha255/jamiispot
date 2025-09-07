@@ -52,35 +52,60 @@ const SuggestedUserCard: React.FC<{user: User, isFollowing: boolean, onToggleFol
     </div>
 );
 
-const UpcomingEventCard: React.FC<{event: Event, onCommunitySelect: () => void, onOpenEventDetail: (event: Event) => void}> = ({ event, onCommunitySelect, onOpenEventDetail }) => (
-    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-4 flex gap-4 cursor-pointer hover:-translate-y-1 transition-transform duration-300" onClick={() => onOpenEventDetail(event)}>
-        <div className="flex flex-col items-center justify-center bg-primary/10 text-primary w-16 h-16 rounded-lg flex-shrink-0">
-            <span className="text-xs font-bold uppercase">{new Date(event.date).toLocaleString('default', { month: 'short' })}</span>
-            <span className="text-2xl font-bold">{new Date(event.date).getDate()}</span>
-        </div>
-        <div>
-            <h4 className="font-bold truncate">{event.title}</h4>
-            <p className="text-sm text-primary font-semibold mt-1 cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); onCommunitySelect() }}>{event.communityName}</p>
-            <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mt-2">
-                <span className="flex items-center gap-1.5">
-                    <ClockIcon className="w-3.5 h-3.5" />
-                    {event.time}
-                </span>
-                <span className="flex items-center gap-1.5">
-                    <MapPinIcon className="w-3.5 h-3.5" />
-                    {event.location}
-                </span>
+const UpcomingEventCard: React.FC<{event: Event, onCommunitySelect: () => void, onOpenEventDetail: (event: Event) => void}> = ({ event, onCommunitySelect, onOpenEventDetail }) => {
+    const eventDate = new Date(event.date);
+
+    return (
+        <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+            <div className="p-4">
+                <div className="flex items-center gap-4 mb-3">
+                    <div className="flex flex-col items-center justify-center bg-primary/10 text-primary w-14 h-14 rounded-lg flex-shrink-0">
+                        <span className="text-xs font-bold uppercase">{eventDate.toLocaleString('default', { month: 'short' })}</span>
+                        <span className="text-2xl font-bold">{eventDate.getDate()}</span>
+                    </div>
+                    <div>
+                        <h4 className="font-bold leading-tight group-hover:text-primary transition-colors cursor-pointer" onClick={() => onOpenEventDetail(event)}>{event.title}</h4>
+                    </div>
+                </div>
+                <div className="space-y-1.5 text-sm text-gray-500 dark:text-gray-400 pl-1">
+                    <p className="flex items-center gap-2">
+                        <ClockIcon className="w-4 h-4" />
+                        <span>{eventDate.toLocaleDateString(undefined, { weekday: 'long' })}, {event.time}</span>
+                    </p>
+                    <p className="flex items-center gap-2">
+                        <MapPinIcon className="w-4 h-4" />
+                        <span>{event.location}</span>
+                    </p>
+                </div>
+            </div>
+            <div className="bg-light-gray/50 dark:bg-zinc-700/20 px-4 py-3 border-t border-gray-200 dark:border-zinc-700 flex items-center justify-between">
+                <div 
+                    className="flex items-center gap-2 cursor-pointer"
+                    onClick={(e) => { e.stopPropagation(); onCommunitySelect(); }}
+                >
+                    <img src={event.creator.avatarUrl} alt={event.creator.name} className="w-8 h-8 rounded-full" />
+                    <div>
+                        <p className="text-xs text-gray-500">Hosted By</p>
+                        <p className="text-sm font-semibold text-deep-gray dark:text-gray-200 hover:underline">{event.communityName}</p>
+                    </div>
+                </div>
+                <button
+                    onClick={() => onOpenEventDetail(event)}
+                    className="bg-primary text-white font-semibold px-4 py-1.5 rounded-lg text-sm hover:bg-orange-600 transition-colors shadow-sm"
+                >
+                    Attend
+                </button>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 
 export const DiscoveryView: React.FC<DiscoveryViewProps> = ({ communities, events, suggestedUsers, onCommunitySelect, onOpenCreateCommunity, followingIds, onToggleFollow, onOpenProfileModal, onOpenEventDetail, onNavigate }) => {
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     
     const filteredCommunities = activeCategory ? communities.filter(c => c.category === activeCategory) : communities;
-    const upcomingEvents = events.filter(e => new Date(e.date) > new Date()).slice(0, 4);
+    const upcomingEvents = events.filter(e => new Date(e.date) > new Date()).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(0, 4);
 
     return (
         <div className="max-w-7xl mx-auto space-y-10">
