@@ -40,6 +40,7 @@ import { EventDetailModal } from './components/EventDetailModal';
 import { MarketplaceDetailModal } from './components/MarketplaceDetailModal';
 import { CreateListingModal } from './components/CreateListingModal';
 import { MarketplaceListingDetailModal } from './components/MarketplaceListingDetailModal';
+import { EventMapView } from './components/EventMapView';
 
 import type { View, Post, User, Story, Community, Conversation, Notification, Permissions, Language, Comment, Event, Message, FeedItem, MarketplaceListing } from './types';
 import { MOCK_USERS, MOCK_POSTS, MOCK_STORIES, MOCK_COMMUNITIES, MOCK_CONVERSATIONS, MOCK_NOTIFICATIONS, SUPPORTED_LANGUAGES, MOCK_MARKETPLACE_LISTINGS } from './constants';
@@ -488,9 +489,9 @@ const App: React.FC = () => {
       case 'feed':
         return <FeedView feedItems={feedItems} stories={filteredStories} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenCreateStory={() => setCreateStoryModalOpen(true)} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenEventDetail={handleOpenEventDetail} {...commonPostHandlers} />;
       case 'discover':
-        const allEvents = communities.flatMap(c => c.events);
+        const allEvents = communities.flatMap(c => c.events || []);
         const suggestedUsers = MOCK_USERS.filter(u => u.id !== currentUser.id && !followingIds.has(u.id));
-        return <DiscoveryView communities={communities} events={allEvents} suggestedUsers={suggestedUsers} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenCreateCommunity={() => setCreateCommunityModalOpen(true)} currentUser={currentUser} followingIds={followingIds} onToggleFollow={handleToggleFollow} onOpenProfileModal={handleOpenProfileModal} onOpenEventDetail={handleOpenEventDetail} />;
+        return <DiscoveryView communities={communities} events={allEvents} suggestedUsers={suggestedUsers} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenCreateCommunity={() => setCreateCommunityModalOpen(true)} currentUser={currentUser} followingIds={followingIds} onToggleFollow={handleToggleFollow} onOpenProfileModal={handleOpenProfileModal} onOpenEventDetail={handleOpenEventDetail} onNavigate={handleNavigate} />;
       case 'community-detail':
         const community = communities.find(c => c.id === activeParams?.communityId);
         if (!community) return <div className="text-center p-8">Community not found</div>;
@@ -517,6 +518,9 @@ const App: React.FC = () => {
         return <SettingsView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onLogout={handleLogout} onOpenPrivacyModal={() => setPrivacyModalOpen(true)} onOpenPermissionsModal={() => setPermissionsModalOpen(true)} onOpenHelpSupportModal={() => setHelpSupportModalOpen(true)} onOpenBlockedUsers={() => setBlockedUsersModalOpen(true)} onOpenVerification={() => setVerificationModalOpen(true)} onOpenLanguageModal={() => setLanguageModalOpen(true)} onOpenShareModal={() => setShareModalOpen(true)} language={language} onOpenSecurityModal={() => setSecurityModalOpen(true)} />;
       case 'marketplace':
         return <MarketplaceView onCategorySelect={handleOpenMarketplaceCategory} onOpenCreateListing={() => setCreateListingModalOpen(true)} />;
+      case 'event-map':
+        const allEventsForMap = communities.flatMap(c => c.events || []);
+        return <EventMapView events={allEventsForMap} communities={communities} onOpenEventDetail={handleOpenEventDetail} />;
       default:
         return <FeedView feedItems={feedItems} stories={stories} currentUser={currentUser} onOpenCreatePost={() => setCreatePostModalOpen(true)} onOpenCreateStory={() => setCreateStoryModalOpen(true)} onCommunitySelect={(id) => handleNavigate('community-detail', { communityId: id })} onOpenEventDetail={handleOpenEventDetail} {...commonPostHandlers} />;
     }

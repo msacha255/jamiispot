@@ -92,6 +92,8 @@ export interface Event {
     time: string;
     location: string;
     creator: User;
+    latitude?: number;
+    longitude?: number;
 }
 
 export type FeedItem = (Post & { type: 'post' }) | (Event & { type: 'event' });
@@ -151,4 +153,4 @@ export interface MarketplaceListing {
   seller: User;
 }
 
-export type View = 'feed' | 'discover' | 'messages' | 'notifications' | 'profile' | 'settings' | 'community-detail' | 'edit-profile' | 'marketplace';
+export type View = 'feed' | 'discover' | 'messages' | 'notifications' | 'profile' | 'settings' | 'community-detail' | 'edit-profile' | 'marketplace' | 'event-map';

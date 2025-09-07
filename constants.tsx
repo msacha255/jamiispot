@@ -124,15 +124,20 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
 ];
 
 export const MOCK_EVENTS: Event[] = [
-    { id: 'e1', communityId: 'comm1', communityName: 'Tech Innovators KE', title: 'Tech Meetup Nairobi', description: 'Join us for our monthly tech meetup. Networking, talks, and pizza!', date: '2024-08-15T18:00:00Z', time: '18:00', location: 'iHub, Nairobi', creator: MOCK_USERS[0] },
+    { id: 'e1', communityId: 'comm1', communityName: 'Tech Innovators KE', title: 'Tech Meetup Nairobi', description: 'Join us for our monthly tech meetup. Networking, talks, and pizza!', date: '2024-08-15T18:00:00Z', time: '18:00', location: 'iHub, Nairobi', creator: MOCK_USERS[0], latitude: -1.286389, longitude: 36.817223 },
     { id: 'e2', communityId: 'comm1', communityName: 'Tech Innovators KE', title: 'Web Development Workshop', description: 'A hands-on workshop on modern web dev tools.', date: '2024-09-05T10:00:00Z', time: '10:00', location: 'Online', creator: MOCK_USERS[1] },
+    { id: 'e3', communityId: 'comm2', communityName: 'Wapenzi wa Vitabu', title: 'Book Club Meetup', description: 'Discussing "The Housemaid" by Freida McFadden.', date: '2024-08-20T16:00:00Z', time: '16:00', location: 'Jahazi Coffee House, Mombasa', creator: MOCK_USERS[2], latitude: -4.0629, longitude: 39.6725 },
+    { id: 'e4', communityId: 'comm3', communityName: 'Safari za Nje', title: 'Serengeti Photo Walk', description: 'Capture the beauty of the Serengeti at sunrise.', date: '2024-09-10T06:00:00Z', time: '06:00', location: 'Serengeti National Park', creator: MOCK_USERS[1], latitude: -2.3333, longitude: 34.8333 },
+    { id: 'e5', communityId: 'comm3', communityName: 'Safari za Nje', title: 'Hike to Ngong Hills', description: 'A beautiful day hike just outside Nairobi.', date: '2024-08-18T08:00:00Z', time: '08:00', location: 'Ngong Hills', creator: MOCK_USERS[4], latitude: -1.3722, longitude: 36.6500 },
+    { id: 'e6', communityId: 'comm2', communityName: 'Wapenzi wa Vitabu', title: 'Poetry Night', description: 'An open mic poetry night.', date: '2024-08-15T19:00:00Z', time: '19:00', location: 'Kwani Trust, Nairobi', creator: MOCK_USERS[5], latitude: -1.2742, longitude: 36.8153 },
+    { id: 'e7', communityId: 'comm1', communityName: 'Tech Innovators KE', title: 'Startup Pitch Night', description: 'Watch the latest startups pitch their ideas.', date: '2024-09-01T18:30:00Z', time: '18:30', location: 'Nairobi Garage', creator: MOCK_USERS[6], latitude: -1.2921, longitude: 36.8219 },
 ];
 
 
 export const MOCK_COMMUNITIES: Community[] = [
-    { id: 'comm1', name: 'Tech Innovators KE', description: 'Jumuiya ya wapenzi wa teknolojia kujadili vifaa vipya, programu, na habari za viwanda.', coverUrl: 'https://picsum.photos/seed/comm1/600/200', memberCount: 12345, isMember: true, members: MOCK_USERS.slice(0,5), posts: MOCK_POSTS.slice(0,2), category: 'Technology', privacy: 'public', admins: ['u1', 'u2'], events: MOCK_EVENTS },
-    { id: 'comm2', name: 'Wapenzi wa Vitabu', description: 'Shiriki vitabu unavyopenda na gundua waandishi wapya na wapenzi wengine wa vitabu.', coverUrl: 'https://picsum.photos/seed/comm2/600/200', memberCount: 5872, isMember: false, members: MOCK_USERS.slice(2,6), posts: MOCK_POSTS.slice(1,3), category: 'Books', privacy: 'public', admins: ['u3'], events: [] },
-    { id: 'comm3', name: 'Safari za Nje', description: 'Kwa wapanda milima, wapiga kambi, na wapenzi wa asili. Shiriki njia na vidokezo.', coverUrl: 'https://picsum.photos/seed/comm3/600/200', memberCount: 8912, isMember: true, members: MOCK_USERS.slice(1,4), posts: MOCK_POSTS.slice(0,1), category: 'Outdoors', privacy: 'private', admins: ['u1'], events: [] },
+    { id: 'comm1', name: 'Tech Innovators KE', description: 'Jumuiya ya wapenzi wa teknolojia kujadili vifaa vipya, programu, na habari za viwanda.', coverUrl: 'https://picsum.photos/seed/comm1/600/200', memberCount: 12345, isMember: true, members: MOCK_USERS.slice(0,5), posts: MOCK_POSTS.slice(0,2), category: 'Technology', privacy: 'public', admins: ['u1', 'u2'], events: MOCK_EVENTS.filter(e => e.communityId === 'comm1') },
+    { id: 'comm2', name: 'Wapenzi wa Vitabu', description: 'Shiriki vitabu unavyopenda na gundua waandishi wapya na wapenzi wengine wa vitabu.', coverUrl: 'https://picsum.photos/seed/comm2/600/200', memberCount: 5872, isMember: false, members: MOCK_USERS.slice(2,6), posts: MOCK_POSTS.slice(1,3), category: 'Books', privacy: 'public', admins: ['u3'], events: MOCK_EVENTS.filter(e => e.communityId === 'comm2') },
+    { id: 'comm3', name: 'Safari za Nje', description: 'Kwa wapanda milima, wapiga kambi, na wapenzi wa asili. Shiriki njia na vidokezo.', coverUrl: 'https://picsum.photos/seed/comm3/600/200', memberCount: 8912, isMember: true, members: MOCK_USERS.slice(1,4), posts: MOCK_POSTS.slice(0,1), category: 'Outdoors', privacy: 'private', admins: ['u1'], events: MOCK_EVENTS.filter(e => e.communityId === 'comm3') },
 ];
 
 export const MOCK_NOTIFICATIONS: Notification[] = [
@@ -434,7 +439,7 @@ export const ComputerIcon: React.FC<{ className?: string }> = ({ className }) =>
 export const CakeIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
         <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/>
-        <path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"/>
+        <path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4 2 2.5 2 4 2 2-1 2-1"/>
         <path d="M2 21h20"/>
         <path d="M7 8v2"/>
         <path d="M12 8v2"/>

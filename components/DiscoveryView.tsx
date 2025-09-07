@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { COMMUNITY_CATEGORIES, UsersIcon, PlusIcon, CalendarDaysIcon } from '../constants';
-import type { Community, Event, User } from '../types';
+import { COMMUNITY_CATEGORIES, UsersIcon, PlusIcon, CalendarDaysIcon, MapIcon } from '../constants';
+import type { Community, Event, User, View } from '../types';
 
 interface DiscoveryViewProps {
     communities: Community[];
@@ -13,6 +13,7 @@ interface DiscoveryViewProps {
     onToggleFollow: (userId: string) => void;
     onOpenProfileModal: (user: User) => void;
     onOpenEventDetail: (event: Event) => void;
+    onNavigate: (view: View, params?: any) => void;
 }
 
 const FeaturedCommunityCard: React.FC<{ community: Community, onClick: () => void }> = ({ community, onClick }) => (
@@ -65,7 +66,7 @@ const UpcomingEventCard: React.FC<{event: Event, onCommunitySelect: () => void, 
 );
 
 
-export const DiscoveryView: React.FC<DiscoveryViewProps> = ({ communities, events, suggestedUsers, onCommunitySelect, onOpenCreateCommunity, followingIds, onToggleFollow, onOpenProfileModal, onOpenEventDetail }) => {
+export const DiscoveryView: React.FC<DiscoveryViewProps> = ({ communities, events, suggestedUsers, onCommunitySelect, onOpenCreateCommunity, followingIds, onToggleFollow, onOpenProfileModal, onOpenEventDetail, onNavigate }) => {
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     
     const filteredCommunities = activeCategory ? communities.filter(c => c.category === activeCategory) : communities;
@@ -77,37 +78,74 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({ communities, event
                  <h1 className="text-3xl font-display font-bold text-deep-gray dark:text-white">Discover</h1>
                  <button onClick={onOpenCreateCommunity} className="bg-primary text-white font-semibold px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors shadow-sm self-start sm:self-auto">
                     <PlusIcon className="w-5 h-5"/>
-                    <span className="hidden sm:inline">Create Community</span>
+                    <span>Create Community</span>
                  </button>
             </div>
+
+            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-6 cursor-pointer hover:-translate-y-1 transition-transform duration-300" onClick={() => onNavigate('event-map')}>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                    <div className="bg-primary/10 text-primary p-4 rounded-lg">
+                        <MapIcon className="w-10 h-10" />
+                    </div>
+                    <div className="flex-1">
+                        <h2 className="text-xl font-bold">Event Map</h2>
+                        <p className="text-gray-600 dark:text-gray-400 mt-1">Discover local events visually on an interactive map. Filter by date, community, and more to find what's happening near you.</p>
+                    </div>
+                    <button className="bg-primary text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-600 transition-colors shadow-sm self-start sm:self-center">
+                        Open Map
+                    </button>
+                </div>
+            </div>
+
+            <section>
+                <h2 className="text-2xl font-bold font-display mb-4">Featured Communities</h2>
+                 <div className="flex space-x-4 overflow-x-auto pb-4 -mx-4 px-4">
+                    {communities.slice(0,5).map(community => <FeaturedCommunityCard key={community.id} community={community} onClick={() => onCommunitySelect(community.id)} />)}
+                </div>
+            </section>
             
-            {suggestedUsers.length > 0 && (
-                <div>
-                    <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                        <UsersIcon className="w-6 h-6 text-primary"/>
-                        People You May Know
-                    </h2>
-                    <div className="flex gap-4 overflow-x-auto pb-4">
+            <section>
+                 <h2 className="text-2xl font-bold font-display mb-4">Explore by Category</h2>
+                 <div className="flex flex-wrap gap-3">
+                    <CategoryButton name="All" isActive={!activeCategory} onClick={() => setActiveCategory(null)} />
+                    {COMMUNITY_CATEGORIES.map(cat => (
+                        <CategoryButton key={cat} name={cat} isActive={activeCategory === cat} onClick={() => setActiveCategory(cat)} />
+                    ))}
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                    {filteredCommunities.map(community => (
+                        <div key={community.id} onClick={() => onCommunitySelect(community.id)} className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-700/50 transition-colors">
+                            <img src={community.coverUrl} alt={community.name} className="w-16 h-16 rounded-lg object-cover"/>
+                            <div>
+                                <h3 className="font-bold">{community.name}</h3>
+                                <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    <UsersIcon className="w-4 h-4 mr-1.5" />
+                                    <span>{community.memberCount.toLocaleString()} members</span>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                 </div>
+            </section>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <section className="lg:col-span-2">
+                     <h2 className="text-2xl font-bold font-display mb-4">Suggested For You</h2>
+                     <div className="flex space-x-4 overflow-x-auto pb-4 -mx-4 px-4">
                         {suggestedUsers.map(user => (
                             <SuggestedUserCard 
-                                key={user.id}
-                                user={user}
+                                key={user.id} 
+                                user={user} 
                                 isFollowing={followingIds.has(user.id)}
                                 onToggleFollow={() => onToggleFollow(user.id)}
                                 onOpenProfile={() => onOpenProfileModal(user)}
                             />
                         ))}
                     </div>
-                </div>
-            )}
-            
-            {upcomingEvents.length > 0 && (
-                 <div>
-                    <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                        <CalendarDaysIcon className="w-6 h-6 text-primary"/>
-                        Upcoming Events
-                    </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                </section>
+                <section>
+                    <h2 className="text-2xl font-bold font-display mb-4">Upcoming Events</h2>
+                    <div className="space-y-4">
                         {upcomingEvents.map(event => (
                             <UpcomingEventCard 
                                 key={event.id}
@@ -117,30 +155,9 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({ communities, event
                             />
                         ))}
                     </div>
-                </div>
-            )}
-
-            <div>
-                <h2 className="text-xl font-bold mb-4">Categories</h2>
-                <div className="flex gap-2 overflow-x-auto pb-4">
-                    <CategoryButton name="View All" isActive={!activeCategory} onClick={() => setActiveCategory(null)} />
-                    {COMMUNITY_CATEGORIES.map(cat => <CategoryButton key={cat} name={cat} isActive={cat === activeCategory} onClick={() => setActiveCategory(cat)} />)}
-                </div>
+                </section>
             </div>
 
-            <div>
-                 <h2 className="text-xl font-bold mb-4">{activeCategory ? `${activeCategory} Communities` : 'Featured Communities'}</h2>
-                 {filteredCommunities.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {filteredCommunities.map(c => <FeaturedCommunityCard key={c.id} community={c} onClick={() => onCommunitySelect(c.id)} />)}
-                    </div>
-                 ) : (
-                    <div className="text-center py-10 text-gray-500 dark:text-gray-400 bg-white dark:bg-zinc-800 rounded-xl shadow-sm">
-                        <p className="font-semibold">No communities found</p>
-                        <p className="mt-1 text-sm">There are no communities in this category yet. Why not create one?</p>
-                    </div>
-                 )}
-            </div>
         </div>
     );
 };
