@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { COMMUNITY_CATEGORIES, UsersIcon, PlusIcon, CalendarDaysIcon, MapIcon } from '../constants';
+import { COMMUNITY_CATEGORIES, UsersIcon, PlusIcon, CalendarDaysIcon, MapIcon, ClockIcon, MapPinIcon } from '../constants';
 import type { Community, Event, User, View } from '../types';
 
 interface DiscoveryViewProps {
@@ -61,6 +61,16 @@ const UpcomingEventCard: React.FC<{event: Event, onCommunitySelect: () => void, 
         <div>
             <h4 className="font-bold truncate">{event.title}</h4>
             <p className="text-sm text-primary font-semibold mt-1 cursor-pointer hover:underline" onClick={(e) => { e.stopPropagation(); onCommunitySelect() }}>{event.communityName}</p>
+            <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mt-2">
+                <span className="flex items-center gap-1.5">
+                    <ClockIcon className="w-3.5 h-3.5" />
+                    {event.time}
+                </span>
+                <span className="flex items-center gap-1.5">
+                    <MapPinIcon className="w-3.5 h-3.5" />
+                    {event.location}
+                </span>
+            </div>
         </div>
     </div>
 );

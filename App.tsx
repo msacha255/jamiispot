@@ -59,6 +59,7 @@ const App: React.FC = () => {
   const [followingIds, setFollowingIds] = useState<Set<string>>(new Set(['u2', 'u3']));
   const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set(['p1']));
   const [language, setLanguage] = useState<Language>(SUPPORTED_LANGUAGES[0]);
+  const [fontSize, setFontSize] = useState(1); // 0: small, 1: medium, 2: large
   const [permissions, setPermissions] = useState<Permissions>({
     camera: true,
     location: false,
@@ -115,6 +116,15 @@ const App: React.FC = () => {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDarkMode);
   }, [isDarkMode]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    switch (fontSize) {
+      case 0: root.style.fontSize = '14px'; break;
+      case 2: root.style.fontSize = '18px'; break;
+      default: root.style.fontSize = '16px'; break;
+    }
+  }, [fontSize]);
   
   useEffect(() => {
     // Simulate a push notification on app load
@@ -515,7 +525,7 @@ const App: React.FC = () => {
       case 'edit-profile':
         return <EditProfileView user={currentUser} onUpdateUser={handleUpdateUser} onCancel={handleBack} />;
       case 'settings':
-        return <SettingsView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onLogout={handleLogout} onOpenPrivacyModal={() => setPrivacyModalOpen(true)} onOpenPermissionsModal={() => setPermissionsModalOpen(true)} onOpenHelpSupportModal={() => setHelpSupportModalOpen(true)} onOpenBlockedUsers={() => setBlockedUsersModalOpen(true)} onOpenVerification={() => setVerificationModalOpen(true)} onOpenLanguageModal={() => setLanguageModalOpen(true)} onOpenShareModal={() => setShareModalOpen(true)} language={language} onOpenSecurityModal={() => setSecurityModalOpen(true)} />;
+        return <SettingsView isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onLogout={handleLogout} onOpenPrivacyModal={() => setPrivacyModalOpen(true)} onOpenPermissionsModal={() => setPermissionsModalOpen(true)} onOpenHelpSupportModal={() => setHelpSupportModalOpen(true)} onOpenBlockedUsers={() => setBlockedUsersModalOpen(true)} onOpenVerification={() => setVerificationModalOpen(true)} onOpenLanguageModal={() => setLanguageModalOpen(true)} onOpenShareModal={() => setShareModalOpen(true)} language={language} onOpenSecurityModal={() => setSecurityModalOpen(true)} fontSize={fontSize} setFontSize={setFontSize} />;
       case 'marketplace':
         return <MarketplaceView onCategorySelect={handleOpenMarketplaceCategory} onOpenCreateListing={() => setCreateListingModalOpen(true)} />;
       case 'event-map':

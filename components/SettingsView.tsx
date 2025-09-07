@@ -17,6 +17,8 @@ interface SettingsViewProps {
     onOpenShareModal: () => void;
     language: Language;
     onOpenSecurityModal: () => void;
+    fontSize: number;
+    setFontSize: (size: number) => void;
 }
 
 const translations = {
@@ -61,7 +63,7 @@ const SettingsToggle: React.FC<{label: string; enabled: boolean; onToggle: () =>
 );
 
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout, onOpenPrivacyModal, onOpenPermissionsModal, onOpenHelpSupportModal, onOpenBlockedUsers, onOpenVerification, onOpenLanguageModal, onOpenShareModal, language, onOpenSecurityModal }) => {
+export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDarkMode, onLogout, onOpenPrivacyModal, onOpenPermissionsModal, onOpenHelpSupportModal, onOpenBlockedUsers, onOpenVerification, onOpenLanguageModal, onOpenShareModal, language, onOpenSecurityModal, fontSize, setFontSize }) => {
     const [isNotificationsExpanded, setNotificationsExpanded] = useState(false);
     const [notificationPrefs, setNotificationPrefs] = useState({ likes: true, comments: true, follows: false });
     const t = useTranslation(language.code);
@@ -127,6 +129,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ isDarkMode, setIsDar
                         enabled={isDarkMode}
                         onToggle={() => setIsDarkMode(!isDarkMode)}
                     />
+                    <div className="flex justify-between items-center py-3">
+                        <p className="font-semibold text-deep-gray dark:text-white">Font Size</p>
+                        <div className="flex items-center gap-1 bg-gray-200 dark:bg-zinc-700 p-1 rounded-lg">
+                            <button onClick={() => setFontSize(0)} className={`px-3 py-1 text-sm font-semibold rounded ${fontSize === 0 ? 'bg-white dark:bg-zinc-600 shadow' : ''}`} aria-label="Small font size">A</button>
+                            <button onClick={() => setFontSize(1)} className={`px-3 py-1 text-base font-semibold rounded ${fontSize === 1 ? 'bg-white dark:bg-zinc-600 shadow' : ''}`} aria-label="Medium font size">A</button>
+                            <button onClick={() => setFontSize(2)} className={`px-3 py-1 text-lg font-semibold rounded ${fontSize === 2 ? 'bg-white dark:bg-zinc-600 shadow' : ''}`} aria-label="Large font size">A</button>
+                        </div>
+                    </div>
                 </div>
                  <div className="p-6">
                     <h2 className="text-xl font-bold mb-2">Account</h2>
